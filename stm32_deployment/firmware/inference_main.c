@@ -6,7 +6,7 @@
  *
  * Hardware configuration:
  *   Board  : NUCLEO-H723ZG
- *   Core   : ARM Cortex-M7 @ 550 MHz
+ *   Core   : ARM Cortex-M7 @ 544 MHz
  *   Flash  : 1024 KB (program + X-CUBE-AI weights)
  *   SRAM   : 564 KB (activations, buffers)
  *
@@ -123,7 +123,7 @@ static int argmax_logsoftmax(float *scores, int n, float *out_confidence)
 void inference_main(void)
 {
     printf("\r\n=== DSC-AMCNet Inference on STM32H723ZG ===\r\n");
-    printf("    Core: Cortex-M7 @ 550 MHz\r\n");
+    printf("    Core: Cortex-M7 @ 544 MHz\r\n");
     printf("    Model: DSC-AMCNet INT8 (X-CUBE-AI 10.2.0)\r\n\r\n");
 
     /* Initialise DWT */

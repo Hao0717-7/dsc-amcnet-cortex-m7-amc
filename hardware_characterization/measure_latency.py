@@ -16,8 +16,8 @@ Usage
 Produces a CSV with columns: timestamp, mean_ms, min_ms, max_ms, n_inferences
 
 Paper result:
-    DSC-AMCNet INT8 : mean = 1.183 ms @ 550 MHz
-    ULCNN-simp INT8 : mean = 2.104 ms @ 550 MHz
+    DSC-AMCNet INT8 : mean = 1.183 ms @ 544 MHz
+    ULCNN-simp INT8 : mean = 2.104 ms @ 544 MHz
     Speedup         : 1.78×
 """
 
@@ -102,7 +102,7 @@ def summarize(csv_path: Path):
     print(f"  Measurements   : {len(means)}")
     print(f"  Overall mean   : {statistics.mean(means):.3f} ms")
     print(f"  Std dev        : {statistics.stdev(means):.4f} ms" if len(means) > 1 else "")
-    print(f"\n  Paper value    : 1.183 ms (DSC-AMCNet INT8, 550 MHz)")
+    print(f"\n  Paper value    : 1.183 ms (DSC-AMCNet INT8, 544 MHz)")
 
 
 if __name__ == "__main__":

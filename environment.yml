@@ -14,7 +14,7 @@ dependencies:
   - tqdm>=4.65.0
   - pip
   - pip:
-    - onnx>=1.16.0
+    - onnx>=1.26.0
     - onnxruntime>=1.18.0
     - pyrtlsdr>=0.3.0
     - pyserial>=3.5

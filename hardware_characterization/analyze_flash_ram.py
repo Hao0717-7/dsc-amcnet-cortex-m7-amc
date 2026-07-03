@@ -30,7 +30,7 @@ Usage
 
 Paper values (locked, silicon-measured):
     DSC-AMCNet INT8  : Flash = 51.26 KB, RAM = 12.09 KB
-    ULCNN-simp INT8  : Flash = 44.26 KB, RAM = 36.78 KB
+    ULCNN-simp INT8  : Flash = 49.25 KB, RAM = 36.78 KB
 """
 
 import argparse
@@ -43,7 +43,7 @@ from pathlib import Path
 # Expected values from paper (Table IV)
 EXPECTED = {
     "dscamcnet": {"flash_kb": 51.26, "ram_kb": 12.09},
-    "ulcnn":     {"flash_kb": 44.26, "ram_kb": 36.78},
+    "ulcnn":     {"flash_kb": 49.25, "ram_kb": 36.78},
 }
 TOLERANCE_KB = 0.5   # Acceptable delta (rounding differences across tool versions)
 

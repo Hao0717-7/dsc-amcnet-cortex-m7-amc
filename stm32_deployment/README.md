@@ -1,7 +1,7 @@
 # STM32 Deployment
 
 Step-by-step instructions to deploy DSC-AMCNet INT8 on the NUCLEO-H723ZG
-using STM32CubeIDE 1.15.x and X-CUBE-AI 10.2.0 (ST Edge AI Core 2.2.0).
+using STM32CubeIDE 2.1.1 and X-CUBE-AI 10.2.0 (ST Edge AI Core 2.2.0).
 
 ---
 
@@ -9,13 +9,13 @@ using STM32CubeIDE 1.15.x and X-CUBE-AI 10.2.0 (ST Edge AI Core 2.2.0).
 
 | Tool | Version | Notes |
 |---|---|---|
-| STM32CubeIDE | 1.15.x | Available at st.com |
+| STM32CubeIDE | 2.1.1 | Available at st.com |
 | X-CUBE-AI | 10.2.0 | Install via CubeMX Embedded Software |
 | ST Edge AI Core | 2.2.0 | CLI: `stedgeai` |
 | STM32CubeMX | 6.11.x | Bundled with CubeIDE |
 | Arm GCC | 12.3 | Bundled with CubeIDE |
 
-**Board:** NUCLEO-H723ZG (STM32H723ZG, Cortex-M7, 550 MHz, 1 MB Flash, 564 KB RAM)
+**Board:** NUCLEO-H723ZG (STM32H723ZG, Cortex-M7, 544 MHz, 1 MB Flash, 564 KB RAM)
 
 ---
 
@@ -26,7 +26,7 @@ Before importing into X-CUBE-AI, confirm the ONNX was generated with the
 
 ```bash
 python quantization/validate_backend.py \
-    --checkpoint models/checkpoints/dscamcnet_best.pth \
+    --checkpoint models/checkpoints/dscamcnet_best.pt \
     --data datasets/RML2016.10a_dict.dat \
     --split datasets/split_indices.npz
 ```
@@ -48,7 +48,7 @@ stedgeai analyze \
     quantization/outputs/dscamcnet_int8.onnx
 ```
 
-Expected output (paper Table IV):
+Expected output (paper Table II):
 ```
 Flash usage  : 51.26 KB
 RAM usage    : 12.09 KB
@@ -68,11 +68,11 @@ If Flash or RAM differs, recheck the ONNX (wrong backend or architecture variant
 
 ---
 
-## Step 4: Configure Clock (550 MHz)
+## Step 4: Configure Clock (544 MHz)
 
 In CubeMX (double-click the `.ioc` file):
 
-1. **RCC:** HCLK = 550 MHz (PLL1, HSE 8 MHz input)
+1. **RCC:** SYSCLK = 544 MHz, VOS0 (PLL1 from HSE 8 MHz: M=2, N=136, P=1; paper Table I)
 2. **USART3:** Enable, Mode = Asynchronous, Baud = 115200
    - PA8 = USART3_TX, PB11 = USART3_RX
    - Redirect `printf` via USART3: add `syscalls.c` with `__io_putchar`
@@ -122,7 +122,7 @@ In `Core/Src/main.c`, add to the main loop:
 // ...
 int main(void) {
     HAL_Init();
-    SystemClock_Config();   // ensures 550 MHz
+    SystemClock_Config();   // ensures 544 MHz
     MX_USART3_UART_Init();
     inference_main();       // does not return
 }
@@ -147,7 +147,7 @@ Connect USART3 (115200 8N1) via USB-UART or STLink VCP:
 
 ```
 === DSC-AMCNet Inference on STM32H723ZG ===
-    Core: Cortex-M7 @ 550 MHz
+    Core: Cortex-M7 @ 544 MHz
     Model: DSC-AMCNet INT8 (X-CUBE-AI 10.2.0)
 
 [AI] DSC-AMCNet INT8 initialised.
@@ -181,6 +181,6 @@ python hardware_characterization/measure_latency.py \
 |---|---|---|
 | Random classification output | Wrong ONNX backend (qnnpack) | Re-export with fbgemm |
 | Flash overflow | Wrong ONNX (FP32 instead of INT8) | Re-run ptq_quantize.py |
-| Latency >> 1.183 ms | Clock not 550 MHz | Check SystemClock_Config |
+| Latency >> 1.183 ms | Clock not 544 MHz | Check SystemClock_Config (M=2, N=136, P=1) |
 | DWT reads 0 | CoreDebug TRCENA not set | Ensure DWT_Init() called first |
 | No UART output | Printf not redirected | Add `__io_putchar` to syscalls.c |

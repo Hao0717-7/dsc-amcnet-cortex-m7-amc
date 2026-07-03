@@ -1,22 +1,42 @@
 """
 dsc_amcnet.py
 =============
-DSC-AMCNet: Depthwise Separable Convolutional AMC Network
+DSC-AMCNet: Depthwise Separable Convolutional AMC Network (4,961 parameters).
 
 Architecture derived from the ULCNN class via systematic ablation and
-Pareto width sweep. Designed for deployment on ARM Cortex-M7 (STM32H723ZG)
-via ST X-CUBE-AI with signed INT8 post-training quantization.
+Pareto width sweep (paper Sections V-VII). Designed for deployment on
+ARM Cortex-M7 (STM32H723ZG, 544 MHz) via ST Edge AI Core 2.2.0
+(X-CUBE-AI 10.2.0) with signed INT8 post-training quantization.
 
-Input:  (batch, 2, 128)  — 2-channel (I/Q) 1-D signal, 128 samples
-Output: (batch, 11)      — log-softmax over 11 RML2016.10a modulation classes
+Input:  (batch, 2, 128)  -- 2-channel (I/Q) 1-D signal, 128 samples,
+                            per-window L2-normalized (see normalize_window)
+Output: (batch, 11)      -- logits over 11 RML2016.10a modulation classes
 
 Classes (RML2016.10a):
     0: 8PSK   1: AM-DSB   2: AM-SSB   3: BPSK   4: CPFSK
     5: GFSK   6: PAM4     7: QAM16    8: QAM64  9: QPSK
     10: WBFM
 
-Paper: "DSC-AMCNet: A Depthwise Separable Architecture for Automatic
-       Modulation Classification on ARM Cortex-M7 Microcontrollers"
+Layer-by-layer specification (paper Table V):
+    Stem   PWC(2->24, k=1), BN, ReLU                    96 params
+    DSC-1  DWC(k=3, g=24), BN, ReLU;
+           PWC(24->24), BN, ReLU; MaxPool1d(2)         744 params
+    DSC-2  (same structure)                             744 params
+    DSC-3  (same structure)                             744 params
+    SE     GAP -> FC(24->6), ReLU;
+           FC(6->24), Sigmoid; channel scale            318 params
+    Shuffle channel shuffle (g=4)                         0 params
+    GAP    GlobalAvgPool1d                                0 params
+    FC-1   Linear(24->64), ReLU                       1,600 params
+    FC-2   Linear(64->11)                               715 params
+    Total                                             4,961 params
+
+State-dict key layout matches the released Zenodo checkpoint
+(dscamcnet_best.pt): stem.{0,1}, dsc{1,2,3}.{dw,bn1,pw,bn2},
+se.{fc1,fc2}, classifier.{0,3}.
+
+Paper: "DSC-AMCNet: Deployment-Guided Automatic Modulation Classification
+        on Bare-Metal MCU-Class IoT Devices" (IEEE IoT-J, under review, 2026).
 """
 
 import torch
@@ -24,174 +44,120 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# ---------------------------------------------------------------------------
-# Squeeze-and-Excitation (channel attention) block
-# ---------------------------------------------------------------------------
+def normalize_window(x: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
+    """Per-window L2 normalization used by DSC-AMCNet (paper Section III-C).
+
+    x: (..., 2, 128). The L2 norm is computed over the full 2x128 window.
+    """
+    flat = x.reshape(*x.shape[:-2], -1)
+    norm = flat.norm(p=2, dim=-1, keepdim=True).clamp_min(eps)
+    return (flat / norm).reshape_as(x)
+
+
 class SEBlock(nn.Module):
-    """
-    Squeeze-and-Excitation block.
+    """Squeeze-and-Excitation channel attention (r=4 -> 6-unit bottleneck).
 
-    NOTE: SE attention is beneficial for accuracy on synthetic RML2016.10a
-    but causes max-softmax overconfidence on OOD inputs (AUC = 0.000 for
-    anomaly detection). This is characterised in the paper as an honest
-    scientific finding. See supplementary/appendix_c_qat_failure.md.
+    FC layers include bias (paper Table V: SE = 150 + 168 = 318 params).
     """
 
-    def __init__(self, channels: int, reduction: int = 4):
+    def __init__(self, channels: int = 24, reduction: int = 4):
         super().__init__()
         mid = max(1, channels // reduction)
-        self.fc1 = nn.Linear(channels, mid, bias=False)
-        self.fc2 = nn.Linear(mid, channels, bias=False)
+        self.fc1 = nn.Linear(channels, mid, bias=True)
+        self.fc2 = nn.Linear(mid, channels, bias=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # x: (B, C, L)
-        s = x.mean(dim=2)              # global average pool → (B, C)
+        s = x.mean(dim=2)                # GAP -> (B, C)
         s = F.relu(self.fc1(s))
-        s = torch.sigmoid(self.fc2(s)) # (B, C)
+        s = torch.sigmoid(self.fc2(s))   # (B, C)
         return x * s.unsqueeze(2)
 
 
-# ---------------------------------------------------------------------------
-# Depthwise Separable Conv block
-# ---------------------------------------------------------------------------
-class DSCBlock(nn.Module):
-    """
-    Depthwise separable 1-D convolution block.
-    Replaces standard Conv1d to reduce multiply-accumulate operations
-    by ~(kernel_size / out_channels) relative to a full convolution.
-
-    Structure: DepthwiseConv → BN → ReLU → PointwiseConv → BN → ReLU
+class DSCStage(nn.Module):
+    """One depthwise-separable stage: DWC(k=3, g=C) -> BN -> ReLU ->
+    PWC(k=1) -> BN -> ReLU -> MaxPool1d(2). All convs bias-free.
     """
 
-    def __init__(
-        self,
-        in_channels: int,
-        out_channels: int,
-        kernel_size: int = 3,
-        padding: int = 1,
-    ):
+    def __init__(self, channels: int = 24, kernel_size: int = 3):
         super().__init__()
-        self.depthwise = nn.Conv1d(
-            in_channels, in_channels, kernel_size=kernel_size,
-            padding=padding, groups=in_channels, bias=False
-        )
-        self.bn1 = nn.BatchNorm1d(in_channels)
-        self.pointwise = nn.Conv1d(in_channels, out_channels, kernel_size=1, bias=False)
-        self.bn2 = nn.BatchNorm1d(out_channels)
+        self.dw = nn.Conv1d(channels, channels, kernel_size=kernel_size,
+                            padding=kernel_size // 2, groups=channels,
+                            bias=False)
+        self.bn1 = nn.BatchNorm1d(channels)
+        self.pw = nn.Conv1d(channels, channels, kernel_size=1, bias=False)
+        self.bn2 = nn.BatchNorm1d(channels)
+        self.pool = nn.MaxPool1d(kernel_size=2)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = F.relu(self.bn1(self.depthwise(x)))
-        x = F.relu(self.bn2(self.pointwise(x)))
-        return x
+        x = F.relu(self.bn1(self.dw(x)))
+        x = F.relu(self.bn2(self.pw(x)))
+        return self.pool(x)
 
 
-# ---------------------------------------------------------------------------
-# DSC-AMCNet
-# ---------------------------------------------------------------------------
+def channel_shuffle(x: torch.Tensor, groups: int = 4) -> torch.Tensor:
+    """Channel shuffle (g=4): reshape -> transpose -> reshape (0 params)."""
+    b, c, l = x.shape
+    x = x.reshape(b, groups, c // groups, l)
+    x = x.transpose(1, 2).contiguous()
+    return x.reshape(b, c, l)
+
+
 class DSCAMCNet(nn.Module):
-    """
-    Full DSC-AMCNet architecture.
+    """DSC-AMCNet, 4,961 trainable parameters (paper Table V)."""
 
-    Pareto-optimal width selected via sweep over width multipliers
-    {0.25, 0.5, 0.75, 1.0} — see Table III of the paper.
-    Base width = 64 channels selected as the efficiency-accuracy optimum.
-
-    Flash / RAM footprint (INT8, X-CUBE-AI 10.2.0, STM32H723ZG):
-        Flash : 51.26 KB
-        RAM   : 12.09 KB
-
-    Inference latency (DWT measured, 550 MHz Cortex-M7, INT8):
-        1.183 ms  (1,183 µs)
-    """
-
-    NUM_CLASSES = 11
-    MODULATIONS = [
-        "8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK",
-        "GFSK", "PAM4", "QAM16", "QAM64", "QPSK", "WBFM",
-    ]
-
-    def __init__(self, width: int = 64, num_classes: int = 11):
+    def __init__(self, width: int = 24, num_classes: int = 11,
+                 shuffle_groups: int = 4):
         super().__init__()
+        self.shuffle_groups = shuffle_groups
 
-        # --- Stem: standard conv to establish channel width ---
+        # Stem: PWC(2->24, k=1), BN, ReLU (ReLU applied functionally)
         self.stem = nn.Sequential(
-            nn.Conv1d(2, width, kernel_size=7, padding=3, bias=False),
+            nn.Conv1d(2, width, kernel_size=1, bias=False),
             nn.BatchNorm1d(width),
-            nn.ReLU(),
-            nn.MaxPool1d(kernel_size=2, stride=2),   # 128 → 64
         )
 
-        # --- DSC Stages ---
-        self.stage1 = nn.Sequential(
-            DSCBlock(width, width * 2, kernel_size=5, padding=2),
-            nn.MaxPool1d(kernel_size=2, stride=2),   # 64 → 32
-        )
+        # Three identical DSC stages, each ending in MaxPool1d(2):
+        # L: 128 -> 64 -> 32 -> 16
+        self.dsc1 = DSCStage(width)
+        self.dsc2 = DSCStage(width)
+        self.dsc3 = DSCStage(width)
 
-        self.stage2 = nn.Sequential(
-            DSCBlock(width * 2, width * 2, kernel_size=3, padding=1),
-            DSCBlock(width * 2, width * 4, kernel_size=3, padding=1),
-            nn.MaxPool1d(kernel_size=2, stride=2),   # 32 → 16
-        )
+        # SE channel attention on the compressed (B, 24, 16) map
+        self.se = SEBlock(width, reduction=4)
 
-        self.stage3 = nn.Sequential(
-            DSCBlock(width * 4, width * 4, kernel_size=3, padding=1),
-            DSCBlock(width * 4, width * 4, kernel_size=3, padding=1),
-        )
-
-        # --- SE Attention ---
-        self.se = SEBlock(width * 4, reduction=4)
-
-        # --- Global Average Pooling + Classifier ---
-        self.gap = nn.AdaptiveAvgPool1d(1)
+        # Classifier: Linear(24->64) -> ReLU -> Identity -> Linear(64->11)
+        # (index-3 placement of the final Linear matches the released
+        #  checkpoint's key layout: classifier.0.*, classifier.3.*)
         self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(width * 4, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, num_classes),
+            nn.Linear(width, 64),
+            nn.ReLU(inplace=True),
+            nn.Identity(),
+            nn.Linear(64, num_classes),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        x: (B, 2, 128) — normalised I/Q input
-        returns: (B, num_classes) log-softmax scores
-        """
-        x = self.stem(x)
-        x = self.stage1(x)
-        x = self.stage2(x)
-        x = self.stage3(x)
-        x = self.se(x)
-        x = self.gap(x)
-        x = self.classifier(x)
-        return F.log_softmax(x, dim=1)
+        x = F.relu(self.stem(x))          # (B, 24, 128)
+        x = self.dsc1(x)                  # (B, 24, 64)
+        x = self.dsc2(x)                  # (B, 24, 32)
+        x = self.dsc3(x)                  # (B, 24, 16)
+        x = self.se(x)                    # (B, 24, 16)
+        x = channel_shuffle(x, self.shuffle_groups)
+        x = x.mean(dim=2)                 # GlobalAvgPool1d -> (B, 24)
+        return self.classifier(x)         # (B, 11) logits
 
 
-# ---------------------------------------------------------------------------
-# Factory + parameter count utility
-# ---------------------------------------------------------------------------
-def build_dsc_amcnet(width: int = 64, num_classes: int = 11) -> DSCAMCNet:
-    """Instantiate DSC-AMCNet with default paper configuration."""
+def build_dsc_amcnet(width: int = 24, num_classes: int = 11) -> DSCAMCNet:
+    """Factory matching the paper's deployed configuration."""
     return DSCAMCNet(width=width, num_classes=num_classes)
-
-
-def count_parameters(model: nn.Module) -> dict:
-    total = sum(p.numel() for p in model.parameters())
-    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    return {"total": total, "trainable": trainable}
 
 
 if __name__ == "__main__":
     model = build_dsc_amcnet()
-    params = count_parameters(model)
-    print(f"DSC-AMCNet | Parameters: {params['total']:,}")
-
-    dummy = torch.randn(1, 2, 128)
-    out = model(dummy)
-    print(f"Output shape: {out.shape}")   # expect (1, 11)
-
-    # Verify INT8 footprint approximation
-    # Actual figures come from ST Edge AI Core Analyze on device
-    print("\nExpected silicon measurements (X-CUBE-AI 10.2.0, STM32H723ZG):")
-    print("  Flash : 51.26 KB")
-    print("  RAM   : 12.09 KB")
-    print("  Latency: 1.183 ms @ 550 MHz (DWT measured)")
+    n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"DSC-AMCNet trainable parameters: {n_params:,} (paper: 4,961)")
+    x = torch.randn(1, 2, 128)
+    y = model(normalize_window(x))
+    print(f"Forward: {tuple(x.shape)} -> {tuple(y.shape)}")
+    print("Deployment (paper Table II): 51.26 KB Flash | 12.09 KB RAM | "
+          "1.183 ms INT8 @ 544 MHz")

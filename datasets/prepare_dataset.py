@@ -4,15 +4,15 @@ prepare_dataset.py
 Dataset loading utilities for RML2016.10a.
 
 Loads the raw .dat file and the locked split_indices.npz to produce
-consistent train/val/test subsets for all experiments.
+consistent train/test subsets for all experiments (80/20, SEED = 42).
 
 The locked split (split_indices.npz) is archived on Zenodo alongside
-model weights. Download from: https://doi.org/10.5281/zenodo.XXXXXXX
+model weights. Download from: https://doi.org/10.5281/zenodo.20579317
 
 Usage
 -----
     from datasets.prepare_dataset import load_splits, MODULATIONS, SNR_VALUES
-    train_X, train_y, val_X, val_y, test_X, test_y = load_splits(
+    train_X, train_y, test_X, test_y = load_splits(
         data_path="datasets/RML2016.10a_dict.dat",
         split_path="datasets/split_indices.npz",
     )
@@ -83,26 +83,25 @@ def load_raw(data_path: str):
 
 def load_splits(data_path: str, split_path: str):
     """
-    Load dataset and apply the locked train/val/test split.
+    Load dataset and apply the locked 80/20 train/test split
+    (split_indices.npz keys: train_idx = 176,000; test_idx = 44,000).
 
     Returns
     -------
-    train_X, train_y, val_X, val_y, test_X, test_y
+    train_X, train_y, test_X, test_y
     (numpy arrays, same dtype as load_raw)
     """
     X, y, _ = load_raw(data_path)
 
     split = np.load(split_path)
-    train_idx = split["train_indices"]
-    val_idx   = split["val_indices"]
-    test_idx  = split["test_indices"]
+    train_idx = split["train_idx"]
+    test_idx  = split["test_idx"]
 
-    assert max(train_idx.max(), val_idx.max(), test_idx.max()) < len(X), \
+    assert max(train_idx.max(), test_idx.max()) < len(X), \
         "split_indices.npz references out-of-range sample indices — wrong dataset?"
 
     return (
         X[train_idx], y[train_idx],
-        X[val_idx],   y[val_idx],
         X[test_idx],  y[test_idx],
     )
 
@@ -114,7 +113,7 @@ def load_by_snr(data_path: str, split_path: str, snr_min: int = 10):
     """
     X, y, snr = load_raw(data_path)
     split = np.load(split_path)
-    test_idx = split["test_indices"]
+    test_idx = split["test_idx"]
     X_test, y_test, snr_test = X[test_idx], y[test_idx], snr[test_idx]
 
     mask = snr_test >= snr_min
@@ -132,8 +131,7 @@ if __name__ == "__main__":
     print(f"Unique classes: {np.unique(y).tolist()} → {MODULATIONS}")
     print(f"SNR range     : {snr.min()} to {snr.max()} dB")
 
-    train_X, train_y, val_X, val_y, test_X, test_y = load_splits(data_path, split_path)
-    print(f"\nLocked split:")
+    train_X, train_y, test_X, test_y = load_splits(data_path, split_path)
+    print(f"\nLocked split (80/20 stratified, SEED = 42):")
     print(f"  Train : {len(train_X):,}")
-    print(f"  Val   : {len(val_X):,}")
     print(f"  Test  : {len(test_X):,}")

@@ -28,7 +28,7 @@ Quantizes DSC-AMCNet with both backends and compares:
 Usage
 -----
     python quantization/validate_backend.py \\
-        --checkpoint models/checkpoints/dscamcnet_best.pth \\
+        --checkpoint models/checkpoints/dscamcnet_best.pt \\
         --data       datasets/RML2016.10a_dict.dat \\
         --split      datasets/split_indices.npz
 """

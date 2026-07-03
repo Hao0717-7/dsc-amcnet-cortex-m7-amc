@@ -3,42 +3,21 @@ qat_experiment.py
 =================
 Quantization-Aware Training (QAT) experiment for DSC-AMCNet.
 
-This script documents a NEGATIVE RESULT: QAT consistently degraded accuracy
-relative to PTQ in this architecture, contrary to the typical expectation
-that QAT outperforms PTQ for difficult-to-quantize models.
+This script documents a NEGATIVE RESULT (paper Section VIII-A): QAT
+fine-tuning of DSC-AMCNet converges to only 48.2% overall accuracy versus
+the 57% FP32 overall baseline, while plain static PTQ preserves FP32
+accuracy within noise (+0.03 pp overall; +0.09 pp at +10 dB).
+PTQ is therefore used exclusively for DSC-AMCNet.
 
-Findings (paper Section V-C, Table V):
-    PTQ accuracy (fbgemm, 1000 calib samples):  85.38%  (−0.42 pp vs FP32)
-    QAT accuracy (fine-tuned 10 epochs):         83.1%   (−2.7 pp vs FP32)
-    QAT accuracy (fine-tuned 30 epochs):         82.4%   (−3.4 pp vs FP32)
+Hypothesis (stated as such in the paper): SE Sigmoid activations may be
+destabilized by fake-quantization perturbations inserted during QAT
+[Jacob et al., 2017]. This appears specific to the SE-attention path:
+for the SE-free LiteAMCNet baseline, QAT works as expected (56.60%
+overall, +1.40 pp ABOVE FP32, recovering PTQ losses at 18 of 20 SNR
+bins; peak recovery +4.75 pp at -6 dB).
 
-Hypothesis:
-    The SE (Squeeze-and-Excitation) attention block contains sigmoid activations
-    that produce near-saturated outputs at high SNR. During QAT fine-tuning,
-    fake quantization noise is inserted into these near-saturated regions,
-    producing large gradient magnitudes that destabilise the global average
-    pool → SE → classifier pathway. The result is catastrophic forgetting of
-    the fine-grained feature discriminations learned during FP32 training.
-
-    This is consistent with the more general finding that PTQ degradation in
-    DSC-AMCNet peaks at high SNR (not low SNR) — precisely where SE attention
-    is most active and most sensitive to perturbation.
-
-This script:
-    1. Runs the QAT fine-tuning procedure used in the paper.
-    2. Logs train/val accuracy across epochs.
-    3. Reports final accuracy vs the PTQ baseline.
-
-Usage
------
-    python quantization/qat_experiment.py \\
-        --checkpoint models/checkpoints/dscamcnet_best.pth \\
-        --data       datasets/RML2016.10a_dict.dat \\
-        --split      datasets/split_indices.npz \\
-        --epochs     10
-
-⚠️  This experiment exists to document the failure. Do not use the QAT
-    checkpoint for deployment — use the PTQ ONNX from ptq_quantize.py.
+Reporting convention: PTQ degradation = FP32 - INT8 (positive = accuracy
+lost to quantization).
 """
 
 import argparse
@@ -120,13 +99,13 @@ def main(args):
     print("\n" + "=" * 60)
     print("QAT RESULT SUMMARY")
     print("=" * 60)
-    print(f"  FP32 baseline    : 85.80%  (PTQ benchmark)")
-    print(f"  PTQ (fbgemm)     : 85.38%  (−0.42 pp)")
-    print(f"  QAT final epoch  : {history[-1]*100:.2f}%  (reported in paper Table V)")
-    degradation = (85.80 - history[-1]*100)
-    print(f"  QAT degradation  : −{degradation:.2f} pp  (WORSE than PTQ)")
-    print("\nConclusion: PTQ is the preferred quantization strategy for this architecture.")
-    print("QAT is not recommended due to SE attention instability under fake-quant noise.")
+    print(f"  Paper reference  : FP32 overall 57%; QAT converges to 48.2%")
+    print(f"  Paper reference  : PTQ overall +0.03 pp; +0.09 pp at +10 dB")
+    print(f"  QAT final epoch  : {history[-1]*100:.2f}% (this run)")
+    print("\nConclusion: PTQ is the preferred quantization strategy for this "
+          "architecture (paper Section VIII-A).")
+    print("QAT is not recommended: SE Sigmoid activations may be destabilized "
+          "by fake-quantization perturbations (stated as hypothesis).")
 
 
 if __name__ == "__main__":

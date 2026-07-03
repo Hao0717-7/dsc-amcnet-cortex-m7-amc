@@ -1,135 +1,60 @@
-# Appendix B: Per-Modulation Accuracy Breakdown
+# Appendix B: Per-Modulation and Multi-Tier Accuracy Findings
 
-Full per-class accuracy for DSC-AMCNet on RML2016.10a test set.
-All values measured on the locked test split (`split_indices.npz`).
+All values below are the paper's verified measurements on the locked test
+split (`split_indices.npz`, SEED = 42). To regenerate the full per-class
+confusion matrix, evaluate the released checkpoint per class:
 
----
+```bash
+python models/train.py --data datasets/RML2016.10a_dict.dat \
+    --split datasets/split_indices.npz --epochs 0   # or load checkpoint
+# then run per-class evaluation on the +10 dB test bin
+```
 
-## High-SNR (≥ 10 dB) Per-Class Accuracy
+## Confusion Structure at +10 dB (INT8)
 
-### DSC-AMCNet FP32 (laptop, PyTorch)
+- Near-perfect (≥99%) for AM-DSB, CPFSK, BPSK, PAM4.
+- QAM16/QAM64 confusion persists: QAM16→QAM64 ≈ 30%,
+  QAM64→QAM16 ≈ 44% — a known dataset-level limitation of RML2016.10a.
 
-| Class | Accuracy | Notes |
+## Four-Tier OTA Validation (paper Table X(a); hi-SNR = mean over +6..+18 dB)
+
+| Tier | Context | Hi-SNR Acc. | Δ (pp) |
+|---|---|---|---|
+| 1 | Laptop FP32 (synthetic) | 85.80% | baseline |
+| 2 | STM32 HIL (synthetic, MCU INT8) | 85.78% | −0.02 |
+| 3 | STM32 loopback (real RF, INT8) | 82.76% | −3.02 |
+| 4 | Real broadcast, WBFM (live, Kerala) | 0–2.4% | — |
+
+- Tier 1→2 (−0.02 pp): quantization cost is negligible in practice.
+- Tier 2→3 (−3.02 pp): consistent with oscillator phase noise, ≈20 ppm
+  frequency offset (HackRF TX–RX mismatch), and non-ideal antenna
+  matching (individual contributions not isolated by direct measurement).
+  AM-SSB degrades most (−14.0 pp, frequency-offset sensitive);
+  QAM16/QAM64 improve (+18.8/+7.0 pp) as phase noise de-correlates their
+  synthetic-test-set confusion.
+- Tier 4: near-zero WBFM accuracy reflects a RadioML dataset synthesis
+  limitation, not a model failure; Tier 3 remains the valid hardware
+  characterization.
+- Latency under real RF: 3.901 ms mean (FP32; WCET 3.950 ms, jitter 1.3%)
+  across 22,000 live inference calls.
+
+## Simulated Fading Robustness (paper Table X(b); FP32, no retraining)
+
+| Channel model | Hi-SNR Acc. | Δ (pp) |
 |---|---|---|
-| 8PSK | 92.3% | |
-| AM-DSB | 97.1% | |
-| AM-SSB | 83.2% | Confused with WBFM at mid-SNR |
-| BPSK | 99.1% | |
-| CPFSK | 98.4% | |
-| GFSK | 96.8% | |
-| PAM4 | 91.7% | |
-| QAM16 | 81.4% | Confused with QAM64 at borderline SNR |
-| QAM64 | 79.8% | Hardest class — high-order constellation |
-| QPSK | 94.2% | |
-| WBFM | 79.2% | Domain gap confirmed (see OTA section) |
-| **Mean** | **85.80%** | **Paper Table II** |
+| Clean AWGN (baseline) | 85.68% | — |
+| Flat Rayleigh (1-tap) | 76.91% | −8.77 |
+| 2-tap multipath (exp. PDP) | 69.49% | −16.19 |
+| 4-tap multipath (exp. PDP) | 60.82% | −24.85 |
 
-### DSC-AMCNet INT8 (PTQ, fbgemm, STM32H723ZG)
+Graceful, retraining-free degradation; per-window L2 normalization applied
+after channel distortion. (The 85.68% clean baseline and the 85.80%
+Tier-1 baseline are independent runs over the same split, within the
+±0.23 pp seed variance.)
 
-| Class | FP32 Acc. | INT8 Acc. | Δ (pp) | Notes |
-|---|---|---|---|---|
-| 8PSK | 92.3% | 91.8% | −0.5 | |
-| AM-DSB | 97.1% | 97.0% | −0.1 | |
-| AM-SSB | 83.2% | 82.9% | −0.3 | |
-| BPSK | 99.1% | 99.0% | −0.1 | |
-| CPFSK | 98.4% | 98.2% | −0.2 | |
-| GFSK | 96.8% | 96.4% | −0.4 | |
-| PAM4 | 91.7% | 91.2% | −0.5 | |
-| QAM16 | 81.4% | 80.6% | −0.8 | PTQ most damaging here |
-| QAM64 | 79.8% | 79.1% | −0.7 | PTQ most damaging here |
-| QPSK | 94.2% | 93.8% | −0.4 | |
-| WBFM | 79.2% | 78.7% | −0.5 | |
-| **Mean** | **85.80%** | **85.38%** | **−0.42** | **Paper Table IV** |
+## Cross-Dataset Generalization (paper Table IX)
 
-**Key finding:** PTQ degradation is worst for high-order modulations (QAM16, QAM64)
-and least for robust formats (BPSK, AM-DSB). This is consistent with the hypothesis
-that quantisation noise disrupts fine-grained constellation boundary discrimination
-most severely — a counterintuitive result since high-SNR signal quality is otherwise
-the easiest operating regime.
-
----
-
-## Full SNR Profile (All SNRs, Mean over 11 Classes)
-
-| SNR (dB) | FP32 Acc. | INT8 Acc. |
-|---|---|---|
-| −20 | 9.2% | 9.1% |
-| −18 | 9.8% | 9.7% |
-| −16 | 10.4% | 10.3% |
-| −14 | 11.9% | 11.8% |
-| −12 | 14.7% | 14.6% |
-| −10 | 21.3% | 21.1% |
-| −8 | 32.8% | 32.5% |
-| −6 | 47.2% | 47.0% |
-| −4 | 58.9% | 58.6% |
-| −2 | 67.3% | 67.0% |
-| 0 | 72.8% | 72.4% |
-| 2 | 76.4% | 76.0% |
-| 4 | 79.1% | 78.7% |
-| 6 | 81.7% | 81.3% |
-| 8 | 83.4% | 83.0% |
-| **10** | **84.2%** | **83.8%** | ← High-SNR threshold |
-| 12 | 85.1% | 84.6% |
-| 14 | 85.5% | 85.0% |
-| 16 | 85.7% | 85.2% |
-| 18 | 85.8% | 85.3% |
-
-*Note: These values are illustrative; use the exact per-SNR evaluation script
-to reproduce from the locked checkpoint.*
-
----
-
-## OTA (Over-The-Air) Accuracy — RTL-SDR Loopback
-
-From M18c experiment (HackRF One TX → RTL-SDR Blog V3 RX, loopback):
-
-| Metric | Value |
-|---|---|
-| Mean high-SNR OTA accuracy | **82.76%** |
-| Mean inference latency (on-device) | **3.901 ms** |
-| OTA vs. synthetic gap | −3.02 pp |
-
-OTA gap is attributed to:
-- Real noise statistics (non-AWGN)
-- Hardware impairments (IQ imbalance, frequency offset)
-- Antenna effects (SRH701 response)
-
----
-
-## WBFM OTA Domain Gap
-
-Comparison with LiteAMCNet on WBFM in OTA conditions:
-
-| Model | WBFM OTA Accuracy (SNR ≥ 10 dB) |
-|---|---|
-| DSC-AMCNet | **0.0 – 2.4%** |
-| LiteAMCNet (SE attention) | 12.8 – 48.9% |
-
-**Finding:** The SE attention in DSC-AMCNet overfits to the synthetic WBFM
-power spectral statistics in RML2016.10a (smooth, wide-band Gaussian).
-Real WBFM broadcast signals exhibit narrowband modulation segments and dynamic
-power envelopes not present in the training distribution. This causes near-zero
-OTA accuracy for WBFM regardless of SNR.
-
-This is documented as a domain gap finding, not a model failure — the model
-performs correctly given its training distribution. Few-shot fine-tuning on
-real WBFM samples did not recover OTA accuracy (M18c supplementary).
-
----
-
-## Anomaly Detection (OOD Evaluation)
-
-From M19 experiment using max-softmax confidence score as OOD detector:
-
-| Model | OOD AUC | In-distribution Acc. |
-|---|---|---|
-| DSC-AMCNet (SE) | **0.000** | 85.80% |
-| ULCNN-simplified | 0.623 | 85.80% |
-
-**Finding:** SE attention exacerbates overconfidence. DSC-AMCNet assigns
-softmax confidence = 1.000 to all OOD samples. This is an honest characterisation
-of the model's limitations in open-set deployment scenarios.
-
-Reported verbatim in paper Section IX as a scientific contribution — the
-interaction between SE attention and max-softmax overconfidence is not previously
-documented in the embedded AMC literature.
+| Model | Flash (KB) | RAM (KB) | Lat. (ms) | FP32 | INT8 | PTQ Deg. |
+|---|---|---|---|---|---|---|
+| DSC-AMCNet-11 | 51.26 | 12.09 | 1.183 | 87.01% | 86.92% | +0.09 pp |
+| DSC-AMCNet-24 | 48.28 | 31.70 | 9.743 | 63.34% | 63.33% | +0.01 pp |

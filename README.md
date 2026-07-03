@@ -1,12 +1,12 @@
-# DSC-AMCNet: Depthwise Separable Architecture for AMC on ARM Cortex-M7
+# DSC-AMCNet: Deployment-Guided Automatic Modulation Classification on Bare-Metal MCU-Class IoT Devices
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20579317.svg)](https://doi.org/10.5281/zenodo.20579317)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21167587.svg)](https://doi.org/10.5281/zenodo.21167587)
 
 Official code and artifacts for the paper:
 
-> **"DSC-AMCNet: A Depthwise Separable Architecture for Automatic Modulation Classification on ARM Cortex-M7 Microcontrollers"**  
-> *IEEE Transactions on Cognitive Communications and Networking (under review), 2025*
+> **"DSC-AMCNet: Deployment-Guided Automatic Modulation Classification on Bare-Metal MCU-Class IoT Devices"**  
+> *IEEE Internet of Things Journal (under review), 2026*
 
 ---
 
@@ -16,20 +16,20 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 
 - Model training and evaluation (RML2016.10a)
 - Post-Training Quantization (PTQ) to INT8 with X-CUBE-AI-compatible backend
-- Deployment on STM32H723ZG (ARM Cortex-M7, 550 MHz) with DWT cycle-accurate latency measurement
-- Over-the-air (OTA) evaluation via RTL-SDR loopback (HackRF One TX → RTL-SDR RX)
+- Deployment on STM32H723ZG (ARM Cortex-M7, 544 MHz) with DWT cycle-accurate latency measurement
+- Four-tier over-the-air (OTA) validation (HackRF One TX → RX loopback via SMA attenuator; live FM/AM broadcast reception)
 
 ---
 
 ## Key Results (Locked, Silicon-Measured)
 
-| Model | Latency (ms) | Flash (KB) | RAM (KB) | High-SNR Acc. |
-|---|---|---|---|---|
-| DSC-AMCNet INT8 | **1.183** | **51.26** | **12.09** | 85.80% |
-| ULCNN-simplified INT8 | 2.104 | 44.26 | 36.78 | 85.80% |
-| **Speedup (DSC vs ULCNN)** | **1.78×** | — | **24.69 KB less** | — |
+| Model | Latency (ms) | Flash (KB) | RAM (KB) | INT8 Acc. @+10 dB | PTQ Degr. |
+|---|---|---|---|---|---|
+| DSC-AMCNet INT8 | **1.183** | **51.26** | **12.09** | **86.92%** | **0.09 pp** |
+| ULCNN-simplified INT8 | 2.104 | 49.25 | 36.78 | 87.55% | 1.95 pp |
+| **DSC vs ULCNN** | **1.78× faster** | — | **−24.69 KB** | within ±1.4 pp Wilson CI | **22× lower** |
 
-> All latency values are measured on physical hardware using DWT cycle counters at 550 MHz. No extrapolation.
+> All values measured on physical hardware (DWT cycle counters, 544 MHz, ICache + DCache). Energy: **0.091 mJ**/inference (955.1 acc/mJ). No extrapolation.
 
 ---
 
@@ -100,16 +100,16 @@ python models/train.py \
     --data datasets/RML2016.10a_dict.dat \
     --split datasets/split_indices.npz \
     --epochs 100 \
-    --output models/checkpoints/dscamcnet_best.pth
+    --output models/checkpoints/dscamcnet_best.pt
 ```
 
-Expected result: **85.80% accuracy** at high SNR (≥ 10 dB), matching Table II of the paper.
+Expected result: **87.01% FP32 accuracy** at +10 dB (seed-to-seed variance ±0.23 pp), matching Table II of the paper.
 
 ### 4. Quantize to INT8
 
 ```bash
 python quantization/ptq_quantize.py \
-    --checkpoint models/checkpoints/dscamcnet_best.pth \
+    --checkpoint models/checkpoints/dscamcnet_best.pt \
     --data datasets/RML2016.10a_dict.dat \
     --split datasets/split_indices.npz \
     --output quantization/outputs/dscamcnet_int8.onnx
@@ -140,11 +140,11 @@ python ota_collection/collect_ota.py \
 
 | Paper Claim | Script | Expected Output |
 |---|---|---|
-| DSC-AMCNet FP32 accuracy 85.80% | `models/train.py` | Val acc ≥ 85.5% at SNR ≥ 10 dB |
+| FP32 accuracy 87.01% @ +10 dB | `models/train.py` | ≥ 86.5% (seed variance ±0.23 pp) |
 | INT8 Flash 51.26 KB, RAM 12.09 KB | `stm32_deployment/` + ST Edge AI Core | Analyze report |
-| INT8 latency 1.183 ms | `hardware_characterization/measure_latency.py` | Serial log |
-| OTA accuracy 82.76% | `ota_collection/collect_ota.py` | `.npz` results file |
-| PTQ accuracy drop < 0.5% | `quantization/ptq_quantize.py` | Eval log |
+| INT8 latency 1.183 ms @ 544 MHz | `hardware_characterization/measure_latency.py` | Serial log |
+| Tier-3 OTA accuracy 82.76% | `ota_collection/collect_ota.py` | `.npz` results file |
+| PTQ degradation 0.09 pp @ +10 dB | `quantization/ptq_quantize.py` | Eval log |
 
 ---
 
@@ -152,7 +152,7 @@ python ota_collection/collect_ota.py \
 
 Model checkpoints and dataset split indices are archived on Zenodo:
 
-> **DOI:** [10.5281/zenodo.20579317](https://doi.org/10.5281/zenodo.20579317)
+> **DOI:** [10.5281/zenodo.21167587](https://doi.org/10.5281/zenodo.21167587)
 
 Download and place files as described in `models/checkpoints/README.md`.
 
@@ -162,9 +162,9 @@ Download and place files as described in `models/checkpoints/README.md`.
 
 | Component | Version |
 |---|---|
-| Python | 3.10+ |
+| Python | 3.10+ (developed on 3.14) |
 | PyTorch | 2.x |
-| ONNX | 1.16+ |
+| ONNX | 1.26.0 |
 | STM32CubeIDE | 1.15.x |
 | X-CUBE-AI / ST Edge AI Core | 10.2.0 / 2.2.0 |
 | Hardware | STM32H723ZG Nucleo, HackRF One, RTL-SDR Blog V3 |
@@ -176,12 +176,12 @@ Download and place files as described in `models/checkpoints/README.md`.
 If you use this work, please cite:
 
 ```bibtex
-@article{dscamcnet2025,
-  title   = {{DSC-AMCNet}: A Depthwise Separable Architecture for Automatic Modulation
-             Classification on {ARM} Cortex-{M7} Microcontrollers},
-  author  = {[Author]},
-  journal = {IEEE Transactions on Cognitive Communications and Networking},
-  year    = {2025},
+@article{dscamcnet2026,
+  title   = {{DSC-AMCNet}: Deployment-Guided Automatic Modulation
+             Classification on Bare-Metal {MCU}-Class {IoT} Devices},
+  author  = {Mishra, Suryaprakash},
+  journal = {IEEE Internet of Things Journal},
+  year    = {2026},
   note    = {Under review}
 }
 ```

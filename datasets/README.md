@@ -34,17 +34,18 @@
    Total samples : 220,000
    Unique classes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
    SNR range     : -20 to 18 dB
-   Locked split:
-     Train : 154,000
-     Val   : 33,000
-     Test  : 33,000
+   Locked split (80/20 stratified, SEED = 42):
+     Train : 176,000
+     Test  :  44,000
    ```
+   (Validation during training is carved from the train indices only;
+   the locked test set is never used for model selection.)
 
 ## Dataset Split (split_indices.npz)
 
 The train/val/test split is **locked** and archived on Zenodo:
 
-> **DOI:** https://doi.org/10.5281/zenodo.XXXXXXX
+> **DOI:** https://doi.org/10.5281/zenodo.20579317
 
 Download `split_indices.npz` from Zenodo and place it in this directory.
 
@@ -60,9 +61,11 @@ on different samples, making results incomparable. Archiving the exact index
 arrays on Zenodo allows anyone to independently verify all claims in the paper
 using precisely the test set the authors used.
 
-## RML2018.01a (used for comparison only)
+## RML2018.01a (cross-dataset generalization, paper Section X)
 
-RML2018.01a is referenced in related work comparisons (Table I) but is **not
-used for training or evaluation** in this paper's experiments. If you intend
-to compare against models trained on RML2018.01a, note that direct accuracy
-comparisons are invalid due to different class sets and sample counts.
+RML2018.01a (24 modulation classes, 1,024-sample windows) **is used** for
+cross-dataset generalization: DSC-AMCNet-24 and LiteAMCNet-24 are trained
+from scratch on it (no transfer learning), changing only the output layer
+and, for DSC-AMCNet-24, adding a fourth MaxPool1d stage (paper Table IX:
++0.01 pp PTQ degradation at 24 classes; 48.28 KB Flash / 31.70 KB RAM).
+Download it separately from DeepSig; note its much larger size (~20 GB).
