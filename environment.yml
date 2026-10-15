@@ -13,7 +13,7 @@ dependencies:
   - matplotlib>=3.7.0
   - tqdm>=4.65.0
   - pip
-    - pip:
+  - pip:
     - -i https://pypi.tuna.tsinghua.edu.cn/simple
     - onnx
     - onnxruntime
