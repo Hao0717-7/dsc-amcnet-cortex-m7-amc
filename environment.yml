@@ -13,8 +13,9 @@ dependencies:
   - matplotlib>=3.7.0
   - tqdm>=4.65.0
   - pip
-  - pip:
-    - onnx>=1.26.0
-    - onnxruntime>=1.18.0
-    - pyrtlsdr>=0.3.0
-    - pyserial>=3.5
+    - pip:
+    - -i https://pypi.tuna.tsinghua.edu.cn/simple
+    - onnx
+    - onnxruntime
+    - pyrtlsdr
+    - pyserial

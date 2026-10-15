@@ -1,3 +1,4 @@
+--index-url https://pypi.tuna.tsinghua.edu.cn/simple
 # DSC-AMCNet Python Dependencies
 # Install: pip install -r requirements.txt
 #
