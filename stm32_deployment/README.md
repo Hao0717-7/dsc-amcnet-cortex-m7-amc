@@ -37,6 +37,22 @@ fbgemm  → zero-point=0, dtype=torch.qint8   ← COMPATIBLE ✓
 qnnpack → zero-point=128, dtype=torch.quint8 ← INCOMPATIBLE ✗
 ```
 
+> **Platform note.** The comparison above needs a PyTorch build with the
+> `fbgemm`/`qnnpack` quantized kernels. Hosts that only register `onednn`
+> (e.g. the Windows CPU wheel) raise `NotImplementedError: Could not run
+> 'quantized::conv1d' ...`. On those hosts the script skips the eager-mode
+> path and validates the exported artifact instead — signed int8 weights
+> (zero-point 0), int8 zero-point tensors, IR ≤ 8, and the INT8-vs-FP32
+> accuracy delta:
+>
+> ```
+> Weight zero-points : [0] -> signed int8 (0) ✓
+> Q/DQ zero-point dtype(s): ['int8'] -> all int8 ✓
+> IR version <= 8 (X-CUBE-AI 10.2): yes ✓
+>   +10 dB accuracy (n=2219): FP32 74.99%  INT8 74.58%  Δ -0.41 pp
+> VERDICT: signed-int8 QDQ artifact -> X-CUBE-AI COMPATIBLE ✓
+> ```
+
 ---
 
 ## Step 2: Analyze with ST Edge AI Core CLI

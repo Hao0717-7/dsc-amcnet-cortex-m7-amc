@@ -111,12 +111,14 @@ def main(args):
     train_idx, test_idx = load_split(args.split)
     tr_idx, val_idx = make_val_subset(train_idx, seed=args.seed)
 
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+
     train_loader = DataLoader(RML2016Dataset(X[tr_idx], y[tr_idx]),
                               batch_size=args.batch_size, shuffle=True,
-                              num_workers=2)
+                              num_workers=args.num_workers)
     val_loader = DataLoader(RML2016Dataset(X[val_idx], y[val_idx]),
                             batch_size=args.batch_size, shuffle=False,
-                            num_workers=2)
+                            num_workers=args.num_workers)
     hi = test_idx[snr[test_idx] == 10]  # +10 dB bin (paper convention)
     hi_loader = DataLoader(RML2016Dataset(X[hi], y[hi]),
                            batch_size=args.batch_size, shuffle=False)
@@ -167,4 +169,7 @@ if __name__ == "__main__":
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--output", default="models/checkpoints/dscamcnet_best.pt")
+    p.add_argument("--num_workers", type=int, default=0,
+                   help="DataLoader workers; 0 is required in sandboxes that "
+                        "forbid multiprocessing named pipes (Windows EPERM)")
     main(p.parse_args())

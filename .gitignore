@@ -1,6 +1,7 @@
-﻿*.pth
+*.pth
 *.onnx
 *.npz
+!datasets/split_indices.npz
 *.dat
 *.pkl
 __pycache__/
@@ -11,3 +12,11 @@ Release/
 *.elf
 *.hex
 *.bin
+
+# local sandbox scaffolding (not part of the repository)
+.pylibs/
+.wheelhouse/
+.piptmp/
+.mplconfig/
+.smoke/
+_probe_write.txt
