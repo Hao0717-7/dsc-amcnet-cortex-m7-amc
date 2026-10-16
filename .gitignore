@@ -19,4 +19,5 @@ Release/
 .piptmp/
 .mplconfig/
 .smoke/
+.timing/
 _probe_write.txt

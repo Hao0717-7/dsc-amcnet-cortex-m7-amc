@@ -1,0 +1,116 @@
+DSC-AMCNet 改动记录
+仓库：D:\dsc-amcnet-cortex-m7-amc
+记录生成：2026-10-16 13:04
+上一次提交：672ac33 “重构代码结构，提升可读性与可维护性”（2026-10-16 12:54）
+
+说明：数据构建、训练与量化那批改动（datasets/build_rml2016_from_csv.py、
+datasets/README.md、datasets/full_2k/selection_manifest.json、
+datasets/split_indices.npz、models/train.py、models/checkpoints/dscamcnet_best.pt、
+quantization/validate_backend.py、stm32_deployment/README.md、activate_env.ps1、
+.gitignore 的沙箱脚手架部分）已包含在上面那次提交里，本次不再重复。
+提交说明见本文件末尾的“已完成改动索引”。
+
+============================================================
+本次待提交（2026-10-16 13:04）
+============================================================
+
+2026-10-16 13:04  .gitignore（+1 行，第 22 行）
+  新增 .timing/ 忽略项。该目录是 5 epoch 计时探测留下的临时输出。
+
+2026-10-16 13:04  CHANGELOG.txt（本文件，新增）
+  记录到目前的全部改动与未完成事项。
+
+需要一并处理的清理项：
+
+  2026-10-16 13:04  取消跟踪 .timing/probe.pt（35,357 B）
+    这个文件被上一次提交误收进版本库（probe.pt 是计时探测的临时产物，
+    不属于仓库）。取消跟踪并加进 .gitignore 后不再出现。
+    命令：git rm --cached .timing/probe.pt
+
+============================================================
+未完成事项
+============================================================
+
+1. +10 dB 精度口径核对
+   实测 FP32 74.99% / INT8 74.58%（n=2,219，locked split 的 +10 dB 分箱）。
+   README.md 第 106 行（“Expected result: 87.01%”）与第 143 行
+   （“≥ 86.5%”）写的是 87.01%。
+   74.99% 恰好等于论文标注的“整体”FP32 精度，疑为统计口径写错，
+   或当前权重与论文那一批不同。
+
+2. README 的 “Eval log” 承诺不存在
+   README.md 第 147 行说 ptq_quantize.py 输出 “Eval log”，
+   但该脚本只导出 ONNX、不打印任何精度。INT8 精度实际由
+   quantization/validate_backend.py 给出。
+
+3. STM32 部署第 2-9 步未做
+   前置条件：安装 STM32CubeIDE 2.1.1 + X-CUBE-AI 10.2.0
+   （ST Edge AI Core 2.2.0，CLI 为 stedgeai）。当前机器上没有这些工具。
+
+4. stm32_deployment/README.md 第 6 步要求新建 Core/Inc/dwt_measure.h
+   仓库里没有这个文件，只有 firmware/dwt_measure.c 与 inference_main.c。
+
+5. OTA 评估未运行
+   ota_collection/collect_ota.py 需要 HackRF One + RTL-SDR Blog V3，
+   或改用 --iq-file 输入。
+
+============================================================
+已完成改动索引（已在 672ac33 及更早提交中）
+============================================================
+
+数据源：桌面 C:\Users\Hao\Desktop\RadioML2016.10a 的 11 个 CSV。
+实测布局：每个 CSV 40,000 行、129 个字段（row[0]=I、row[1:129]=Q、
+row[128]=SNR），每个「调制 x SNR」组合 2,000 行，共 440,000 行。
+
+2026-10-16 07:29  datasets/split_indices.npz（1,760,520 B）
+  官方 locked 80/20 划分（train 176,000 / test 44,000）。
+  ※ 提交前建议与 Zenodo DOI 10.5281/zenodo.20579317 原件做 SHA256 比对。
+
+2026-10-16 07:36  datasets/build_rml2016_from_csv.py（新增，10,677 B）
+  把 11 个 CSV 转成 README 要求的 {(调制, SNR): (N, 2, 128) float32} 字典。
+  生成产物（均被 .gitignore 忽略，未入库）：
+    datasets/RML2016.10a_dict.dat          220,000 条，215 MB
+    datasets/full_2k/RML2016.10a_2k_dict.dat  440,000 条，450,572,687 B
+
+2026-10-16 07:39  datasets/README.md（+57 行）
+  补充数据集构建说明与校验命令。
+
+2026-10-16 07:39  datasets/full_2k/selection_manifest.json（新增，1,198,133 B）
+  2K 超集保留下来的是哪 1,000 条/组的抽样清单。
+
+2026-10-16 07:56  models/train.py（+9/-2 行）
+  新增 --num_workers 参数（默认 0）：本机沙箱禁止多进程命名管道，
+  Windows 下多进程 DataLoader 会 EPERM。
+  另在训练前加 Path(args.output).parent.mkdir(parents=True, exist_ok=True)。
+
+2026-10-16 07:56  .gitignore（沙箱脚手架部分）
+  .pylibs/、.wheelhouse/、.piptmp/、.mplconfig/、.smoke/、_probe_write.txt。
+
+2026-10-16 07:56  activate_env.ps1（新增，904 B）
+  依赖解包在 .pylibs/（本机全局 site-packages 不可写、pip 临时目录被沙箱拒）。
+  用法：. .\activate_env.ps1
+
+2026-10-16 12:17  models/checkpoints/dscamcnet_best.pt（新增，36,437 B）
+  训练 100 epoch，第 90 epoch 早停（patience=15）；参数量 4,961，与论文一致。
+  实测 +10 dB 测试精度 74.99%（见“未完成事项”第 1 条）。
+
+2026-10-16 12:21  quantization/outputs/dscamcnet_int8.onnx（新增，27,980 B）
+  静态 PTQ：QDQ 格式、有符号 INT8、1024 校准样本。
+  同目录 dscamcnet_fp32.onnx（23,952 B）。两个文件都被 *.onnx 忽略，未入库。
+
+2026-10-16 12:23  quantization/validate_backend.py（+151/-18 行）
+  修复该脚本原本跑不起来的三处问题：
+  1) 第 59 行按 6 个返回值解包 load_splits()，实际只返回 4 个 -> ValueError；
+  2) 本机 PyTorch 只注册 onednn，无 fbgemm/qnnpack 量化 kernel，
+     quantized::conv1d 抛 NotImplementedError；
+  3) 新增的 ONNX 产物校验里，bias 的 int32 zero-point 被误判为 uint8。
+  现在该平台自动退回校验 ONNX 产物，输出：
+    Weight zero-points [0] -> signed int8 (0) OK
+    Q/DQ zero-point dtype(s) ['int8'] -> all int8 OK
+    IR 7 <= 8 OK
+    +10 dB: FP32 74.99% / INT8 74.58% / delta -0.41 pp
+    VERDICT: signed-int8 QDQ artifact -> X-CUBE-AI COMPATIBLE
+
+2026-10-16 12:23  stm32_deployment/README.md（+16 行）
+  在第 1 步下加平台说明：无 fbgemm/qnnpack 的宿主上脚本改为校验 ONNX 产物，
+  并记录本次实测输出。
