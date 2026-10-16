@@ -49,3 +49,38 @@ Get-FileHash datasets\split_indices.npz -Algorithm SHA256
 - The INT8 ONNX carries signed INT8 (QDQ; zero-point 0). Unsigned INT8
   (qnnpack-style, zero-point 128) is incompatible with X-CUBE-AI and fails
   silently on device. See `quantization/validate_backend.py`.
+
+## Local provenance (2026-10-16) — read before trusting the Zenodo weights
+
+The published `dscamcnet_best.pt` (SHA-256 `4827d8dc…`, 37,397 B) could **not**
+be reproduced against either available copy of the dataset:
+
+| Evaluation data | Official Zenodo checkpoint | Locally retrained checkpoint |
+|---|---|---|
+| CSV-derived canonical file (Q = 0) | 15.35% @ +10 dB | 73.86% @ +10 dB |
+| Genuine DeepSig pickle, locked split | 26.05% @ +10 dB | **89.73% @ +10 dB** |
+
+11-class chance level is ~9.1%, so the published checkpoint behaves as if it
+was trained on a differently ordered/aligned array.
+
+The checkpoint now in this directory was retrained from scratch with
+`models/train.py` on the genuine DeepSig I/Q pickle and the archived
+`split_indices.npz`:
+
+- `dscamcnet_best.pt` — 36,437 B, SHA-256
+  `F7A05C25672A0074CFF30673C87ACB097897FA96662264CB57F9A959A91BAAB6`,
+  **+10 dB 89.73% / all-SNR 59.56%** on the locked test split (2,219 samples
+  in the +10 dB bin), best validation epoch 87 of 100, 4,961 parameters as in
+  the paper.
+- `quantization/outputs/dscamcnet_int8.onnx` — 27,989 B, +10 dB 89.36%
+  (PTQ degradation 0.37 pp). The Zenodo artifact of the same name (58,169 B,
+  SHA-256 `6d3520a3…`) does not match this file either.
+- `dscamcnet_best.prev-89.00.pt` — earlier run of the same protocol
+  (+10 dB 89.00%), kept as evidence that the number reproduces run to run.
+- `dscamcnet_best.legacy-csv.pt` — the old baseline (74.99%), trained on the
+  CSV-derived data with Q = 0. Do not deploy.
+
+The CSV export on the Desktop (`RadioML2016.10a/*.csv`, 129 fields per row)
+contains the I channel only; the Q channel does not exist in it. See the root
+`CHANGELOG.txt` section "数据 provenance 更正与重训" for the full evidence chain.
+

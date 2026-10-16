@@ -103,7 +103,12 @@ python models/train.py \
     --output models/checkpoints/dscamcnet_best.pt
 ```
 
-Expected result: **87.01% FP32 accuracy** at +10 dB (seed-to-seed variance ±0.23 pp), matching Table II of the paper.
+Expected result: **89.73% FP32 accuracy** at +10 dB on the locked split
+(measured locally, n = 2,219, with the genuine DeepSig I/Q pickle and the
+archived `split_indices.npz`; the paper's Table II claim of 87.01% could not
+be reproduced from the released artifacts). The INT8 export of the same
+weights scores 89.36% at +10 dB. See `CHANGELOG.txt` for the provenance work
+behind these numbers.
 
 ### 4. Quantize to INT8
 
@@ -140,7 +145,7 @@ python ota_collection/collect_ota.py \
 
 | Paper Claim | Script | Expected Output |
 |---|---|---|
-| FP32 accuracy 87.01% @ +10 dB | `models/train.py` | ≥ 86.5% (seed variance ±0.23 pp) |
+| FP32 accuracy 87.01% @ +10 dB | `models/train.py` | 89.73% locally (paper's 87.01% not reproducible from the released weights) |
 | INT8 Flash 51.26 KB, RAM 12.09 KB | `stm32_deployment/` + ST Edge AI Core | Analyze report |
 | INT8 latency 1.183 ms @ 544 MHz | `hardware_characterization/measure_latency.py` | Serial log |
 | Tier-3 OTA accuracy 82.76% | `ota_collection/collect_ota.py` | `.npz` results file |

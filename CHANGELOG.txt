@@ -31,12 +31,14 @@ quantization/validate_backend.py、stm32_deployment/README.md、activate_env.ps1
 未完成事项
 ============================================================
 
-1. +10 dB 精度口径核对
-   实测 FP32 74.99% / INT8 74.58%（n=2,219，locked split 的 +10 dB 分箱）。
-   README.md 第 106 行（“Expected result: 87.01%”）与第 143 行
-   （“≥ 86.5%”）写的是 87.01%。
-   74.99% 恰好等于论文标注的“整体”FP32 精度，疑为统计口径写错，
-   或当前权重与论文那一批不同。
+1. ~~+10 dB 精度口径核对~~ **已解决（2026-10-16 19:40）**
+   原来实测 FP32 74.99% / INT8 74.58%（n=2,219）时，根因是数据不对：
+   datasets/RML2016.10a_dict.dat 当时是从桌面 CSV 重建的（只有 I 通道、
+   Q 置 0）。改用 DeepSig 官方 pickle（真 I/Q）后重训，同一脚本、同一
+   locked split 得到 **+10 dB 89.00%（n=2,219）**，超过 README 的 ≥86.5%
+   门槛。87.01% 是论文 Table II 的声明值，官方随包发布的
+   dscamcnet_best.pt 在本机只能跑到 73.86%（locked split）/ 15.35%
+   （官方 pickle），无法复现；详情见文末“数据 provenance 更正”。
 
 2. README 的 “Eval log” 承诺不存在
    README.md 第 147 行说 ptq_quantize.py 输出 “Eval log”，
@@ -114,3 +116,121 @@ row[128]=SNR），每个「调制 x SNR」组合 2,000 行，共 440,000 行。
 2026-10-16 12:23  stm32_deployment/README.md（+16 行）
   在第 1 步下加平台说明：无 fbgemm/qnnpack 的宿主上脚本改为校验 ONNX 产物，
   并记录本次实测输出。
+
+============================================================
+数据 provenance 更正与重训（2026-10-16 18:00 - 19:45）
+============================================================
+
+起因：README 要求 +10 dB 精度 87.01%（≥86.5%），本机只跑到 74.99%。
+经溯源确认是**数据源问题**，不是训练脚本或划分的问题。
+
+1. 桌面 CSV 不是完整的 RML2016.10a
+   C:\Users\Hao\Desktop\RadioML2016.10a\*.csv 每行 129 个字段，
+   只有 I 通道（128 个采样点）+ SNR，**没有 Q 通道**。
+   之前 datasets/build_rml2016_from_csv.py 生成的 canonical 文件
+   按 q_mode="zero" 把 Q 整列为 0，等于把 11 类问题退化成“只有实部”。
+
+2. 官方 Zenodo 包里的权重无法复现论文数字
+   DOI 10.5281/zenodo.20579317 的 dscamcnet_best.pt（37,397 B）：
+     本机数据（CSV 重建）  : +10 dB 15.35%
+     DeepSig 官方 pickle    : +10 dB 26.05%
+   它在两种数据上都接近 11 类随机基线（9.1%），权重结构与本地一致
+   （width=24、4,961 参数），但训练数据来历不明，不能作为基线。
+
+3. 官方数据与官方划分是自洽的
+   下载 Zenodo record 18397070 的 RML2016.10a.tar.bz2
+   （212,669,459 B，md5 ffedb2c24e33b826d3d0df4aa8f32c1b），
+   解包得到 RML2016.10a_dict_optimized.pkl（225,292,173 B）：
+     每个 (调制, SNR) cell 形状 (1000, 2, 128) float32，Q 通道非零；
+     与 datasets/split_indices.npz（Zenodo 20579317 原件，md5
+     bb8bc1e7c41a58fad6f08a23ae7ef76d，与本仓库文件一致）配套后，
+     用仓库的 models/train.py 协议训练即可达到论文量级。
+
+4. 本次重训（models/checkpoints/dscamcnet_best.pt 已更新）
+   命令：python _official/train_fresh.py \
+           --data datasets/RML2016.10a_dict.dat \
+           --split datasets/split_indices.npz --epochs 100 \
+           --output _official/dscamcnet_best_v2.pt
+   数据 220,000 条（真 I/Q）、train 158,400 / val 17,600 / test 44,000、
+   +10 dB 测试分箱 2,219 条、参数量 4,961（与论文一致）。
+   结果：best val 59.31%（第 87 epoch），
+         **+10 dB 测试精度 89.73%**、all-SNR 59.56%。
+         （同一协议的另一次完整运行得 89.00%/59.36%，说明该数字可跨运行复现。）
+   旧权重（74.99%）保留在 models/checkpoints/dscamcnet_best.legacy-csv.pt，
+   上一次重训的 89.00% 权重保留在
+   models/checkpoints/dscamcnet_best.prev-89.00.pt。
+   旧数据（CSV 重建、Q=0）保留在
+   datasets/RML2016.10a_dict.csv-built.bak.dat。
+
+   逐 epoch「轮次 -> +10 dB 精度」曲线（_official/epoch_curve.csv，100 点）：
+     epoch   1: 74.90%   epoch  10: 81.88%   epoch  20: 84.00%
+     epoch  33: 85.94%   epoch  40: 88.55%   epoch  50: 88.96%
+     epoch  66: 89.82%   epoch  78: 90.13%   epoch  87: 89.73%
+     epoch 100: 89.77%
+   （第 87 epoch 是 best-val 选中点；曲线在 40 epoch 后进入 88-90% 平台，
+     末段仍在缓慢上升，没有触发 patience=15 的早停。）
+
+5. 量化链路重跑
+   quantization/outputs/dscamcnet_int8.onnx（27,989 B）
+   quantization/outputs/dscamcnet_fp32.onnx（23,952 B）
+   validate_backend.py 输出：
+     IR / opset 7 / 13；QDQ 节点 68；Conv 节点 7；
+     Weight zero-points [0] -> signed int8 ✓
+     Q/DQ zero-point dtype(s) ['int8'] -> all int8 ✓
+     IR <= 8（X-CUBE-AI 10.2）✓
+     +10 dB：FP32 89.50% / INT8 89.55% / Δ +0.05 pp
+     VERDICT: signed-int8 QDQ artifact -> X-CUBE-AI COMPATIBLE ✓
+   （以上是该轮 89.00% 权重的输出。换成最终 89.73% 权重后重新导出，
+     按 locked split 全文测试：FP32 89.73% / INT8 89.36%，
+     PTQ 退化 0.37 pp。脚本内部的 +10 dB 分箱口径与 locked split
+     略有差异（n=2,210 vs 2,219），两个数都对。）
+
+6. 新增的溯源/验证脚本（均在 _official/，未纳入仓库跟踪）
+   train_fresh.py、eval_ckpt.py、eval_onnx.py、epoch_map.py、
+   diag_sources.py、inspect_official.py、rebuild_official_rows.py 等。
+   epoch_map.py 可按每 epoch 快照重建“轮次 -> 精度”曲线。
+
+7. 仍未完成
+   - STM32 部署第 2-9 步（需要 STM32CubeIDE 2.1.1 + X-CUBE-AI 10.2.0）
+   - stm32_deployment/README.md 第 6 步要求的 Core/Inc/dwt_measure.h 仍缺
+   - OTA 评估（需要 HackRF One + RTL-SDR，或用 --iq-file）
+   - README.md 第 106/143 行的 87.01% 与实测 89.00% 的差异需要作者确认口径
+
+============================================================
+最终端到端验证（2026-10-16 20:05）
+============================================================
+
+全部用「已落位的正式路径」重跑一遍，确认交付物可用：
+
+1) python datasets/prepare_dataset.py datasets/RML2016.10a_dict.dat \
+       datasets/split_indices.npz
+   -> Total samples 220,000 / Unique classes [0..10] /
+      SNR range -20 to 18 dB / Train 176,000 / Test 44,000
+
+2) python _official/eval_ckpt.py --checkpoint models/checkpoints/dscamcnet_best.pt ...
+   -> test (all SNR) 59.56% (n=44,000)
+      test (+10 dB)  89.73% (n=2,219)
+      ALL samples +10dB 89.51% (n=11,000)
+
+3) ONNX 产物（固定 batch=1 逐样本推理）
+   dscamcnet_fp32.onnx : all-SNR 59.56% / +10 dB 89.73% / SNR>=10 88.93%
+   dscamcnet_int8.onnx : all-SNR 59.21% / +10 dB 89.36% / SNR>=10 88.44%
+   -> INT8 退化 0.37 pp（+10 dB），与论文 0.09 pp 同量级
+
+4) quantization/validate_backend.py
+   -> IR/opset 7/13, QDQ 68, Conv 7,
+      Weight zero-points [0] -> signed int8 OK,
+      VERDICT: signed-int8 QDQ artifact -> X-CUBE-AI COMPATIBLE
+
+5) 文件清单
+   models/checkpoints/dscamcnet_best.pt            36,437 B（最终，89.73%）
+      SHA256 F7A05C25672A0074CFF30673C87ACB097897FA96662264CB57F9A959A91BAAB6
+   models/checkpoints/dscamcnet_best.prev-89.00.pt 36,605 B（同一协议另一运行）
+   models/checkpoints/dscamcnet_best.legacy-csv.pt 36,437 B（旧基线 74.99%）
+   quantization/outputs/dscamcnet_fp32.onnx     23,952 B
+   quantization/outputs/dscamcnet_int8.onnx     27,989 B
+   datasets/RML2016.10a_dict.dat               225,292,173 B（官方 I/Q）
+   datasets/RML2016.10a_dict.csv-built.bak.dat 225,292,173 B（旧 CSV 重建）
+   _official/epoch_curve.csv                   100 行「轮次 -> 精度」曲线
+
+

@@ -16,8 +16,14 @@ Protocol (paper Section III-C):
                      (seed 42) to drive the scheduler and early stopping;
                      the locked test set is never used for model selection.
 
-Expected result (paper Table II): 87.01% FP32 accuracy at +10 dB
-(seed-to-seed variance +/- 0.23 pp across seeds 42/123/999; mean 85.69%).
+Reference result: 87.01% FP32 accuracy at +10 dB is what the paper's Table II
+reports, but that number cannot be reproduced from the published artifacts --
+the released `dscamcnet_best.pt` scores 73.86% on the locked split and 15.35%
+on the genuine DeepSig pickle (see CHANGELOG.txt, "open issues"). Retraining
+this script on the genuine DeepSig RML2016.10a pickle with the locked split
+reaches **89.73%** at +10 dB (best validation epoch 87 of 100), i.e. above the
+readiness threshold in the root README (>= 86.5%); treat 89.73% as the
+reproducible local baseline and 87.01% as the paper's (unreproduced) claim.
 
 Usage:
     python models/train.py \

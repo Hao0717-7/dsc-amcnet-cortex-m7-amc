@@ -1,5 +1,6 @@
 *.pth
 *.onnx
+*.npy
 *.npz
 !datasets/split_indices.npz
 *.dat
@@ -21,3 +22,14 @@ Release/
 .smoke/
 .timing/
 _probe_write.txt
+
+# dataset provenance work (2026-10-16): keep the diagnostic scripts,
+# drop the multi-hundred-MB downloads and intermediate arrays they produced
+_official/*
+!_official/*.py
+!_official/repo/
+_rebuilt/
+
+# superseded local checkpoints (kept on disk as evidence, not in version control)
+models/checkpoints/*.legacy-*.pt
+models/checkpoints/*.prev-*.pt
