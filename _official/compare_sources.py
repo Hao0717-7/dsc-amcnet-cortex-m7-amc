@@ -13,7 +13,7 @@ import sys
 
 import numpy as np
 
-OFF_PKL = r'_official\radio\RML2016.10a_dict_optimized.pkl'
+OFF_PKL = r'datasets\RML2016.10a_dict.dat'
 CSV_DIR = r'C:\Users\Hao\Desktop\RadioML2016.10a'
 FULL_DAT = r'datasets\full_2k\RML2016.10a_2k_dict.dat'
 

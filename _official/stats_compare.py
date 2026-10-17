@@ -4,7 +4,7 @@ import pickle
 
 import numpy as np
 
-OFF = r'_official\radio\RML2016.10a_dict_optimized.pkl'
+OFF = r'datasets\RML2016.10a_dict.dat'
 CSV = os.path.join(r'C:\Users\Hao\Desktop\RadioML2016.10a',
                    '8PSK.csv').replace('8PSK', '{M}')
 FULL = r'datasets\full_2k\RML2016.10a_2k_dict.dat'

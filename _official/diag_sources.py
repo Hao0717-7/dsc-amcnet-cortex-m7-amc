@@ -18,7 +18,7 @@ from dsc_amcnet import build_dsc_amcnet, normalize_window  # noqa: E402
 MODS = ["8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK",
         "GFSK", "PAM4", "QAM16", "QAM64", "QPSK", "WBFM"]
 CSV_DIR = r'C:\Users\Hao\Desktop\RadioML2016.10a'
-OFF = r'_official\radio\RML2016.10a_dict_optimized.pkl'
+OFF = r'datasets\RML2016.10a_dict.dat'
 
 
 def csv_table(mod):

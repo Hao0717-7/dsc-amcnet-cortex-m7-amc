@@ -90,6 +90,13 @@ def main():
 
     torch.set_num_threads(args.threads)
     dev = 'cpu'
+    # NOTE: the two checkpoints kept in models/checkpoints/ (89.73% and 89.00%)
+    # were produced by versions of this script that did NOT seed the PyTorch RNG.
+    # They therefore started from different random weight initialisations and saw
+    # different batch orders; that, not a protocol change, is the whole 0.73 pp
+    # gap between them. Seeding here makes future runs reproducible.
+    torch.manual_seed(SEED)
+    np.random.seed(SEED)
 
     t0 = time.time()
     X, y, snr = load_official(args.data)

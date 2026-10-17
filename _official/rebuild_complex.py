@@ -20,7 +20,7 @@ import time
 import numpy as np
 
 CSV_DIR = r'C:\Users\Hao\Desktop\RadioML2016.10a'
-OFFICIAL = r'_official\radio\RML2016.10a_dict_optimized.pkl'
+OFFICIAL = r'datasets\RML2016.10a_dict.dat'
 MODS = ["8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK",
         "GFSK", "PAM4", "QAM16", "QAM64", "QPSK", "WBFM"]
 SNRS = list(range(-20, 20, 2))

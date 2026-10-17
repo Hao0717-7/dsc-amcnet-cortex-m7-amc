@@ -75,10 +75,17 @@ The checkpoint now in this directory was retrained from scratch with
 - `quantization/outputs/dscamcnet_int8.onnx` — 27,989 B, +10 dB 89.36%
   (PTQ degradation 0.37 pp). The Zenodo artifact of the same name (58,169 B,
   SHA-256 `6d3520a3…`) does not match this file either.
-- `dscamcnet_best.prev-89.00.pt` — earlier run of the same protocol
-  (+10 dB 89.00%), kept as evidence that the number reproduces run to run.
-- `dscamcnet_best.legacy-csv.pt` — the old baseline (74.99%), trained on the
-  CSV-derived data with Q = 0. Do not deploy.
+- `dscamcnet_best.prev-89.00.pt` — earlier independent run of the same
+  protocol (+10 dB 89.00%, all-SNR 59.36%). The 0.73 pp gap to
+  `dscamcnet_best.pt` is ordinary run-to-run scatter, not a protocol change:
+  `_official/train_fresh.py` did not seed the PyTorch RNG when these two runs
+  were made, so each started from a different random initialisation and saw a
+  different batch order. Independently, the +10 dB bin holds only 2,219
+  samples (one sample = 0.045 pp, binomial 1σ ≈ 0.6 pp) and the two snapshots
+  sit at different best-validation epochs (98 vs 87), where the accuracy curve
+  already plateaus around 88–90%.
+- The old CSV-era baseline (74.99%, trained on the CSV-derived data with
+  Q = 0) has been deleted — it must not be deployed.
 
 The CSV export on the Desktop (`RadioML2016.10a/*.csv`, 129 fields per row)
 contains the I channel only; the Q channel does not exist in it. See the root

@@ -46,7 +46,7 @@ def acc(model, X, y, idx, bs=4096):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--checkpoint', required=True)
-    ap.add_argument('--data', default=r'_official\radio\RML2016.10a_dict_optimized.pkl')
+    ap.add_argument('--data', default=r'datasets\RML2016.10a_dict.dat')
     ap.add_argument('--split', default=r'datasets\split_indices.npz')
     ap.add_argument('--per-snr', action='store_true')
     ap.add_argument('--per-class', action='store_true')

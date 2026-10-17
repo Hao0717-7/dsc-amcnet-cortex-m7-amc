@@ -80,7 +80,7 @@ def main():
     cands = []
     for path, tag in ((r'datasets\RML2016.10a_dict.dat', 'workspace 1k'),
                       (r'datasets\full_2k\RML2016.10a_2k_dict.dat', 'workspace 2k'),
-                      (r'_official\radio\RML2016.10a_dict_optimized.pkl', 'official pkl')):
+                      (r'datasets\RML2016.10a_dict.dat', 'official pkl')):
         for order in ('sorted', 'insert', 'sorted_snr', 'reversed'):
             try:
                 X, y, snr = from_pickle(path, order)

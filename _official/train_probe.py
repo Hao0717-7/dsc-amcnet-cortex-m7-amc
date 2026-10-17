@@ -36,7 +36,7 @@ class DS(Dataset):
 
 
 def load_official():
-    with open(r'_official\radio\RML2016.10a_dict_optimized.pkl', 'rb') as f:
+    with open(r'datasets\RML2016.10a_dict.dat', 'rb') as f:
         d = pickle.load(f, encoding='latin1')
     ci = {m: i for i, m in enumerate(MODS)}
     X, y, snr = [], [], []

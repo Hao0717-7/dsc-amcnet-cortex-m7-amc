@@ -17,7 +17,7 @@ import torch
 sys.path.insert(0, 'models')
 from dsc_amcnet import build_dsc_amcnet, normalize_window
 
-OFF = r'_official\radio\RML2016.10a_dict_optimized.pkl'
+OFF = r'datasets\RML2016.10a_dict.dat'
 CSV_DIR = r'C:\Users\Hao\Desktop\RadioML2016.10a'
 MODS = ["8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK",
         "GFSK", "PAM4", "QAM16", "QAM64", "QPSK", "WBFM"]

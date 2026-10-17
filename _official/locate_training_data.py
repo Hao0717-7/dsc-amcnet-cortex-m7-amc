@@ -79,7 +79,7 @@ def main():
     off = load_ckpt(r'_official\dscamcnet_best.pt')
     loc = load_ckpt(r'models\checkpoints\dscamcnet_best.pt')
 
-    for path, tag in ((r'_official\radio\RML2016.10a_dict_optimized.pkl', 'official pkl'),
+    for path, tag in ((r'datasets\RML2016.10a_dict.dat', 'official pkl'),
                       (r'datasets\RML2016.10a_dict.dat', 'workspace dat')):
         d = cells(path)
         print(f'\n================ {tag}  ({len(d)} cells) ================')
