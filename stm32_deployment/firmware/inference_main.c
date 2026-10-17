@@ -91,11 +91,21 @@ static HAL_StatusTypeDef network_init(void)
     return HAL_OK;
 }
 
+/* Per-window L2 normalization, defined below (used by run_inference_once). */
+static void normalize_window_l2(float *x, int n);
+
 /* -------------------------------------------------------------------------
  * Single inference wrapper (called by DWT_BenchmarkN)
  * ---------------------------------------------------------------------- */
 static void run_inference_once(void)
 {
+    /* Per-window L2 normalization -- must match the training preprocessing
+     * (models/train.py -> RML2016Dataset.__init__ -> normalize_window).
+     * Done here rather than at the fill sites so that every caller, including
+     * the DWT benchmark, gets the same preprocessing. Identical math to
+     * models/dsc_amcnet.py:normalize_window(x, eps=1e-12) over 2 x 128. */
+    normalize_window_l2(input_data, 2 * 128);
+
     ai_input_buffers[0].data  = AI_HANDLE_PTR(input_data);
     ai_output_buffers[0].data = AI_HANDLE_PTR(output_data);
 
@@ -115,6 +125,31 @@ static int argmax_logsoftmax(float *scores, int n, float *out_confidence)
     /* Convert log-softmax to probability for reporting */
     *out_confidence = expf(scores[best]);
     return best;
+}
+
+/* -------------------------------------------------------------------------
+ * Input preprocessing: per-window L2 normalization
+ *
+ * The model was trained on windows normalized exactly this way
+ * (models/train.py -> RML2016Dataset.__init__ calls
+ * models/dsc_amcnet.py:normalize_window on every sample). Feeding raw ADC
+ * amplitudes instead costs almost all of the accuracy.
+ *
+ * Applied unconditionally inside run_inference_once(), so both the DWT
+ * benchmark and the classification loop see the same preprocessing.
+ *
+ * normalize_window(x, eps=1e-12): x / max(||x||_2, eps) over the whole
+ * 2 x 128 window (both I and Q together, not per channel).
+ * ---------------------------------------------------------------------- */
+static void normalize_window_l2(float *x, int n)
+{
+    float sum_sq = 0.0f;
+    for (int i = 0; i < n; i++) sum_sq += x[i] * x[i];
+
+    float norm = sqrtf(sum_sq);
+    if (norm < 1e-12f) norm = 1e-12f;
+
+    for (int i = 0; i < n; i++) x[i] /= norm;
 }
 
 /* -------------------------------------------------------------------------

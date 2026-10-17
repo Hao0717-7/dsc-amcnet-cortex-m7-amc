@@ -234,3 +234,43 @@ row[128]=SNR），每个「调制 x SNR」组合 2,000 行，共 440,000 行。
    _official/epoch_curve.csv                   100 行「轮次 -> 精度」曲线
 
 
+
+============================================================
+上板前固件准备（2026-10-17）
+============================================================
+
+1) 补齐缺失的头文件（之前引用了但仓库里不存在，CubeIDE 必然报错）
+   stm32_deployment/firmware/dwt_measure.h      新增，76 行
+      DWT_Init / DWT_Start / DWT_Stop / DWT_GetCycles /
+      DWT_GetMicroseconds / DWT_PrintResult / DWT_BenchmarkN
+   stm32_deployment/firmware/inference_main.h   新增，33 行
+      void inference_main(void);
+
+2) 修复固件漏做 per-window L2 归一化（会直接导致板上精度接近随机）
+   stm32_deployment/firmware/inference_main.c
+      - 新增 static void normalize_window_l2(float *x, int n)
+        x / max(||x||_2, 1e-12)，对整窗 2x128 求范数（I、Q 合在一起），
+        与 models/dsc_amcnet.py:normalize_window、models/train.py
+        RML2016Dataset.__init__ 的训练预处理一致。
+      - 在 run_inference_once() 里无条件调用，DWT 基准测试和分类循环
+        走同一条预处理路径（原先该函数只有注释占位，从未真正生效）。
+
+3) 文档数字更正
+   stm32_deployment/README.md  Step 1 验证输出
+      +10 dB 精度由旧的 74.99% / 74.58%（CSV 重建数据 + 旧权重）
+      改为 89.50% / 89.55%（官方 I/Q 数据 + 重训权重）
+      并注明 locked split 口径 n=2,219 与脚本内部 +10 dB 分箱 n=2,210 的差异。
+
+4) .gitignore
+   新增 _pdf/ 忽略项。_pdf/ 是从芯片 PDF 手册抽取的本地文本证据
+   （en_rm / cn_rm / ds / errata / sch 等，约 13.7 MB），按需可重新生成。
+
+5) 本次未改动的部分（等 NUCLEO-H723ZG 到手后再定）
+   - 时钟口径：仓库同时存在 544 MHz 和 550 MHz 两套说法，需按实际运行结果统一
+   - 周期数：官方 650,650 cycles @ 550 MHz 与本地 643,552 cycles @ 544 MHz 差 1.1%
+   - 串口引脚：官方 README 写 PA8 = USART3_TX，但数据手册 AF 表里 PA8 无 USART3 复用
+   - CPU_FREQ_BOOST：官方 README 未提及，但数据手册 p.91 写明 VOS0 单独上限 520 MHz
+
+提交命令：
+   git add .gitignore stm32_deployment/README.md stm32_deployment/firmware/inference_main.c stm32_deployment/firmware/dwt_measure.h stm32_deployment/firmware/inference_main.h CHANGELOG.txt
+   git commit -m "上板前固件准备：补齐 DWT/inference 头文件，修 per-window L2 归一化遗漏，同步验证精度数字"

@@ -33,3 +33,7 @@ _rebuilt/
 # superseded local checkpoints (kept on disk as evidence, not in version control)
 models/checkpoints/*.legacy-*.pt
 models/checkpoints/*.prev-*.pt
+
+# chip-datasheet text extraction used for local fact-checking (2026-10-16);
+# regenerated from the vendor PDFs on demand, too large to track
+_pdf/

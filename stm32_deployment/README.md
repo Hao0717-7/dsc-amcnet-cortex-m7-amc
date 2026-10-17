@@ -49,9 +49,13 @@ qnnpack → zero-point=128, dtype=torch.quint8 ← INCOMPATIBLE ✗
 > Weight zero-points : [0] -> signed int8 (0) ✓
 > Q/DQ zero-point dtype(s): ['int8'] -> all int8 ✓
 > IR version <= 8 (X-CUBE-AI 10.2): yes ✓
->   +10 dB accuracy (n=2219): FP32 74.99%  INT8 74.58%  Δ -0.41 pp
+>   +10 dB accuracy (n=2210): FP32 89.50%  INT8 89.55%  Δ +0.05 pp
 > VERDICT: signed-int8 QDQ artifact -> X-CUBE-AI COMPATIBLE ✓
 > ```
+>
+> (Values from the retrained weights, 2026-10-16. Measured on the locked test
+> split the same pair scores FP32 89.73% / INT8 89.36%; the script's internal
+> +10 dB bin is 9 samples narrower.)
 
 ---
 
