@@ -50,8 +50,14 @@ static ai_buffer   ai_output_buffers[AI_NETWORK_OUT_NUM] = AI_NETWORK_OUT_INIT;
 /* Input: (1, 2, 128) float32 = 256 floats = 1024 bytes */
 AI_ALIGNED(4) static float input_data[2 * 128];
 
-/* Output: (1, 11) float32  (log-softmax scores) */
+/* Output: (1, 11) float32  (raw logits -- the model ends in a bare Linear) */
 AI_ALIGNED(4) static float output_data[AI_NETWORK_OUT_1_SIZE];
+
+/* Activations scratch area. X-CUBE-AI 10 generates the activation map with a
+ * NULL data pointer and expects the application to supply the storage, so this
+ * buffer must exist and be handed to ai_network_init() (see below).
+ * With --target stm32h7 this model needs AI_NETWORK_DATA_ACTIVATIONS_SIZE bytes. */
+AI_ALIGNED(4) static ai_u8 activations[AI_NETWORK_DATA_ACTIVATIONS_SIZE];
 
 /* -------------------------------------------------------------------------
  * Modulation class labels (RML2016.10a ordering)
@@ -77,7 +83,7 @@ static HAL_StatusTypeDef network_init(void)
 
     const ai_network_params params = {
         AI_NETWORK_DATA_WEIGHTS(ai_network_data_weights_get()),
-        AI_NETWORK_DATA_ACTIVATIONS(NULL)
+        AI_NETWORK_DATA_ACTIVATIONS(activations)
     };
     if (!ai_network_init(network_handle, &params))
     {
@@ -87,7 +93,11 @@ static HAL_StatusTypeDef network_init(void)
     }
 
     printf("[AI] DSC-AMCNet INT8 initialised.\r\n");
-    printf("[AI] Flash: 51.26 KB | RAM: 12.09 KB\r\n");
+    printf("[AI] weights=%u B (flash) | activations=%u B | io=%u+%u B (ram)\r\n",
+           (unsigned)AI_NETWORK_DATA_WEIGHTS_SIZE,
+           (unsigned)AI_NETWORK_DATA_ACTIVATIONS_SIZE,
+           (unsigned)AI_NETWORK_IN_1_SIZE_BYTES,
+           (unsigned)AI_NETWORK_OUT_1_SIZE_BYTES);
     return HAL_OK;
 }
 
@@ -114,16 +124,26 @@ static void run_inference_once(void)
 }
 
 /* -------------------------------------------------------------------------
- * Softmax + argmax over log-softmax output
- * (output_data contains log-softmax scores)
+ * argmax over raw logits + softmax probability for reporting
+ *
+ * NOTE: the exported model ends in a bare Linear layer (models/dsc_amcnet.py
+ * classifier: Linear -> ReLU -> Identity -> Linear), so output_data holds raw
+ * logits, NOT log-softmax scores. Use a numerically stable softmax here;
+ * expf(score) alone is not a probability.
  * ---------------------------------------------------------------------- */
-static int argmax_logsoftmax(float *scores, int n, float *out_confidence)
+static int argmax_softmax(float *scores, int n, float *out_confidence)
 {
     int best = 0;
+    float max = scores[0];
     for (int i = 1; i < n; i++)
+    {
         if (scores[i] > scores[best]) best = i;
-    /* Convert log-softmax to probability for reporting */
-    *out_confidence = expf(scores[best]);
+        if (scores[i] > max) max = scores[i];
+    }
+    /* softmax(best) = exp(x_best - max) / sum(exp(x_i - max)) */
+    float sum = 0.0f;
+    for (int i = 0; i < n; i++) sum += expf(scores[i] - max);
+    *out_confidence = (sum > 0.0f) ? (1.0f / sum) : 0.0f;
     return best;
 }
 
@@ -209,7 +229,7 @@ void inference_main(void)
         DWT_Stop();
 
         float confidence;
-        int pred = argmax_logsoftmax(output_data, 11, &confidence);
+        int pred = argmax_softmax(output_data, 11, &confidence);
         float latency_us = DWT_GetMicroseconds();
 
         printf("[%6lu] Pred: %-7s | Conf: %.3f | Latency: %.2f µs\r\n",

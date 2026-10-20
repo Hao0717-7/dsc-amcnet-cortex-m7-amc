@@ -37,3 +37,16 @@ models/checkpoints/*.prev-*.pt
 # chip-datasheet text extraction used for local fact-checking (2026-10-16);
 # regenerated from the vendor PDFs on demand, too large to track
 _pdf/
+
+# X-CUBE-AI / ST Edge AI build scratch (the generated sources that matter are
+# committed under stm32_deployment/X-CUBE-AI/)
+st_ai_gen/
+st_ai_output/
+st_ai_ws/
+st_ai_gen_ws/
+*.pred.npy
+
+# generated walkthrough document (source: _doc/build_walkthrough.py;
+# the exported PDF is kept so it can be shared)
+_doc/*.docx
+.dsh-office-*/
