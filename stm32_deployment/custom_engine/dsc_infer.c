@@ -10,6 +10,10 @@
 #include "dsc_infer.h"
 #include "dsc_model_data.h"
 #include "test_sample.h"
+#include "main.h"
+
+uint32_t dsc_prof_cyc[16];
+int dsc_prof_enable = 0;
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
@@ -156,20 +160,32 @@ static void conv1x1(const int8_t *in, int ic, int len, const uint32_t *wp,
     }
 }
 
+/* 3-tap depthwise, two outputs per packed pair:
+ *   y[2i]   = w0*x[2i-1] + SMLAD((x[2i],x[2i+1]), (w1,w2))
+ *   y[2i+1] = SMLAD((x[2i],x[2i+1]), (w0,w1)) + w2*x[2i+2]
+ * Padding in the q domain is q = -128 (handled by the base offset already). */
 static void conv_dw3(const int8_t *in, int ch, int len, const int8_t *w,
                      const int32_t *base, int32_t m, int8_t *out)
 {
-    int c, t, k;
+    int c, i;
     for (c = 0; c < ch; c++) {
+        const int8_t *x = in + c * len;
+        int8_t *o = out + c * len;
         const int8_t *wc = w + c * 3;
-        for (t = 0; t < len; t++) {
-            int32_t acc = base[c];
-            for (k = -1; k <= 1; k++) {
-                int idx = t + k;
-                int qv = (idx >= 0 && idx < len) ? (int)in[c * len + idx] : -128;
-                acc += qv * (int32_t)wc[k + 1];
-            }
-            out[c * len + t] = (int8_t)clampi(rq(acc, m) - 128, QMIN, QMAX);
+        const uint32_t w01 = pk2(wc[0], wc[1]);
+        const uint32_t w12 = pk2(wc[1], wc[2]);
+        const int32_t b = base[c];
+        for (i = 0; i < len / 2; i++) {
+            const int t0 = 2 * i, t1 = t0 + 1;
+            const uint32_t P = pk2(x[t0], x[t1]);
+            const int32_t xm1 = (t0 == 0) ? -128 : x[t0 - 1];
+            const int32_t xp2 = (t1 + 1 >= len) ? -128 : x[t1 + 1];
+            int32_t a0 = b + (int32_t)xm1 * wc[0];
+            int32_t a1 = b + (int32_t)xp2 * wc[2];
+            a0 = smlad(P, w12, a0);
+            a1 = smlad(P, w01, a1);
+            o[t0] = (int8_t)clampi(rq(a0, m) - 128, QMIN, QMAX);
+            o[t1] = (int8_t)clampi(rq(a1, m) - 128, QMIN, QMAX);
         }
     }
 }
@@ -281,25 +297,41 @@ void dsc_fill_sample(float *dst)
 void dsc_infer_run_q(const int8_t *in8, int8_t *logits_out)
 {
     int8_t qbuf[64];
+    const int pf = dsc_prof_enable;
 
+#define PR(k) do { if (pf) dsc_prof_cyc[k] = DWT->CYCCNT; } while (0)
+
+    PR(0);
     conv1x1(in8, 2, 128, wp1, b1, m_c1, A);
+    PR(1);
     conv_dw3(A, 24, 128, dsc_w_c2, b2, m_c2, B);
+    PR(2);
     conv1x1(B, 24, 128, wp3, b3, m_c3, A);
+    PR(3);
     maxpool2(A, 24, 128, B);
-
+    PR(4);
     conv_dw3(B, 24, 64, dsc_w_c4, b4, m_c4, A);
+    PR(5);
     conv1x1(A, 24, 64, wp5, b5, m_c5, B);
+    PR(6);
     maxpool2(B, 24, 64, A);
-
+    PR(7);
     conv_dw3(A, 24, 32, dsc_w_c6, b6, m_c6, B);
+    PR(8);
     conv1x1(B, 24, 32, wp7, b7, m_c7, A);
+    PR(9);
     maxpool2(A, 24, 32, B);
+    PR(10);
     se_block(B, 16, A);
+    PR(11);
     shuffle4(A, 16, B);
     gap(B, 16, C);
-
+    PR(12);
     dense(C, 24, 64, wcl0, bcl0, m_cl0, -128, qbuf, 1);
+    PR(13);
     dense(qbuf, 64, 11, wcl3, bcl3, m_cl3, 63, logits_out, 1);
+    PR(14);
+#undef PR
 }
 
 void dsc_infer_run(const float *input_f32, int8_t *logits_out)

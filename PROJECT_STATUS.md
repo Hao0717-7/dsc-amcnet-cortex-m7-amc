@@ -280,3 +280,14 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 **P2 可复现（2026-10-29）**
 - 新增 `docs/BUILD.md`：工程结构、CubeMX 重生成会覆盖的补丁清单、构建/烧录/验收步骤
 - 部署侧补丁源码快照：`stm32_deployment/custom_engine/app_main.c`、`app_inference_main.c`、`retarget_keil_h723.c`、`startup_stm32h723xx.s`
+
+**P3 工程化（2026-10-29）**
+- 新增 `docs/REPRODUCE.md`：数据→训练→量化→C 代码→固件→验收的端到端复现路径 + 许可/引用
+- 新增 `stm32_deployment/tools/build_flash.ps1`：一键编译+烧录+抓串口关键行
+- 部署配置快照：`stm32_deployment/custom_engine/DSC_AMCNet_Deployment.ioc`
+
+**P4 性能优化（2026-10-29）**
+- 全零 **0.958 ms**、真实样本 **0.968 ms**（优化前 0.967 / 0.975）
+- 逐层 profile：pw1/pw2/pw3 合计 283k cycles（55%），dw 合计 119k（23%）
+- 成功：dw3 改为成对 SMLAD（−4k cycles）；失败并回退：conv1x1 全时间打包（+45%）、tile 16+4 累加器（+76%）、双累加器（+76%）
+- 详见 `docs/P4_OPTIMIZATION.md`

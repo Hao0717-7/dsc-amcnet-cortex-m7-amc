@@ -37,6 +37,9 @@
 #include "dwt_measure.h"
 #include "dsc_infer.h"
 
+extern uint32_t dsc_prof_cyc[16];
+extern int dsc_prof_enable;
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -289,6 +292,25 @@ void inference_main(void)
             myl[0], myl[1], myl[2], myl[3], myl[4], myl[5], myl[6], myl[7], myl[8], myl[9], myl[10]);
         for (i = 0; i < 256; i++) input_data[i] = 0.0f;
     }
+    /* one instrumented run: per-stage cycles (DWT) */
+    dsc_fill_sample(input_data);
+    dsc_prof_enable = 1;
+    { signed char tmp_l[11]; dsc_infer_run(input_data, tmp_l); }
+    dsc_prof_enable = 0;
+    {
+        uint32_t p0 = dsc_prof_cyc[0];
+        uart_printf("[PROF] c1=%lu dw1=%lu pw1=%lu p1=%lu dw2=%lu pw2=%lu p2=%lu dw3=%lu pw3=%lu p3=%lu se=%lu sh=%lu gap=%lu fc1=%lu fc2=%lu tot=%lu\r\n",
+            (unsigned long)(dsc_prof_cyc[1]-p0), (unsigned long)(dsc_prof_cyc[2]-dsc_prof_cyc[1]),
+            (unsigned long)(dsc_prof_cyc[3]-dsc_prof_cyc[2]), (unsigned long)(dsc_prof_cyc[4]-dsc_prof_cyc[3]),
+            (unsigned long)(dsc_prof_cyc[5]-dsc_prof_cyc[4]), (unsigned long)(dsc_prof_cyc[6]-dsc_prof_cyc[5]),
+            (unsigned long)(dsc_prof_cyc[7]-dsc_prof_cyc[6]), (unsigned long)(dsc_prof_cyc[8]-dsc_prof_cyc[7]),
+            (unsigned long)(dsc_prof_cyc[9]-dsc_prof_cyc[8]), (unsigned long)(dsc_prof_cyc[10]-dsc_prof_cyc[9]),
+            (unsigned long)(dsc_prof_cyc[11]-dsc_prof_cyc[10]), (unsigned long)(dsc_prof_cyc[12]-dsc_prof_cyc[11]),
+            (unsigned long)(dsc_prof_cyc[13]-dsc_prof_cyc[12]), (unsigned long)(dsc_prof_cyc[14]-dsc_prof_cyc[13]),
+            (unsigned long)(dsc_prof_cyc[14]-dsc_prof_cyc[13]),
+            (unsigned long)(dsc_prof_cyc[14]-p0));
+    }
+
     uart_printf("[BENCH] Running 1000 inferences (10 warm-up discarded) ...\r\n");
 
     uint32_t mean_x100 = 0U, min_x100 = 0U, max_x100 = 0U;
