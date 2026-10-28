@@ -272,6 +272,71 @@ void uart_printf(const char *fmt, ...)
   * @brief  The application entry point.
   * @retval int
   */
+/* -------------------------------------------------------------------------
+ * Streaming mode ('S'): host sends 256 int16 LE values per window
+ * (I[0..127] then Q[0..127], full-scale 32768).  The board does windowing,
+ * L2 normalisation, quantisation and inference - i.e. the production path,
+ * with UART standing in for the ADC/DMA front end.
+ * ---------------------------------------------------------------------- */
+static void normalize_l2(float *x, int n)
+{
+  float s = 0.0f;
+  for (int i = 0; i < n; i++) s += x[i] * x[i];
+  s = sqrtf(s);
+  if (s < 1e-12f) s = 1e-12f;
+  for (int i = 0; i < n; i++) x[i] /= s;
+}
+
+static void stream_loop(void);
+void dsc_stream_entry(void) { stream_loop(); }
+
+static void stream_loop(void)
+{
+  static const char *names[11] = {"8PSK","AM-DSB","AM-SSB","BPSK","CPFSK","GFSK",
+                                  "PAM4","QAM16","QAM64","QPSK","WBFM"};
+  uint8_t rb[512];
+  float win[256];
+  int8_t logits[11];
+  float scores[11];
+
+  dsc_infer_init();
+  DWT_Init();
+  uart_printf("[STREAM] switching to 921600, 256 x int16 LE per window\r\n");
+  HAL_Delay(50);
+  huart3.Init.BaudRate = 921600;
+  HAL_UART_DeInit(&huart3);
+  HAL_UART_Init(&huart3);
+
+  for (;;) {
+    if (HAL_UART_Receive(&huart3, rb, 512, 5000) != HAL_OK) continue;
+
+    for (int i = 0; i < 256; i++) {
+      int16_t v = (int16_t)((uint16_t)rb[2 * i] | ((uint16_t)rb[2 * i + 1] << 8));
+      win[i] = (float)v * (1.0f / 32768.0f);
+    }
+
+    uint32_t c0 = DWT->CYCCNT;
+    normalize_l2(win, 256);
+    dsc_infer_run(win, logits);
+    uint32_t c1 = DWT->CYCCNT;
+
+    float mx = -1e9f;
+    for (int i = 0; i < 11; i++) { scores[i] = (float)logits[i] * 0.35008532f; if (scores[i] > mx) mx = scores[i]; }
+    float sum = 0.0f;
+    for (int i = 0; i < 11; i++) { scores[i] = expf(scores[i] - mx); sum += scores[i]; }
+    int best = 0; mx = scores[0];
+    for (int i = 1; i < 11; i++) if (scores[i] > mx) { mx = scores[i]; best = i; }
+    uint32_t conf = (uint32_t)((mx / sum) * 1000.0f + 0.5f);
+    uint32_t us_x100 = (uint32_t)(((uint64_t)(c1 - c0) * 100ULL) /
+                                  (uint64_t)(SystemCoreClock / 1000000U));
+    uart_printf("C,%d,%lu,%lu,%s\r\n", best, (unsigned long)conf,
+                (unsigned long)us_x100, names[best]);
+  }
+}
+
+static void replay_loop(int first);
+void dsc_replay_entry(void) { replay_loop(1); }
+
 static void replay_serve(void)
 {
   uint8_t rb[256];
@@ -339,7 +404,10 @@ int main(void)
   uart_printf("[T] probe %.6f %.6f %.6f\r\n", 0.0235f, -0.0235f, 1e-7f);
   {
     uint8_t h;
-    if (HAL_UART_Receive(&huart3, &h, 1, 1500) == HAL_OK && h == 'R') replay_loop(1);
+    if (HAL_UART_Receive(&huart3, &h, 1, 1500) == HAL_OK) {
+      if (h == 'R') replay_loop(1);
+      if (h == 'S') stream_loop();
+    }
   }
   inference_main();
 }

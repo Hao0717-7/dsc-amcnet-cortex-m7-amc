@@ -37,6 +37,8 @@
 #include "dwt_measure.h"
 #include "dsc_infer.h"
 
+extern UART_HandleTypeDef huart3;
+
 extern uint32_t dsc_prof_cyc[16];
 extern int dsc_prof_enable;
 
@@ -355,6 +357,13 @@ void inference_main(void)
     float scores[11];
     while (1)
     {
+        uint8_t cmd;
+        if (HAL_UART_Receive(&huart3, &cmd, 1, 0) == HAL_OK)
+        {
+            if (cmd == 'S') { extern void dsc_stream_entry(void); dsc_stream_entry(); }
+            if (cmd == 'R') { extern void dsc_replay_entry(void); dsc_replay_entry(); }
+        }
+
         /* In real deployment: wait for DMA buffer swap signal */
         /* HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin); */
 
