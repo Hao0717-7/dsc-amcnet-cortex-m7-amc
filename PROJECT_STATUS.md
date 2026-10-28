@@ -265,3 +265,9 @@ X-CUBE-AI 10.2.1 的运行时是标量 C 内核（反汇编无 SMLAD/SMLAL，约
 python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 ```
 （串口助手若占用 COM3 需先关闭；期望 exact_11_logits 接近 200/200）
+
+**P0 结果（2026-10-28 深夜完成）**
+- 参考精度：overall **59.21%**、+10 dB **89.36%**（44k locked test）
+- 板端回放（5,000 样本）：11 logits 全等 **98.46%**、argmax 一致 **99.88%**、平均差 **0.09 LSB**
+- 板端准确率 **59.04%** vs 参考 59.12%（Δ 0.08 pp，抽样误差内）
+- 详见 `docs/P0_ACCURACY.md`；结果文件 `stm32_deployment/results/ref_accuracy.json`
