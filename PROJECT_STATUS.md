@@ -234,3 +234,15 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 - `.tmp/` 是联调期临时目录（诊断脚本、串口日志、截图），已加入 `.gitignore`，不入库。
 - 0.2 ms 级的差距尚未解释：已排除内存布局、激活对齐、优化等级、编译工具链；剩余怀疑为 int8 I/O 转换与量化图差异（见 §7）。
 - 当前 HEAD 之上没有未提交的源码改动；本次提交只涉及 `PROJECT_STATUS.md` 与 `.gitignore`。
+
+## 10. 自研 SMLAD 引擎（2026-10-28）
+
+X-CUBE-AI 10.2.1 的运行时是标量 C 内核（反汇编无 SMLAD/SMLAL，约 6.1 cycles/MACC），实测 1.827–1.845 ms，无法达到论文 1.183 ms。因此实现了一个针对 DSC-AMCNet 结构定制的 INT8 引擎：
+
+- 位置：`stm32_deployment/custom_engine/`（`dsc_infer.c/.h`、`dsc_model_data.h`、`test_sample.h`、`README.md`）。
+- 实现：通道两两打包 + 内联 `smlad` 双 16 位乘加；每层 `sumw` 吸收输入零点；Q31 定点 requant（无逐元素 `lroundf`）；dw3 边界补 q=-128。
+- 量化语义：激活 zp=-128，输入 zp=-4，SE fc2 zp=-5，logits zp=63，权重 zp=0；与 onnxruntime 逐位一致。
+- 实测（NUCLEO-H723ZG，544 MHz，1000 次，10 次预热）：**Mean 0.966 ms（min 0.965 / max 0.967）**，比 X-CUBE-AI 快 47%，比论文 1.183 ms 快 18%。
+- 数值：QPSK@10 dB 样本 `[MYS] 55 31 0 48 30 34 51 64 60 60 34` 与 ORT 完全相同。
+
+部署工程 `D:\DSC_AMCNet_Deployment` 的 `Src/inference_main.c` 已改为调用 `dsc_infer_run`（benchmark 与分类循环均走自研引擎），X-CUBE-AI 仅保留作对照。烧录镜像：`D:\DSC_AMCNet_Deployment\firmware_DSC_AMCNet_INT8.hex`（22:08 构建，Code 63,108 B / RO 16,620 B / RW 8,456 B / ZI 40,024 B）。
