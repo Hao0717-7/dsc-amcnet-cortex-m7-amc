@@ -271,3 +271,12 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 - 板端回放（5,000 样本）：11 logits 全等 **98.46%**、argmax 一致 **99.88%**、平均差 **0.09 LSB**
 - 板端准确率 **59.04%** vs 参考 59.12%（Δ 0.08 pp，抽样误差内）
 - 详见 `docs/P0_ACCURACY.md`；结果文件 `stm32_deployment/results/ref_accuracy.json`
+
+**P1 基准规范化（2026-10-29）**
+- 双 benchmark：全零 0.967 ms，真实 QPSK(+10 dB) 窗口 **0.975 ms**（+0.8%，数据相关分支/缓存）
+- 对外口径用 0.975 ms；论文 1.183 ms → 快 17.6%
+- 方法学与数据：`docs/P1_BENCHMARK.md`
+
+**P2 可复现（2026-10-29）**
+- 新增 `docs/BUILD.md`：工程结构、CubeMX 重生成会覆盖的补丁清单、构建/烧录/验收步骤
+- 部署侧补丁源码快照：`stm32_deployment/custom_engine/app_main.c`、`app_inference_main.c`、`retarget_keil_h723.c`、`startup_stm32h723xx.s`
