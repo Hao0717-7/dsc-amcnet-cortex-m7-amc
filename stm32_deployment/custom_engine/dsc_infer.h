@@ -13,6 +13,9 @@ void dsc_infer_init(void);
 /* input: 2x128 float32, normalized; output: 11 int8 logits (scale A_LOGITS) */
 void dsc_infer_run(const float *input_f32, int8_t *logits_out);
 
+/* input: 2x128 int8 q values (already quantized), output: 11 int8 logits */
+void dsc_infer_run_q(const int8_t *in8, int8_t *logits_out);
+
 #ifdef __cplusplus
 }
 #endif

@@ -278,14 +278,9 @@ void dsc_fill_sample(float *dst)
     for (i = 0; i < 256; i++) dst[i] = ((float)test_sample[i] + 4.0f) * A_IN;
 }
 
-void dsc_infer_run(const float *input_f32, int8_t *logits_out)
+void dsc_infer_run_q(const int8_t *in8, int8_t *logits_out)
 {
-    int i;
-    int8_t in8[2 * 128];
     int8_t qbuf[64];
-    
-    for (i = 0; i < 256; i++)
-        in8[i] = (int8_t)clampi((int)lrintf(input_f32[i] / A_IN) - 4, QMIN, QMAX);
 
     conv1x1(in8, 2, 128, wp1, b1, m_c1, A);
     conv_dw3(A, 24, 128, dsc_w_c2, b2, m_c2, B);
@@ -305,4 +300,15 @@ void dsc_infer_run(const float *input_f32, int8_t *logits_out)
 
     dense(C, 24, 64, wcl0, bcl0, m_cl0, -128, qbuf, 1);
     dense(qbuf, 64, 11, wcl3, bcl3, m_cl3, 63, logits_out, 1);
+}
+
+void dsc_infer_run(const float *input_f32, int8_t *logits_out)
+{
+    int i;
+    int8_t in8[2 * 128];
+
+    for (i = 0; i < 256; i++)
+        in8[i] = (int8_t)clampi((int)lrintf(input_f32[i] / A_IN) - 4, QMIN, QMAX);
+
+    dsc_infer_run_q(in8, logits_out);
 }

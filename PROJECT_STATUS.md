@@ -246,3 +246,22 @@ X-CUBE-AI 10.2.1 的运行时是标量 C 内核（反汇编无 SMLAD/SMLAL，约
 - 数值：QPSK@10 dB 样本 `[MYS] 55 31 0 48 30 34 51 64 60 60 34` 与 ORT 完全相同。
 
 部署工程 `D:\DSC_AMCNet_Deployment` 的 `Src/inference_main.c` 已改为调用 `dsc_infer_run`（benchmark 与分类循环均走自研引擎），X-CUBE-AI 仅保留作对照。烧录镜像：`D:\DSC_AMCNet_Deployment\firmware_DSC_AMCNet_INT8.hex`（22:08 构建，Code 63,108 B / RO 16,620 B / RW 8,456 B / ZI 40,024 B）。
+
+## 11. P0 精度验收（进行中，2026-10-28 夜）
+
+**参考精度（onnxruntime，locked test split 44,000 样本）**
+- overall acc **59.21%**；+10 dB **89.36%**（论文 89.50/89.55，噪声范围内一致）
+- 逐 SNR：-20 dB 9.05% → 0 dB 81.51% → +10 dB 89.36% → +18 dB 87.33%
+- 结果文件：`stm32_deployment/results/ref_accuracy.json`；脚本：`stm32_deployment/tools/p0_accuracy.py`
+
+**板端回放通道（已实现并烧录，待跑量）**
+- `Src/main.c`：上电先等 1.5 s；收到 `R` 后进入回放模式：继续收 256 字节 int8 q 样本 → `dsc_infer_run_q()` → 回 `L,q0,...,q10`；收不到 `R` 则走原 `inference_main()` 正常流程。
+- `Src/dsc_infer.c/.h`：新增 `dsc_infer_run_q(const int8_t*, int8_t*)`，`dsc_infer_run` 只是先量化再调用它。
+- PC 驱动：`stm32_deployment/tools/p0_replay.py`（pyserial 3.5 已装），随机抽 test split 样本，逐样本比对板端与 ORT 的 11 个 int8 logits、argmax、准确率。
+- 状态：固件已构建并烧录成功；200 样本比对脚本首次运行被中断，**明天从这里继续**。
+
+**明天第一步**
+```
+python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
+```
+（串口助手若占用 COM3 需先关闭；期望 exact_11_logits 接近 200/200）
