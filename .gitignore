@@ -50,3 +50,7 @@ st_ai_gen_ws/
 # the exported PDF is kept so it can be shared)
 _doc/*.docx
 .dsh-office-*/
+
+# 2026-10 on-board bring-up scratch: diagnostic scripts, serial logs, screenshots,
+# generated reference projects. Keep the findings in PROJECT_STATUS.md instead.
+.tmp/

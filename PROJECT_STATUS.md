@@ -1,11 +1,11 @@
 # 项目状态与工作区地图
 
 > 面向：接手这个仓库的人或 AI。读完这一页就能知道项目在做什么、做到哪、每个文件夹装的是什么、哪些坑已经踩过。
-> 最后更新：2026-10-19 ｜ 分支 `main` ｜ HEAD `a85dbaa`
+> 最后更新：2026-10-28 ｜ 分支 `main` ｜ HEAD `08ba0c6`
 
 ## 0. 一句话
 
-复现一篇论文：把 4,961 参数的调制识别网络 DSC-AMCNet 部署到 STM32H723（Cortex-M7 544 MHz）上做 INT8 推理，目标延迟 1.183 ms、+10 dB 准确率 87.01%。**数据 → 训练 → 量化 → 模型转 C 代码 已完成**，剩 CubeIDE 编译烧录和 OTA 采集两段。
+复现一篇论文：把 4,961 参数的调制识别网络 DSC-AMCNet 部署到 STM32H723（Cortex-M7 544 MHz）上做 INT8 推理，目标延迟 1.183 ms、+10 dB 准确率 87.01%。**数据 → 训练 → 量化 → 模型转 C 代码 → 编译烧录 → 板上实测 已全部打通**；当前实测 **1.827–1.843 ms**，是论文的 1.54×，差距分析与下一步列在 §7、§7.1。
 
 ## 1. 当前进度
 
@@ -15,9 +15,9 @@
 | 训练 | ✅ 完成 | `models/checkpoints/dscamcnet_best.pt` | **+10 dB 89.73%**，全 SNR 59.56% |
 | PTQ 量化 | ✅ 完成 | `quantization/outputs/dscamcnet_int8.onnx` | **INT8 89.36%**，比 FP32 掉 0.37 pp |
 | 后端兼容性校验 | ✅ 通过 | `validate_backend.py` 输出 | signed int8 / IR 7 / opset 13 / QDQ 68 节点 |
-| ST Edge AI 转换 | ✅ 完成 | `stm32_deployment/X-CUBE-AI/*.c/.h` | 权重 5,804 B、激活 4,488 B、MACC 163,615 |
-| CubeIDE 工程与编译 | ⬜ 未做 | — | 本机缺 arm-none-eabi-gcc |
-| 烧录上板测延迟 | ⬜ 未做 | — | 目标 mean = 1.183 ms（= 643,552 cycles @ 544 MHz） |
+| ST Edge AI 转换 | ✅ 完成 | `stm32_deployment/X-CUBE-AI/*.c/.h` | 权重 5,804 B；仓库内为 balanced 版（激活 4,488 B），板端实跑 time 版（激活 7,488 B），MACC 163,615 |
+| CubeMX 工程 + Keil 编译 | ✅ 完成 | `D:\DSC_AMCNet_Deployment`（生成物，未纳入本仓库） | Keil AC6 6.7，0 error / 9 warning |
+| 烧录上板测延迟 | ✅ 完成 | `firmware_DSC_AMCNet_INT8.hex`（`D:\DSC_AMCNet_Deployment`） | **1.827–1.843 ms**（≈995k cycles @ 544 MHz），论文 1.183 ms |
 | OTA 采集评估 | ⬜ 未做 | — | 需 HackRF + RTL-SDR |
 
 ## 2. 先看这八条，避免重复踩坑
@@ -131,6 +131,9 @@ D:\dsc-amcnet-cortex-m7-amc\
 | 2026-10-16 | 查到官方权重失效、CSV 缺 Q；改用官方 I/Q pickle 重训 → **89.73%**；PTQ → 89.36% |
 | 2026-10-17 | 补齐固件头文件、修 L2 归一化、activations 缓冲；ST Edge AI 转换出 C 代码 |
 | 2026-10-19 | 清理工作区（1.50 GB → 649 MB），删除生成文档 |
+| 2026-10-22 | 装好 Keil DFP（STM32H7 4.1.3）；CubeMX CLI 生成 NUCLEO-H723ZG 工程并手工接入 AI 模型 |
+| 2026-10-27 | 定位并修复 stdio/半主机启动崩溃、DWT 不计数；544 MHz 首次跑通，实测 2.55 ms（balanced） |
+| 2026-10-28 | 换 `--optimization time` 重生成（激活 7,488 B），实测 **1.827 ms**；ITCM/DTCM 对照无收益，回退默认布局 |
 
 ## 6. 复现命令
 
@@ -165,19 +168,50 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
     --model quantization\outputs\dscamcnet_int8.onnx `
     --input-data-type float32 --output-data-type float32 `
     --compression none --no-inputs-allocation --no-outputs-allocation `
+    --optimization time `
     --output st_ai_gen
 # 生成 7 个文件，拷进 stm32_deployment/X-CUBE-AI/
 ```
 
+> `--optimization time`（2026-10-28 加入）把 activations 从 4,488 B 提到 7,488 B，板端从 2.55 ms 降到 1.83 ms；若重新生成时漏掉这个参数，会退回 balanced 版本。
+
 ## 7. 下一步 Todo（按顺序）
 
-1. 安装 STM32CubeIDE 2.1.1（自带 arm-none-eabi-gcc，用于编译和烧录）。
-2. 新建工程：MCU 选 `STM32H723ZGTx`；RCC HSE = Crystal（25 MHz）、VOS0、PLL1 25/544/1；SYS → Debug = Serial Wire；USART1 115200（PA9/PA10）；生成代码。
-3. 导入模型：`stm32_deployment/X-CUBE-AI/` 的 3 个 `.c` 放进工程的 `X-CUBE-AI/App/`，头文件进 `Middlewares/ST/AI/Inc/`；从 X-CUBE-AI 包复制 `Middlewares/ST/AI/Inc/*.h` 与 `Lib/GCC/STM32H7/NetworkRuntime1020_CM7_GCC.a` 并加入链接。
-4. 把 `stm32_deployment/firmware/` 的 4 个文件加进工程，`main.c` 在 `MX_USART1_UART_Init()` 之后调用 `inference_main()`；`syscalls.c` 里用 `__io_putchar` 把 printf 重定向到 USART1。
-5. 编译烧录，串口 115200 预期看到 `[AI] weights=5804 B ...`、`[DWT] N=1000 mean=1.183 ms`。
-6. 记录延迟：`python hardware_characterization/measure_latency.py --port COMx --baud 115200 --output results/latency_log.csv`（需装 pyserial）。
-7. OTA：需要 HackRF + RTL-SDR，用 `ota_collection/collect_ota.py`（需 pyrtlsdr/onnxruntime）。
+> 2026-10-28 更新：上板链路已通，以下从「搭建」改为「缩小 1.54× 差距」。
+
+1. **int8 I/O 对照**：用 `--input-data-type int8 --output-data-type int8` 重新生成，固件直接喂 int8（scale 0.002135044 / zp −4），去掉每次推理的 256 点 float→int8 与 11 点 int8→float 转换，测差值（预期 ~1%）。
+2. **量化图对照**：把仓库里论文原版 `stm32_deployment/X-CUBE-AI/`（4,488 B 激活那版）换回工程实测一次，确认差距在图还是在生成参数。
+3. **per-channel 量化实验**：改 `ptq_quantize.py` 的 `per_channel=True`，看 QDQ 节点数与 MACC 路径是否变化；若内核效率提升明显，再评估精度回退。
+4. **官方 on-target 验证**：`stedgeai validate --mode target --desc serial:COM3:115200`，用真实测试集在板上核对逐样本精度（当前板端只喂了全零）。
+5. OTA：需要 HackRF + RTL-SDR，用 `ota_collection/collect_ota.py`（需 pyrtlsdr/onnxruntime）。
+
+## 7.1 上板联调记录（2026-10-28）
+
+**硬件**：NUCLEO-H723ZG（MB1364E，STLINK-V3E 板载）；HSE 走 ST-LINK MCO 的 8 MHz（板上 25 MHz 晶振 X3 标 DNF）；VCP = USART3 PD8/PD9，枚举为 `COM3`；LED：LD1 绿 PB0、LD2 黄 PE1、LD3 红 PB14。
+
+**工具链**：CubeMX 6.18.1 CLI 生成工程（`-q script`：`config load` → `project generate`）；Keil µVision 5.24a + **ARM Compiler 6.7**（`pCCUsed 6070000::V6.7::ARMCLANG`，必须放在 `<Target>` 层）；ST-LINK 烧录。
+
+**时钟**：VOS0、HSE bypass 8 MHz、PLL1 **M=2 / N=136 / P=1 / Q=4 / R=2** → SYSCLK 544 MHz；HPRE /2（AXI=272 MHz）、APB1-4 /2、FLASH_LATENCY_3。HPRE 设为 /1 时 CubeMX 会算出非法的 FLASH_LATENCY_0，故 HCLK 必须 /2。
+
+**踩过的四个坑**（都已修）：
+1. **链接 printf 会在启动阶段崩**：AC6 的 stdio 初始化走 `_sys_open`/半主机 `BKPT 0xAB`，未接调试器即 HardFault，程序到不了 main。→ 固件改用自写 `uart_printf`（`Src/main.c` + `Inc/uart_printf.h`），全程不链接 stdio。
+2. **浮点 printf 打不出来**：AC6 的 `%f` 依赖完整格式化路径，串口只出 0.000。→ 时延/置信度全部改成整数定点打印（`us_x100`、`conf_x1000`）。
+3. **DWT 不计数**：H7 需要 `DBGMCU->CR |= DBGMCU_CR_DBG_TRACECKEN` 且 `DWT->LAR = 0xC5ACCE55` 解锁；否则 CYCCNT 恒 0。
+4. **µs 换算用错时钟**：CPU 544 MHz 而 HCLK 272 MHz，`dwt_measure.c` 的 µs 换算改用 `SystemCoreClock`。
+
+**实测**（`[DWT] N=1000`，输入全零）：
+
+| 布局 | mean |
+|---|---|
+| 默认（Flash + AXI SRAM） | **1.827 ms**（995,505 cycles） |
+| 全部 RO 搬 ITCM | 1.842 ms |
+| RW/ZI 搬 DTCM | 1.835 ms |
+| balanced 生成（4,488 B 激活） | 2.55 ms |
+| 论文 | 1.183 ms（643,552 cycles） |
+
+结论：内存布局 ±0.7%，瓶颈在 X-CUBE-AI 10.2 内核（≈6.1 cycles/MACC，论文 ≈3.9）。
+
+**与官方流程的差异**：CLI 生成 + 手工集成（非 CubeMX 中间件向导）；`--optimization time`（官方默认 balanced）；float32 I/O（官方默认 int8）；Keil AC6（官方示例 CubeIDE GCC）；未做 on-target validation。激活缓冲已按官方模板对齐到 `AI_ALIGNED(32)`，实测无变化。
 
 ## 8. 环境与工具现状
 
@@ -188,11 +222,15 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 | STM32CubeMX | ✅ 6.18.1（`D:\APP\STM32CubeMX\STM32CubeMX\STM32CubeMX.exe`） |
 | X-CUBE-AI | ✅ 10.2.1（`%USERPROFILE%\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI\10.2.1`） |
 | ST Edge AI Core | ✅ 2.2.0（随 X-CUBE-AI 10.2.1 提供） |
-| STM32CubeIDE / arm-none-eabi-gcc | ❌ 未安装（当前唯一硬阻塞） |
-| 硬件 | 自制 LXB723ZG-P1 核心板 + 外接 ST-LINK；OTA 还需 RF 前端 |
+| Keil MDK | ✅ µVision 5.24a + ARM Compiler 6.7（`D:\APP\Keil5`），STM32H7xx_DFP 4.1.3 手工安装 |
+| STM32CubeIDE / arm-none-eabi-gcc | ❌ 未安装（最终没走 CubeIDE 路线） |
+| 部署工程 | `D:\DSC_AMCNet_Deployment`（CubeMX 生成 + 手工集成 AI 与固件，不在本仓库内） |
+| 硬件 | NUCLEO-H723ZG（板载 STLINK-V3E + VCP），COM3；OTA 还需 HackRF + RTL-SDR |
 
 ## 9. 已知限制
 
-- 沙箱环境（workspace-write）下，`models/`、`quantization/`、`.git` 等原有目录对 shell 只读，写入需要提权；`datasets/` 可写。新目录可直接创建。
-- `git` 在本会话内不可执行（`.git/index.lock` 被拒绝），提交需在普通终端手动完成。
-- 当前未提交改动：`.gitignore`（M）、`CHANGELOG.txt`（D）、`stm32_deployment/README.md`（M）、`stm32_deployment/firmware/inference_main.c`（M）、`stm32_deployment/X-CUBE-AI/`（未跟踪，建议纳入版本控制）。
+- 板端 benchmark 输入是全零，只验证时延，未验证精度；精度核对需跑 `stedgeai validate --mode target` 或用真实样本回放。
+- 部署工程 `D:\DSC_AMCNet_Deployment` 在仓库之外，`.ioc` 中没有 X-CUBE-AI 中间件条目：在 CubeMX 里重新 Generate 会覆盖 `main.c` 的 544 MHz 时钟与 `inference_main()` 调用，也会丢 AI 集成，改配置后要重新打补丁。
+- `.tmp/` 是联调期临时目录（诊断脚本、串口日志、截图），已加入 `.gitignore`，不入库。
+- 0.2 ms 级的差距尚未解释：已排除内存布局、激活对齐、优化等级、编译工具链；剩余怀疑为 int8 I/O 转换与量化图差异（见 §7）。
+- 当前 HEAD 之上没有未提交的源码改动；本次提交只涉及 `PROJECT_STATUS.md` 与 `.gitignore`。
