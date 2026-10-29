@@ -31,6 +31,20 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 
 > All values measured on physical hardware (DWT cycle counters, 544 MHz, ICache + DCache). Energy: **0.091 mJ**/inference (955.1 acc/mJ). No extrapolation.
 
+### 本仓库实测（2026-10，NUCLEO-H723ZG）
+
+| 项 | 实测 | 说明 |
+|---|---|---|
+| 推理时延 | **0.958 ms**（全零）/ **0.968 ms**（真实 QPSK 窗口） | 自研 SMLAD INT8 引擎，544 MHz，I/D Cache 开 |
+| 对照 | X-CUBE-AI 10.2.1 同模型 1.827 ms | 官方运行时是标量 C 内核，已确认是上限 |
+| 全量精度 | **59.20%**（44k locked test，全 SNR） | onnxruntime 参考 59.21%，逐位一致 98.8% |
+| +10 dB 精度 | **89.36%** | 与论文 89.5% 一致 |
+| Flash / RAM | 85.36 KB / 47.42 KB | 双推理栈 + HAL；组成见 `docs/P5_RESOURCES.md` |
+| 能耗 | 未本地复测 | 缺电流测量硬件，保留论文 0.091 mJ 作为文献值 |
+
+复现入口：`docs/REPRODUCE.md`；基准方法 `docs/P1_BENCHMARK.md`；优化记录 `docs/P4_OPTIMIZATION.md`；
+实时链路 `docs/P5_REALTIME.md`；全量精度 `docs/P5_ACCURACY.md`；回归向量 `stm32_deployment/results/golden_vectors.json`。
+
 ---
 
 ## Repository Structure
@@ -148,6 +162,9 @@ python ota_collection/collect_ota.py \
 | FP32 accuracy 87.01% @ +10 dB | `models/train.py` | 89.73% locally (paper's 87.01% not reproducible from the released weights) |
 | INT8 Flash 51.26 KB, RAM 12.09 KB | `stm32_deployment/` + ST Edge AI Core | Analyze report |
 | INT8 latency 1.183 ms @ 544 MHz | `hardware_characterization/measure_latency.py` | Serial log |
+| 自研引擎 0.968 ms（优于论文 1.183 ms） | `stm32_deployment/tools/build_flash.ps1` | `docs/P1_BENCHMARK.md` |
+| 板端全量精度 59.20% | `stm32_deployment/tools/p5_full_accuracy.py` | `docs/P5_ACCURACY.md` |
+| 回归：22 golden vectors | `stm32_deployment/tools/golden_test.py` | `stm32_deployment/results/golden_vectors.json` |
 | Tier-3 OTA accuracy 82.76% | `ota_collection/collect_ota.py` | `.npz` results file |
 | PTQ degradation 0.09 pp @ +10 dB | `quantization/ptq_quantize.py` | Eval log |
 

@@ -303,3 +303,13 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 - 44,000/44,000 窗口回放，板端 **59.2045%** vs 参考 59.2091%（差 2 个样本）
 - logits 逐位一致 **98.80%**、argmax 一致 **99.98%**、+10 dB 板端 **89.36%**
 - 详见 `docs/P5_ACCURACY.md`，结果 `stm32_deployment/results/p5_accuracy_44k.json`
+
+
+**P5-3 资源（2026-10-29）**
+- Flash **87,408 B（85.36 KB）**、RAM **48,560 B（47.42 KB）**；组成与论文口径差异见 `docs/P5_RESOURCES.md`
+- 能耗无法本地测量（无电流表），方法已写入文档，不伪造数值
+
+**P5-4/5/6 文档、回归与发布（2026-10-29）**
+- README 增加「本仓库实测」块；新增 `docs/RELEASE_v1.0.md`
+- golden vectors：22 条（11 类 × +10/0 dB），`stm32_deployment/tools/golden_test.py` 全部通过（±1 LSB）
+- 未完成项（OTA/ULCNN/能耗/低功耗）原因与方法：`docs/P5_BLOCKED.md`
