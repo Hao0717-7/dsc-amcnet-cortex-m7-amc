@@ -38,12 +38,36 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", default="COM3")
     ap.add_argument("--json", default=str(VEC))
+    ap.add_argument("--flash", action="store_true",
+                    help="flash first and wait for [CLASSIFY] so the board is in 115200 replay mode")
     args = ap.parse_args()
 
     vecs = json.loads(Path(args.json).read_text(encoding="utf-8"))
     ser = serial.Serial(args.port, 115200, timeout=0.5)
     ser.reset_input_buffer()
     time.sleep(0.3)
+    if args.flash:
+        import subprocess
+        subprocess.run([r"D:\APP\Keil5\UV4\UV4.exe", "-f",
+                        r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
+                        "-o", r"D:\dsc-amcnet-cortex-m7-amc\.tmp\golden_flash.log"],
+                       capture_output=True)
+        deadline = time.time() + 25
+        while time.time() < deadline:
+            line = read_line(ser, 1.0)
+            if "CLASSIFY" in line:
+                break
+        ser.reset_input_buffer()
+
+    # Prime: send one throw-away frame and wait for its reply so the board's
+    # replay loop and this script agree on frame boundaries (the first 'R' after
+    # boot can otherwise be consumed while the classify banner is still printing).
+    ser.write(b"R" + bytes(256))
+    prime_deadline = time.time() + 3.0
+    while time.time() < prime_deadline:
+        if read_line(ser, 0.5).startswith("L,"):
+            break
+    ser.reset_input_buffer()
 
     passed = 0
     for v in vecs:

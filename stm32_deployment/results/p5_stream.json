@@ -1,0 +1,14 @@
+{
+ "mode": "uart_stream_int16",
+ "n": 300,
+ "board_acc": 0.623,
+ "ref_acc": 0.5921,
+ "compute_us_mean": 979.0,
+ "compute_us_min": 974.8,
+ "compute_us_max": 984.6,
+ "roundtrip_ms_mean": 7.4,
+ "baud": 921600,
+ "payload_bytes_per_window": 512,
+ "note": "random locked-test windows across all SNRs; firmware does window L2 + quantisation + inference on-board",
+ "port": "COM3"
+}

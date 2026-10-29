@@ -1,0 +1,17 @@
+board: [UART] formatter test: int=-42 uint=7 long=1234567 str=OK f3=1.235 f2=3.14
+board: [T] probe 0.023500 -0.023500 0.000000
+board: [STREAM] switching to 921600, 256 x int16 LE per window
+[  0] AM-SSB  conf=0.239 compute=984.1us rtt=   7.7ms
+[  1] BPSK    conf=0.994 compute=979.9us rtt=   7.7ms
+[  2] CPFSK   conf=1.000 compute=979.6us rtt=   7.5ms
+[  3] 8PSK    conf=0.996 compute=979.8us rtt=   7.6ms
+[  4] QAM64   conf=0.668 compute=980.5us rtt=   7.6ms
+[  5] AM-SSB  conf=0.313 compute=978.5us rtt=   7.5ms
+[  6] QPSK    conf=0.453 compute=978.5us rtt=   7.4ms
+[  7] AM-SSB  conf=0.181 compute=979.5us rtt=   7.6ms
+[  8] AM-SSB  conf=0.353 compute=976.5us rtt=   7.5ms
+[  9] 8PSK    conf=0.353 compute=980.0us rtt=   7.2ms
+
+windows=30/30  board_acc=0.700
+compute  mean=979.1us  min=976.1  max=984.1
+round-trip mean=7.5ms (UART 921600: 512 B payload ~= 5.6 ms)
