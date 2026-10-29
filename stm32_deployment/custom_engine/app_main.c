@@ -61,62 +61,6 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/* LD1 = PB0 (green), LD3 = PB14 (red) on NUCLEO-H723ZG */
-static void boot_led_init(void)
-{
-  GPIO_InitTypeDef g = {0};
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  g.Pin = GPIO_PIN_0 | GPIO_PIN_14;
-  g.Mode = GPIO_MODE_OUTPUT_PP;
-  g.Pull = GPIO_NOPULL;
-  g.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &g);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0 | GPIO_PIN_14, GPIO_PIN_RESET);
-}
-
-static void boot_led_blink(int n)
-{
-  for (int i = 0; i < n; i++)
-  {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-    HAL_Delay(80);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-    HAL_Delay(120);
-  }
-}
-
-/* Raw USART3 probe: proves the core runs and that PD8/PD9 reach the ST-LINK
- * VCP, using only registers and the reset-default HSI 64 MHz clock (PCLK1 =
- * 64 MHz, BRR = 556 -> 115.2 kBd). Independent of HAL, printf and our clock
- * setup, so it answers "is the chip alive and wired?" before anything else. */
-static void raw_uart_boot(void)
-{
-  RCC->AHB4ENR |= RCC_AHB4ENR_GPIODEN;
-  RCC->APB1LENR |= RCC_APB1LENR_USART3EN;
-  (void)RCC->APB1LENR;
-
-  GPIOD->MODER = (GPIOD->MODER & ~((3U << 16U) | (3U << 18U)))
-               | (2U << 16U) | (2U << 18U);
-  GPIOD->AFR[1] = (GPIOD->AFR[1] & ~((0xFU << 0U) | (0xFU << 4U)))
-                | (7U << 0U) | (7U << 4U);
-
-  USART3->CR1 = 0;
-  USART3->BRR = 556U;                 /* 64 MHz / 115200 */
-  USART3->CR1 = USART_CR1_TE | USART_CR1_UE;
-
-  const char *s = "\r\n[RAW] boot ok: HSI 64 MHz, USART3 PD8/PD9 115200\r\n";
-  for (int rep = 0; rep < 10; rep++)
-  {
-    const char *p = s;
-    while (*p)
-    {
-      while ((USART3->ISR & USART_ISR_TXE_TXFNF) == 0U) { }
-      USART3->TDR = (uint8_t)(*p++);
-    }
-    while ((USART3->ISR & USART_ISR_TC) == 0U) { }
-    for (volatile uint32_t i = 0; i < 4000000U; i++) { __NOP(); }  /* ~0.5 s */
-  }
-}
 /* USER CODE END 0 */
 
 /* ---------------------------------------------------------------------------
@@ -364,44 +308,21 @@ static void replay_loop(int first)
 }
 int main(void)
 {
-  /* ---------------- bring-up stage beacons (all three user LEDs) ---------
-   * LD1 green = PB0, LD2 yellow = PE1, LD3 red = PB14.
-   * Stage 1 = main entered, 2 = HAL_Init done, 3 = UART init done.
-   * A healthy board blinks 1, then 2, then 3, then 0.5 Hz forever.        */
-  RCC->AHB4ENR |= RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIOEEN;
-  (void)RCC->AHB4ENR;
-  GPIOB->MODER = (GPIOB->MODER & ~((3U << 0U) | (3U << 28U)))
-               | (1U << 0U) | (1U << 28U);
-  GPIOE->MODER = (GPIOE->MODER & ~(3U << 2U)) | (1U << 2U);
-
-#define BEACON_DELAY() do { for (volatile uint32_t i = 0; i < 8000000U; i++) { __NOP(); } } while (0)
-#define BEACON(n) do {                                                        \
-    for (int b = 0; b < (n); b++) {                                           \
-      GPIOB->BSRR = (1U << 0U) | (1U << 14U); GPIOE->BSRR = (1U << 1U);       \
-      BEACON_DELAY();                                                         \
-      GPIOB->BSRR = (1U << 16U) | (1U << 30U); GPIOE->BSRR = (1U << 17U);     \
-      BEACON_DELAY();                                                         \
-    }                                                                         \
-  } while (0)
-
-  BEACON(1);                     /* stage 1: main reached */
-
-  HAL_Init();                    /* SysTick from HSI 64 MHz */
-  BEACON(2);                     /* stage 2: HAL_Init returned */
-
+  HAL_Init();
   SystemClock_Config();          /* 544 MHz: HSI 64 -> PLL1 M=8 N=68 P=1, VOS0 */
-  SystemCoreClockUpdate();       /* refresh SystemCoreClock from RCC registers */
-  SCB_EnableICache();            /* Cortex-M7 caches: essential at 544 MHz  */
+  SystemCoreClockUpdate();
+  SCB_EnableICache();
   SCB_EnableDCache();
 
   MX_GPIO_Init();
   MX_USART3_UART_Init();         /* USART3 PD8/PD9, 115200 8N1 */
-  BEACON(3);                     /* stage 3: UART init returned */
 
+  /* Early sanity check: proves the UART path and the float formatter work
+     before any model code runs. Kept intentionally - it is the first
+     evidence line in every boot log. */
   uart_printf("\r\n[UART] formatter test: int=%d uint=%u long=%lu str=%s f3=%.3f f2=%.2f\r\n",
               -42, 7U, (unsigned long)1234567UL, "OK", 1.2345f, 3.14159f);
 
-  uart_printf("[T] probe %.6f %.6f %.6f\r\n", 0.0235f, -0.0235f, 1e-7f);
   {
     uint8_t h;
     if (HAL_UART_Receive(&huart3, &h, 1, 1500) == HAL_OK) {

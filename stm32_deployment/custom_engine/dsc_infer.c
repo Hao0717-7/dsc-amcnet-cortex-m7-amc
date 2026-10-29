@@ -1,6 +1,7 @@
 /* Custom INT8 inference for DSC-AMCNet — signed q-domain + SMLAD packing.
  *
- * Reference semantics: .tmp\cmpall.py (matches onnxruntime 12/12 layers).
+ * Reference semantics: re-derived from the ONNX QDQ graph (validated 12/12
+ * layers against onnxruntime, see docs/P0_ACCURACY.md).
  * Activation q values are int8; "value = (q - zp) * scale".
  * Weight/bias values come from dsc_model_data.h as int8/int32 quantized ints.
  *
@@ -12,8 +13,6 @@
 #include "test_sample.h"
 #include "main.h"
 
-uint32_t dsc_prof_cyc[16];
-int dsc_prof_enable = 0;
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
@@ -283,11 +282,6 @@ static int8_t A[24 * 128];
 static int8_t B[24 * 128];
 static int8_t C[24 * 16 + 64];
 
-void dsc_dbg_sample(void)
-{
-    uart_printf("[SMP] ts0=%d ts1=%d\r\n", test_sample[0], test_sample[1]);
-}
-
 void dsc_fill_sample(float *dst)
 {
     int i;
@@ -297,41 +291,21 @@ void dsc_fill_sample(float *dst)
 void dsc_infer_run_q(const int8_t *in8, int8_t *logits_out)
 {
     int8_t qbuf[64];
-    const int pf = dsc_prof_enable;
-
-#define PR(k) do { if (pf) dsc_prof_cyc[k] = DWT->CYCCNT; } while (0)
-
-    PR(0);
     conv1x1(in8, 2, 128, wp1, b1, m_c1, A);
-    PR(1);
     conv_dw3(A, 24, 128, dsc_w_c2, b2, m_c2, B);
-    PR(2);
     conv1x1(B, 24, 128, wp3, b3, m_c3, A);
-    PR(3);
     maxpool2(A, 24, 128, B);
-    PR(4);
     conv_dw3(B, 24, 64, dsc_w_c4, b4, m_c4, A);
-    PR(5);
     conv1x1(A, 24, 64, wp5, b5, m_c5, B);
-    PR(6);
     maxpool2(B, 24, 64, A);
-    PR(7);
     conv_dw3(A, 24, 32, dsc_w_c6, b6, m_c6, B);
-    PR(8);
     conv1x1(B, 24, 32, wp7, b7, m_c7, A);
-    PR(9);
     maxpool2(A, 24, 32, B);
-    PR(10);
     se_block(B, 16, A);
-    PR(11);
     shuffle4(A, 16, B);
     gap(B, 16, C);
-    PR(12);
     dense(C, 24, 64, wcl0, bcl0, m_cl0, -128, qbuf, 1);
-    PR(13);
     dense(qbuf, 64, 11, wcl3, bcl3, m_cl3, 63, logits_out, 1);
-    PR(14);
-#undef PR
 }
 
 void dsc_infer_run(const float *input_f32, int8_t *logits_out)

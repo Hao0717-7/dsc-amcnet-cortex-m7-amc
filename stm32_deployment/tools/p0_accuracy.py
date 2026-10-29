@@ -12,7 +12,8 @@ ROOT = Path(r"D:\dsc-amcnet-cortex-m7-amc")
 DATA = ROOT / "datasets" / "RML2016.10a_dict.dat"
 SPLIT = ROOT / "datasets" / "split_indices.npz"
 MODEL = ROOT / "quantization" / "outputs" / "dscamcnet_int8.onnx"
-OUT = ROOT / ".tmp" / "p0"
+OUT = ROOT / "stm32_deployment" / "results"
+OUT.mkdir(parents=True, exist_ok=True)
 OUT.mkdir(parents=True, exist_ok=True)
 
 CLASSES = ["8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK", "GFSK",

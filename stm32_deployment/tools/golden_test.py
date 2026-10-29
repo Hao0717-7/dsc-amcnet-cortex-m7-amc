@@ -50,7 +50,7 @@ def main():
         import subprocess
         subprocess.run([r"D:\APP\Keil5\UV4\UV4.exe", "-f",
                         r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
-                        "-o", r"D:\dsc-amcnet-cortex-m7-amc\.tmp\golden_flash.log"],
+                        "-o", str(pathlib.Path(tempfile.gettempdir()) / "dsc_golden_flash.log")],
                        capture_output=True)
         deadline = time.time() + 25
         while time.time() < deadline:

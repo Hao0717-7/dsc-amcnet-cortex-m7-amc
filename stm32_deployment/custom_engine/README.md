@@ -25,7 +25,7 @@
 ## 文件
 
 - `dsc_infer.c` / `dsc_infer.h`：引擎实现与接口（`dsc_infer_init` / `dsc_infer_run`）。
-- `dsc_model_data.h`：从 `quantization/outputs/dscamcnet_int8.onnx` 抽出的量化权重/偏置/scale（生成脚本见仓库 `.tmp` 历史或 `stm32_deployment/X-CUBE-AI/`）。
+- `dsc_model_data.h`：从 `quantization/outputs/dscamcnet_int8.onnx` 抽出的量化权重/偏置/scale（生成方式见 `stm32_deployment/X-CUBE-AI/`）。
 - `test_sample.h`：QPSK@10 dB 参考样本（int8 q，输入 scale 0.00213504443，zp -4）。
 
 ## 集成

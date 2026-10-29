@@ -67,7 +67,6 @@ $proj = "D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
 ## 5. 验收清单
 
 1. 串口出现 `[UART] formatter test: int=-42 ...`
-2. `[AI] weights=5804 B (flash) | activations=7488 B | io=1024+44 B`
-3. `[DIAG] SYSCLK=544000000 Hz ... CCR=00070200`
-4. `[DWT] N=1000 mean=0.967 ms`（全零）与 `[RESULT-SAMPLE] Mean : 0.975 ms`
+2. `[AI] weights=5804 B (flash) | activations=4488 B | io=1024+44 B`
+3. `[DWT] N=1000 mean=0.951 ms`（全零）与 `[RESULT-SAMPLE] Mean : 0.960 ms`
 5. 回放模式：上电 1.5 s 内发 `R`，出现 `[REPLAY] ready`

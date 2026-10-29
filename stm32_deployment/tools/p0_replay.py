@@ -4,6 +4,7 @@ Protocol (firmware `Src/main.c`):
   boot: wait <=1.5 s for 'R' -> print "[REPLAY] ready" -> wait 256 bytes -> reply "L,q0..q10"
   loop: wait 'R' -> wait 256 bytes -> reply line
 """
+import tempfile
 import argparse
 import json
 import pickle
@@ -20,7 +21,8 @@ ROOT = Path(r"D:\dsc-amcnet-cortex-m7-amc")
 DATA = ROOT / "datasets" / "RML2016.10a_dict.dat"
 SPLIT = ROOT / "datasets" / "split_indices.npz"
 MODEL = ROOT / "quantization" / "outputs" / "dscamcnet_int8.onnx"
-OUT = ROOT / ".tmp" / "p0"
+OUT = ROOT / "stm32_deployment" / "results"
+OUT.mkdir(parents=True, exist_ok=True)
 A_IN = 0.00213504443
 UV4 = Path(r"D:\APP\Keil5\UV4\UV4.exe")
 PROJ = Path(r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx")
@@ -62,7 +64,7 @@ def estimate_ref(sess, Xs):
     return np.clip(np.rint(ref / 0.35008532) + 63, -128, 127).astype(np.int8)
 
 
-def flash_board(log=Path(r"D:\dsc-amcnet-cortex-m7-amc\.tmp\p0_flash.log")):
+def flash_board(log=Path(tempfile.gettempdir()) / "dsc_p0_flash.log"):
     log.parent.mkdir(parents=True, exist_ok=True)
     r = subprocess.run([str(UV4), "-f", str(PROJ), "-o", str(log)],
                        capture_output=True, text=True)

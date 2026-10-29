@@ -51,10 +51,10 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 预期输出：
 
 ```
-[AI] weights=5804 B (flash) | activations=7488 B | io=1024+44 B
-[DIAG] SYSCLK=544000000 Hz ... CCR=00070200
-[RESULT] ... Mean : 0.958 ms
-[RESULT-SAMPLE] ... Mean : 0.968 ms
+[AI] weights=5804 B (flash) | activations=4488 B | io=1024+44 B
+[DWT] N=1000  mean=0.951 ms  min=0.951 ms  max=0.951 ms
+[RESULT] ... Mean : 0.951 ms
+[RESULT-SAMPLE] ... Mean : 0.960 ms
 ```
 
 ## 5. 精度验收（P0）

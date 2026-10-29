@@ -182,6 +182,8 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 ## 7. 下一步 Todo（按顺序）
 
 > 2026-10-29 更新：延迟与精度均已收口（0.969 ms / 59.20% / golden 22/22），剩余项为可选项或硬件事项。
+>
+> 2026-10-29 收尾清理：删除 328 MB 联调临时目录（`.tmp/`、`st_ai_ws/`），移除固件内的调试探针（`[DIAG]`/`[AIS]`/`[MY]`/`[PTR]`/`[SMP]`/`[PROF]`/beacon），源码快照与 `docs/` 已对齐清理后实测输出（0.951/0.960 ms，golden 22/22，stream 20/20、972.6 µs）。
 
 1. **可选：删掉 X-CUBE-AI 运行时**。当前固件仍链接官方 runtime（约 40 KB Flash）只为兼容旧路径；自研引擎已独立，删除后可再省 Flash，需同步删 `network*.c` 与链接库。
 2. **可选：per-channel 量化**。改 `ptq_quantize.py` 的 `per_channel=True` 重新量化，自研引擎需同步改 scale；预期收益有限，精度可能回退。

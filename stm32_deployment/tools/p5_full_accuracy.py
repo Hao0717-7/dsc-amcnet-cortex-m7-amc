@@ -102,7 +102,7 @@ def main():
 
     if args.flash:
         r = subprocess.run([str(UV4), "-f", str(PROJ), "-o",
-                            str(ROOT / ".tmp" / "p5_flash.log")], capture_output=True)
+                            str(__import__("tempfile").gettempdir() + r"\dsc_p5_flash.log")], capture_output=True)
         print("flash rc:", r.returncode)
 
     ser = serial.Serial(args.port, 115200, timeout=0.5)

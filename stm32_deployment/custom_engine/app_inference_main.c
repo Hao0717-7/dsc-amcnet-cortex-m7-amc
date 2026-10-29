@@ -39,8 +39,6 @@
 
 extern UART_HandleTypeDef huart3;
 
-extern uint32_t dsc_prof_cyc[16];
-extern int dsc_prof_enable;
 
 #include <stdio.h>
 #include <string.h>
@@ -199,7 +197,6 @@ static void normalize_window_l2(float *x, int n)
  * ---------------------------------------------------------------------- */
 void inference_main(void)
 {
-    uart_printf("[VER] ptr2\r\n");
     uart_printf("\r\n=== DSC-AMCNet Inference on STM32H723ZG ===\r\n");
     uart_printf("    Core: Cortex-M7 @ 544 MHz\r\n");
     uart_printf("    Model: DSC-AMCNet INT8 (X-CUBE-AI 10.2.0)\r\n\r\n");
@@ -213,106 +210,13 @@ void inference_main(void)
         uart_printf("[FATAL] Network init failed. Halting.\r\n");
         Error_Handler();
     }
-    /* ---- bring-up diagnostics ---------------------------------------- */
-    uart_printf("[DIAG] SYSCLK=%lu Hz DEMCR=%08lx DWT_CTRL=%08lx DBGMCU_CR=%08lx\r\n",
-                (unsigned long)SystemCoreClock,
-                (unsigned long)CoreDebug->DEMCR,
-                (unsigned long)DWT->CTRL,
-                (unsigned long)DBGMCU->CR);
-    uart_printf("[DIAG] CCR=%08lx (DC=%lu IC=%lu)\r\n",
-                (unsigned long)SCB->CCR,
-                (unsigned long)((SCB->CCR >> 16) & 1U),
-                (unsigned long)((SCB->CCR >> 17) & 1U));
-    {
-        uint32_t c0 = DWT->CYCCNT;
-        HAL_Delay(10);
-        uint32_t c1 = DWT->CYCCNT;
-        uart_printf("[DIAG] CYCCNT %lu -> %lu (delta %lu, expect ~640000)\r\n",
-                    (unsigned long)c0, (unsigned long)c1, (unsigned long)(c1 - c0));
-    }
-    memset(input_data, 0, sizeof(input_data));
-    run_inference_once();
-    uart_printf("[DIAG] ai_run ret=%ld logits*1000: %d %d %d %d %d\r\n",
-                (long)g_last_run,
-                (int)(output_data[0] * 1000.0f), (int)(output_data[1] * 1000.0f),
-                (int)(output_data[2] * 1000.0f), (int)(output_data[3] * 1000.0f),
-                (int)(output_data[4] * 1000.0f));
 
-    /* ---- compare with the hand-written int8 engine -------------------- */
     dsc_infer_init();
-    dsc_infer_run(input_data, my_logits);
-    uart_printf("[MY] logits*1000: %d %d %d %d %d %d %d %d %d %d %d\r\n",
-                (int)(my_logits[0] * 0.35008532f * 1000.0f), (int)(my_logits[1] * 0.35008532f * 1000.0f),
-                (int)(my_logits[2] * 0.35008532f * 1000.0f), (int)(my_logits[3] * 0.35008532f * 1000.0f),
-                (int)(my_logits[4] * 0.35008532f * 1000.0f), (int)(my_logits[5] * 0.35008532f * 1000.0f),
-                (int)(my_logits[6] * 0.35008532f * 1000.0f), (int)(my_logits[7] * 0.35008532f * 1000.0f),
-                (int)(my_logits[8] * 0.35008532f * 1000.0f), (int)(my_logits[9] * 0.35008532f * 1000.0f),
-                (int)(my_logits[10] * 0.35008532f * 1000.0f));
-    /* ------------------------------------------------------------------ */
 
     /* -----------------------------------------------------------------
      * Benchmark mode: 1000 inferences, report mean / min / max latency
      * This is the methodology used to produce Table IV in the paper.
      * --------------------------------------------------------------- */
-    /* ---- sample self-test: vendor vs custom ---- */
-    {
-        extern void dsc_fill_sample(float *dst);
-        extern void dsc_infer_run(const float *input_f32, signed char *logits_out);
-        signed char myl[11];
-        int i;
-        extern void dsc_dbg_sample(void);
-        dsc_dbg_sample();
-        dsc_fill_sample(input_data);
-        ai_input_buffers[0].data = AI_HANDLE_PTR(input_data);
-        ai_output_buffers[0].data = AI_HANDLE_PTR(output_data);
-        float s0 = input_data[0], s1 = input_data[1], s2 = input_data[2], s255 = input_data[255];
-        int ai_ret = ai_network_run(network_handle, ai_input_buffers, ai_output_buffers);
-        uart_printf("[IN] s0=%d s1=%d s2=%d s255=%d ret=%d\r\n",
-            (int)(s0*1000000.0f), (int)(s1*1000000.0f), (int)(s2*1000000.0f), (int)(s255*1000000.0f), ai_ret);        uart_printf("[AIS] %d %d %d %d %d %d %d %d %d %d %d\r\n",
-            (int)(output_data[0]*1000.0f), (int)(output_data[1]*1000.0f), (int)(output_data[2]*1000.0f),
-            (int)(output_data[3]*1000.0f), (int)(output_data[4]*1000.0f), (int)(output_data[5]*1000.0f),
-            (int)(output_data[6]*1000.0f), (int)(output_data[7]*1000.0f), (int)(output_data[8]*1000.0f),
-            (int)(output_data[9]*1000.0f), (int)(output_data[10]*1000.0f));
-        dsc_infer_run(input_data, myl);
-        uart_printf("[PTR] in=%u desc=%u fmt=%u sz=%u\r\n",
-            (unsigned)(uintptr_t)input_data,
-            (unsigned)(uintptr_t)ai_input_buffers[0].data,
-            (unsigned)ai_input_buffers[0].format, (unsigned)ai_input_buffers[0].size);
-        memset(input_data, 0, sizeof(input_data));
-        ai_network_run(network_handle, ai_input_buffers, ai_output_buffers);
-        uart_printf("[AIZ2] %d %d %d %d %d %d %d %d %d %d %d\r\n",
-            (int)(output_data[0]*1000.0f), (int)(output_data[1]*1000.0f), (int)(output_data[2]*1000.0f),
-            (int)(output_data[3]*1000.0f), (int)(output_data[4]*1000.0f), (int)(output_data[5]*1000.0f),
-            (int)(output_data[6]*1000.0f), (int)(output_data[7]*1000.0f), (int)(output_data[8]*1000.0f),
-            (int)(output_data[9]*1000.0f), (int)(output_data[10]*1000.0f));
-        ai_network_run(network_handle, ai_input_buffers, ai_output_buffers);
-        uart_printf("[AIZ] %d %d %d %d %d %d %d %d %d %d %d\r\n",
-            (int)(output_data[0]*1000.0f), (int)(output_data[1]*1000.0f), (int)(output_data[2]*1000.0f),
-            (int)(output_data[3]*1000.0f), (int)(output_data[4]*1000.0f), (int)(output_data[5]*1000.0f),
-            (int)(output_data[6]*1000.0f), (int)(output_data[7]*1000.0f), (int)(output_data[8]*1000.0f),
-            (int)(output_data[9]*1000.0f), (int)(output_data[10]*1000.0f));        uart_printf("[MYS] %d %d %d %d %d %d %d %d %d %d %d\r\n",
-            myl[0], myl[1], myl[2], myl[3], myl[4], myl[5], myl[6], myl[7], myl[8], myl[9], myl[10]);
-        for (i = 0; i < 256; i++) input_data[i] = 0.0f;
-    }
-    /* one instrumented run: per-stage cycles (DWT) */
-    dsc_fill_sample(input_data);
-    dsc_prof_enable = 1;
-    { signed char tmp_l[11]; dsc_infer_run(input_data, tmp_l); }
-    dsc_prof_enable = 0;
-    {
-        uint32_t p0 = dsc_prof_cyc[0];
-        uart_printf("[PROF] c1=%lu dw1=%lu pw1=%lu p1=%lu dw2=%lu pw2=%lu p2=%lu dw3=%lu pw3=%lu p3=%lu se=%lu sh=%lu gap=%lu fc1=%lu fc2=%lu tot=%lu\r\n",
-            (unsigned long)(dsc_prof_cyc[1]-p0), (unsigned long)(dsc_prof_cyc[2]-dsc_prof_cyc[1]),
-            (unsigned long)(dsc_prof_cyc[3]-dsc_prof_cyc[2]), (unsigned long)(dsc_prof_cyc[4]-dsc_prof_cyc[3]),
-            (unsigned long)(dsc_prof_cyc[5]-dsc_prof_cyc[4]), (unsigned long)(dsc_prof_cyc[6]-dsc_prof_cyc[5]),
-            (unsigned long)(dsc_prof_cyc[7]-dsc_prof_cyc[6]), (unsigned long)(dsc_prof_cyc[8]-dsc_prof_cyc[7]),
-            (unsigned long)(dsc_prof_cyc[9]-dsc_prof_cyc[8]), (unsigned long)(dsc_prof_cyc[10]-dsc_prof_cyc[9]),
-            (unsigned long)(dsc_prof_cyc[11]-dsc_prof_cyc[10]), (unsigned long)(dsc_prof_cyc[12]-dsc_prof_cyc[11]),
-            (unsigned long)(dsc_prof_cyc[13]-dsc_prof_cyc[12]), (unsigned long)(dsc_prof_cyc[14]-dsc_prof_cyc[13]),
-            (unsigned long)(dsc_prof_cyc[14]-dsc_prof_cyc[13]),
-            (unsigned long)(dsc_prof_cyc[14]-p0));
-    }
-
     uart_printf("[BENCH] Running 1000 inferences (10 warm-up discarded) ...\r\n");
 
     uint32_t mean_x100 = 0U, min_x100 = 0U, max_x100 = 0U;
@@ -382,23 +286,6 @@ void inference_main(void)
         uint32_t us_x100 = (uint32_t)(((uint64_t)(c1 - c0) * 100ULL) /
                              (uint64_t)(SystemCoreClock / 1000000U));
         uint32_t conf_x1000 = (uint32_t)(confidence * 1000.0f);
-
-        if (frame_count < 3)
-        {
-            uart_printf("[DBG] c0=%lu c1=%lu delta=%lu elapsed=%lu ctrl=%08lx\r\n",
-                        (unsigned long)c0, (unsigned long)c1,
-                        (unsigned long)(c1 - c0), (unsigned long)DWT_GetCycles(),
-                        (unsigned long)DWT->CTRL);
-            uart_printf("[DBG] s*100: %d %d %d %d %d %d %d %d %d %d %d\r\n",
-                        (int)(scores[0] * 100.0f), (int)(scores[1] * 100.0f),
-                        (int)(scores[2] * 100.0f), (int)(scores[3] * 100.0f),
-                        (int)(scores[4] * 100.0f), (int)(scores[5] * 100.0f),
-                        (int)(scores[6] * 100.0f), (int)(scores[7] * 100.0f),
-                        (int)(scores[8] * 100.0f), (int)(scores[9] * 100.0f),
-                        (int)(scores[10] * 100.0f));
-            uart_printf("[DBG] pred=%d conf*1000=%lu us*100=%lu\r\n",
-                        pred, (unsigned long)conf_x1000, (unsigned long)us_x100);
-        }
 
         uart_printf("[%6lu] Pred: %-7s | Conf: %lu.%03lu | Latency: %lu.%02lu us\r\n",
                (unsigned long)frame_count,

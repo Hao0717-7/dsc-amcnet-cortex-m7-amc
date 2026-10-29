@@ -49,10 +49,10 @@
 
 ## 复现
 
-固件启动自动打印两轮 benchmark 与一行 `[PROF]`（逐层 cycles）。串口 115200：
+固件启动自动打印两轮 benchmark（全零 + 真实窗口）。逐层 `[PROF]` 探针仅用于调优，收口时已从固件移除，表 4 的数据为当时的测量结果。串口 115200：
 
 ```
-[PROF] c1=... dw1=... pw1=... ... tot=515323
-[RESULT] ... Mean : 0.958 ms
-[RESULT-SAMPLE] ... Mean : 0.968 ms
+[DWT] N=1000  mean=0.951 ms  min=0.951 ms  max=0.951 ms
+[RESULT] ... Mean : 0.951 ms
+[RESULT-SAMPLE] ... Mean : 0.960 ms
 ```
