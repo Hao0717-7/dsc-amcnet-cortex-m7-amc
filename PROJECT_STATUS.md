@@ -1,11 +1,11 @@
 # 项目状态与工作区地图
 
 > 面向：接手这个仓库的人或 AI。读完这一页就能知道项目在做什么、做到哪、每个文件夹装的是什么、哪些坑已经踩过。
-> 最后更新：2026-10-29 ｜ 分支 `main` ｜ HEAD `9e2e1fd`
+> 最后更新：2026-10-29 ｜ 分支 `main`
 
 ## 0. 一句话
 
-复现一篇论文：把 4,961 参数的调制识别网络 DSC-AMCNet 部署到 STM32H723（Cortex-M7 544 MHz）上做 INT8 推理，目标延迟 1.183 ms、+10 dB 准确率 87.01%。**数据 → 训练 → 量化 → 模型转 C 代码 → 编译烧录 → 板上实测 已全部打通**；当前自研 SMLAD 引擎实测 **0.958 ms（全零）/ 0.968 ms（真实样本）**，比论文 1.183 ms 快约 18%；全量 44k 测试集板端准确率 59.20%，与 onnxruntime 一致。
+复现一篇论文：把 4,961 参数的调制识别网络 DSC-AMCNet 部署到 STM32H723（Cortex-M7 544 MHz）上做 INT8 推理，目标延迟 1.183 ms、+10 dB 准确率 87.01%。**数据 → 训练 → 量化 → 模型转 C 代码 → 编译烧录 → 板上实测 已全部打通**；当前自研 SMLAD 引擎实测 **0.958 ms（全零）/ 0.969 ms（真实样本）**，比论文 1.183 ms 快约 18%；全量 44k 板端准确率 **59.20%**（参考 59.21%）、logits 逐位一致 98.80%、golden 回归 22/22；一页式证据报告见 `docs/REPORT.html`。
 
 ## 1. 当前进度
 
@@ -17,7 +17,11 @@
 | 后端兼容性校验 | ✅ 通过 | `validate_backend.py` 输出 | signed int8 / IR 7 / opset 13 / QDQ 68 节点 |
 | ST Edge AI 转换 | ✅ 完成 | `stm32_deployment/X-CUBE-AI/*.c/.h` | 权重 5,804 B；仓库内为 balanced 版（激活 4,488 B），板端实跑 time 版（激活 7,488 B），MACC 163,615 |
 | CubeMX 工程 + Keil 编译 | ✅ 完成 | `D:\DSC_AMCNet_Deployment`（生成物，未纳入本仓库） | Keil AC6 6.7，0 error / 9 warning |
-| 烧录上板测延迟 | ✅ 完成 | `firmware_DSC_AMCNet_INT8.hex`（`D:\DSC_AMCNet_Deployment`） | **1.827–1.843 ms**（≈995k cycles @ 544 MHz），论文 1.183 ms |
+| X-CUBE-AI 运行时上板 | ✅ 完成 | `firmware_DSC_AMCNet_INT8.hex`（部署工程内） | 1.827–1.843 ms；其数值与 onnxruntime 不符，仅作对照基线 |
+| 自研 SMLAD 引擎上板 | ✅ 完成 | 同上（当前固件） | **0.958 / 0.969 ms**（全零 / 真实窗口） |
+| 精度验收（44k 回放） | ✅ 完成 | `stm32_deployment/results/p5_accuracy_44k.json` | 板端 59.20% vs 参考 59.21%，逐位一致 98.80% |
+| 实时流式链路 | ✅ 完成 | `stm32_deployment/results/evidence/stream.log` | 30/30 窗口，板端计算 979 µs/窗 |
+| 证据报告与回归 | ✅ 完成 | `docs/REPORT.html`、`tools/golden_test.py` | golden 22/22；原始日志在 `results/evidence/` |
 | OTA 采集评估 | ⬜ 未做 | — | 需 HackRF + RTL-SDR |
 
 ## 2. 先看这八条，避免重复踩坑
@@ -177,13 +181,13 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 
 ## 7. 下一步 Todo（按顺序）
 
-> 2026-10-28 更新：上板链路已通，以下从「搭建」改为「缩小 1.54× 差距」。
+> 2026-10-29 更新：延迟与精度均已收口（0.969 ms / 59.20% / golden 22/22），剩余项为可选项或硬件事项。
 
-1. **int8 I/O 对照**：用 `--input-data-type int8 --output-data-type int8` 重新生成，固件直接喂 int8（scale 0.002135044 / zp −4），去掉每次推理的 256 点 float→int8 与 11 点 int8→float 转换，测差值（预期 ~1%）。
-2. **量化图对照**：把仓库里论文原版 `stm32_deployment/X-CUBE-AI/`（4,488 B 激活那版）换回工程实测一次，确认差距在图还是在生成参数。
-3. **per-channel 量化实验**：改 `ptq_quantize.py` 的 `per_channel=True`，看 QDQ 节点数与 MACC 路径是否变化；若内核效率提升明显，再评估精度回退。
-4. **官方 on-target 验证**：`stedgeai validate --mode target --desc serial:COM3:115200`，用真实测试集在板上核对逐样本精度（当前板端只喂了全零）。
-5. OTA：需要 HackRF + RTL-SDR，用 `ota_collection/collect_ota.py`（需 pyrtlsdr/onnxruntime）。
+1. **可选：删掉 X-CUBE-AI 运行时**。当前固件仍链接官方 runtime（约 40 KB Flash）只为兼容旧路径；自研引擎已独立，删除后可再省 Flash，需同步删 `network*.c` 与链接库。
+2. **可选：per-channel 量化**。改 `ptq_quantize.py` 的 `per_channel=True` 重新量化，自研引擎需同步改 scale；预期收益有限，精度可能回退。
+3. **OTA**：需要 HackRF + RTL-SDR，用 `ota_collection/collect_ota.py`（需 pyrtlsdr/onnxruntime）。
+4. **能耗**：需要电流表/功耗分析仪；方法与仪器清单见 `docs/P5_RESOURCES.md`，不伪造数值。
+5. **ULCNN 对照**：缺官方权重与训练环境（Zenodo 权重经复测不可用），暂缓。
 
 ## 7.1 上板联调记录（2026-10-28）
 
@@ -247,7 +251,7 @@ X-CUBE-AI 10.2.1 的运行时是标量 C 内核（反汇编无 SMLAD/SMLAL，约
 
 部署工程 `D:\DSC_AMCNet_Deployment` 的 `Src/inference_main.c` 已改为调用 `dsc_infer_run`（benchmark 与分类循环均走自研引擎），X-CUBE-AI 仅保留作对照。烧录镜像：`D:\DSC_AMCNet_Deployment\firmware_DSC_AMCNet_INT8.hex`（22:08 构建，Code 63,108 B / RO 16,620 B / RW 8,456 B / ZI 40,024 B）。
 
-## 11. P0 精度验收（进行中，2026-10-28 夜）
+## 11. P0–P5 精度验收与证据（已完成，2026-10-29）
 
 **参考精度（onnxruntime，locked test split 44,000 样本）**
 - overall acc **59.21%**；+10 dB **89.36%**（论文 89.50/89.55，噪声范围内一致）
@@ -313,3 +317,9 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 - README 增加「本仓库实测」块；新增 `docs/RELEASE_v1.0.md`
 - golden vectors：22 条（11 类 × +10/0 dB），`stm32_deployment/tools/golden_test.py` 全部通过（±1 LSB）
 - 未完成项（OTA/ULCNN/能耗/低功耗）原因与方法：`docs/P5_BLOCKED.md`
+
+**P5-7 证据链收口（2026-10-29）**
+- `docs/REPORT.html`：一页式验收报告（四个结论数字 + 三张图 + 五段原始日志 + 官方对照 + 复现命令），图片已内联，可单独传阅
+- `stm32_deployment/results/evidence/`：build / flash / serial_boot / golden / stream 五份原始日志
+- `stm32_deployment/tools/verify_all.ps1`：一键构建 → 烧录 → golden → 流式 → 重生成报告
+- 说明：`stm32_deployment/results/` 原被 `.gitignore` 忽略，证据文件以 `git add -f` 纳入（约 175 KB）
