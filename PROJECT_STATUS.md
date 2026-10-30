@@ -5,7 +5,7 @@
 
 ## 0. 一句话
 
-复现一篇论文：把 4,961 参数的调制识别网络 DSC-AMCNet 部署到 STM32H723（Cortex-M7 544 MHz）上做 INT8 推理，目标延迟 1.183 ms、+10 dB 准确率 87.01%。**数据 → 训练 → 量化 → 模型转 C 代码 → 编译烧录 → 板上实测 已全部打通**；当前自研 SMLAD 引擎实测 **0.958 ms（全零）/ 0.969 ms（真实样本）**，比论文 1.183 ms 快约 18%；全量 44k 板端准确率 **59.20%**（参考 59.21%）、logits 逐位一致 98.80%、golden 回归 22/22；一页式证据报告见 `docs/REPORT.html`。
+复现一篇论文：把 4,961 参数的调制识别网络 DSC-AMCNet 部署到 STM32H723（Cortex-M7 544 MHz）上做 INT8 推理，目标延迟 1.183 ms、+10 dB 准确率 87.01%。**数据 → 训练 → 量化 → 模型转 C 代码 → 编译烧录 → 板上实测 已全部打通**；当前自研 SMLAD 引擎实测 **0.951 ms（全零）/ 0.960 ms（真实样本）**，比论文 1.183 ms 快约 19%；全量 44k 板端准确率 **59.20%**（参考 59.21%）、logits 逐位一致 98.80%、golden 回归 22/22；一页式证据报告见 `docs/REPORT.html`。
 
 ## 1. 当前进度
 
@@ -16,11 +16,11 @@
 | PTQ 量化 | ✅ 完成 | `quantization/outputs/dscamcnet_int8.onnx` | **INT8 89.36%**，比 FP32 掉 0.37 pp |
 | 后端兼容性校验 | ✅ 通过 | `validate_backend.py` 输出 | signed int8 / IR 7 / opset 13 / QDQ 68 节点 |
 | ST Edge AI 转换 | ✅ 完成 | `stm32_deployment/X-CUBE-AI/*.c/.h` | 权重 5,804 B；仓库内为 balanced 版（激活 4,488 B），板端实跑 time 版（激活 7,488 B），MACC 163,615 |
-| CubeMX 工程 + Keil 编译 | ✅ 完成 | `D:\DSC_AMCNet_Deployment`（生成物，未纳入本仓库） | Keil AC6 6.7，0 error / 9 warning |
+| CubeMX 工程 + Keil 编译 | ✅ 完成 | `D:\DSC_AMCNet_Deployment`（生成物，未纳入本仓库） | Keil AC6 6.7，0 error / 23 warning（全量构建；evidence/build.log 为增量空构建，见 §11） |
 | X-CUBE-AI 运行时上板 | ✅ 完成 | `firmware_DSC_AMCNet_INT8.hex`（部署工程内） | 1.827–1.843 ms；其数值与 onnxruntime 不符，仅作对照基线 |
-| 自研 SMLAD 引擎上板 | ✅ 完成 | 同上（当前固件） | **0.958 / 0.969 ms**（全零 / 真实窗口） |
+| 自研 SMLAD 引擎上板 | ✅ 完成 | 同上（当前固件） | **0.951 / 0.960 ms**（全零 / 真实窗口） |
 | 精度验收（44k 回放） | ✅ 完成 | `stm32_deployment/results/p5_accuracy_44k.json` | 板端 59.20% vs 参考 59.21%，逐位一致 98.80% |
-| 实时流式链路 | ✅ 完成 | `stm32_deployment/results/evidence/stream.log` | 30/30 窗口，板端计算 979 µs/窗 |
+| 实时流式链路 | ✅ 完成 | `stm32_deployment/results/evidence/stream.log` | 20/20 窗口、972.6 µs/窗（日志原值）；300 窗压测 62.3% / 979 µs |
 | 证据报告与回归 | ✅ 完成 | `docs/REPORT.html`、`tools/golden_test.py` | golden 22/22；原始日志在 `results/evidence/` |
 | OTA 采集评估 | ⬜ 未做 | — | 需 HackRF + RTL-SDR |
 
@@ -33,7 +33,7 @@
 5. **训练和推理都必须 per-window L2 归一化。** 归一化覆盖整个 2×128 窗口（256 个数一起求范数），不是按 I/Q 分通道。固件里漏掉这一步，板上精度会掉到接近随机。
 6. **模型转换固定用 float32 I/O + 不分配 I/O 缓冲**（命令见 §6）。ONNX 图本身是 int8 I/O，但仓库固件按 float 收发、自己管理缓冲区，所以生成时必须加 `--input-data-type float32 --output-data-type float32 --no-inputs-allocation --no-outputs-allocation`。
 7. **论文数字与实测不一致，以实测为准。** 论文写 87.01%（官方 Zenodo 元数据写 85.80%，复现不出来）；又写 51.26 KB Flash / 12.09 KB RAM / ≈1.2M MACC，而转换报告是 5.67 KiB 权重、4.38 KiB 激活、163,615 MACC（51.26 KB 应该是含 AI 运行时库的估算）。
-8. **USART 引脚文档是错的。** STM32H723 的 PA8 没有 USART3 复用；自制板调试排针上的 TXD/RXD 实际是 USART1（PA9/PA10），CubeMX 以引脚分配图为准。
+8. **USART 引脚文档是错的。** STM32H723 的 PA8 没有 USART3 复用；自制板调试排针上的 TXD/RXD 实际是 USART1（PA9/PA10），CubeMX 以引脚分配图为准。（2026-10-30 按原理图核对补：当前实测用的 **NUCLEO-H723ZG** 板，板载 ST-LINK VCP 走的是 **USART3 PD8/PD9 → COM3**，不要把 USART1 PA9/PA10 套到 Nucleo 上。）
 
 ## 3. 工作区目录地图
 
@@ -124,7 +124,7 @@ D:\dsc-amcnet-cortex-m7-amc\
 ### 目标硬件（自制核心板 LXB723ZG-P1）
 - MCU：STM32H723ZGT6（LQFP144）；晶振 **25 MHz**（不是 Nucleo 的 8 MHz）；无板载 ST-LINK、无 USB 转串口。
 - 时钟：VOS0，HSE 25 MHz → PLL1 **M=25 / N=544 / P=1** → 544 MHz。（若改用 Nucleo：8 MHz → M=2 / N=136 / P=1。550 MHz 需要额外开 `CPU_FREQ_BOOST`，代价是 ITCM/DTCM 的 ECC 失效。）
-- 串口：USART1，PA9 = TX / PA10 = RX，115200 8N1，已引到调试排针 `3V3 RST TXD RXD`。
+- 串口：USART1，PA9 = TX / PA10 = RX，115200 8N1，已引到调试排针 `3V3 RST TXD RXD`。**注意**：这是自制核心板 LXB723ZG-P1 的接法；当前实测的 NUCLEO-H723ZG 板用的是 USART3 PD8/PD9（ST-LINK VCP → COM3，原理图 MB1364 焊桥 SB19/SB12 确认），固件 `MX_USART3_UART_Init()` 亦如此。
 - 调试：SWD，PA13 = SWDIO / PA14 = SWCLK，外接 ST-LINK。
 
 ## 5. 关键里程碑
@@ -181,7 +181,7 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 
 ## 7. 下一步 Todo（按顺序）
 
-> 2026-10-29 更新：延迟与精度均已收口（0.969 ms / 59.20% / golden 22/22），剩余项为可选项或硬件事项。
+> 2026-10-29 更新：延迟与精度均已收口（0.951/0.960 ms / 59.20% / golden 22/22），剩余项为可选项或硬件事项。
 >
 > 2026-10-29 收尾清理：删除 328 MB 联调临时目录（`.tmp/`、`st_ai_ws/`），移除固件内的调试探针（`[DIAG]`/`[AIS]`/`[MY]`/`[PTR]`/`[SMP]`/`[PROF]`/beacon），源码快照与 `docs/` 已对齐清理后实测输出（0.951/0.960 ms，golden 22/22，stream 20/20、972.6 µs）。
 
@@ -193,11 +193,11 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 
 ## 7.1 上板联调记录（2026-10-28）
 
-**硬件**：NUCLEO-H723ZG（MB1364E，STLINK-V3E 板载）；HSE 走 ST-LINK MCO 的 8 MHz（板上 25 MHz 晶振 X3 标 DNF）；VCP = USART3 PD8/PD9，枚举为 `COM3`；LED：LD1 绿 PB0、LD2 黄 PE1、LD3 红 PB14。
+**硬件**：NUCLEO-H723ZG（MB1364E，STLINK-V3E 板载）；**时钟用 HSI 64 MHz（未启用 HSE）**——2026-10-30 按 MB1364 原理图核对：板上 X3 是 25 MHz 晶振、ST-LINK MCO 8 MHz 经 SB3/SB4（可选，均未使用）；VCP = USART3 PD8/PD9（MB1364 焊桥 SB19/SB12），枚举为 `COM3`；LED：LD1 绿 PB0、LD2 黄 PE1、LD3 红 PB14。
 
 **工具链**：CubeMX 6.18.1 CLI 生成工程（`-q script`：`config load` → `project generate`）；Keil µVision 5.24a + **ARM Compiler 6.7**（`pCCUsed 6070000::V6.7::ARMCLANG`，必须放在 `<Target>` 层）；ST-LINK 烧录。
 
-**时钟**：VOS0、HSE bypass 8 MHz、PLL1 **M=2 / N=136 / P=1 / Q=4 / R=2** → SYSCLK 544 MHz；HPRE /2（AXI=272 MHz）、APB1-4 /2、FLASH_LATENCY_3。HPRE 设为 /1 时 CubeMX 会算出非法的 FLASH_LATENCY_0，故 HCLK 必须 /2。
+**时钟**：VOS0、PLL 源 = **HSI 64 MHz**、PLL1 **M=8 / N=68 / P=1 / Q=4 / R=2**（VCO 输入 8 MHz）→ SYSCLK 544 MHz；HPRE /2（AXI=272 MHz）、APB1-4 /2、FLASH_LATENCY_3。HPRE 设为 /1 时 CubeMX 会算出非法的 FLASH_LATENCY_0，故 HCLK 必须 /2。（10-28 曾用 HSE bypass 8 MHz + M=2/N=136 的方案，10-29 起改为 HSI，不再依赖板载晶振 / ST-LINK MCO；`.ioc` 已于 2026-10-30 同步为 HSI M=8/N=68。）
 
 **踩过的四个坑**（都已修）：
 1. **链接 printf 会在启动阶段崩**：AC6 的 stdio 初始化走 `_sys_open`/半主机 `BKPT 0xAB`，未接调试器即 HardFault，程序到不了 main。→ 固件改用自写 `uart_printf`（`Src/main.c` + `Inc/uart_printf.h`），全程不链接 stdio。
@@ -236,10 +236,10 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 ## 9. 已知限制
 
 - 板端 benchmark 输入是全零，只验证时延，未验证精度；精度核对需跑 `stedgeai validate --mode target` 或用真实样本回放。
-- 部署工程 `D:\DSC_AMCNet_Deployment` 在仓库之外，`.ioc` 中没有 X-CUBE-AI 中间件条目：在 CubeMX 里重新 Generate 会覆盖 `main.c` 的 544 MHz 时钟与 `inference_main()` 调用，也会丢 AI 集成，改配置后要重新打补丁。
+- 部署工程 `D:\DSC_AMCNet_Deployment` 在仓库之外，`.ioc` 中没有 X-CUBE-AI 中间件条目：在 CubeMX 里重新 Generate 会覆盖 `main.c` 的 544 MHz 时钟与 `inference_main()` 调用，也会丢 AI 集成，改配置后要重新打补丁。（2026-10-30 已收口：产生实测镜像的 `dwt_measure.{c,h}`、`uvprojx`、`.sct` 已收回 `stm32_deployment/custom_engine/`，`.ioc` 已同步到 HSI 544 MHz，详见 `docs/BUILD.md` §1.1。）
 - `.tmp/` 是联调期临时目录（诊断脚本、串口日志、截图），已加入 `.gitignore`，不入库。
 - 0.2 ms 级的差距尚未解释：已排除内存布局、激活对齐、优化等级、编译工具链；剩余怀疑为 int8 I/O 转换与量化图差异（见 §7）。
-- 当前 HEAD 之上没有未提交的源码改动；本次提交只涉及 `PROJECT_STATUS.md` 与 `.gitignore`。
+- 2026-10-29 收尾提交（f4e10cd）后工作区是干净的；2026-10-30 为统一口径 + 源码收口又改了一批文件（见 `git status`），尚未提交。
 
 ## 10. 自研 SMLAD 引擎（2026-10-28）
 
@@ -248,10 +248,10 @@ X-CUBE-AI 10.2.1 的运行时是标量 C 内核（反汇编无 SMLAD/SMLAL，约
 - 位置：`stm32_deployment/custom_engine/`（`dsc_infer.c/.h`、`dsc_model_data.h`、`test_sample.h`、`README.md`）。
 - 实现：通道两两打包 + 内联 `smlad` 双 16 位乘加；每层 `sumw` 吸收输入零点；Q31 定点 requant（无逐元素 `lroundf`）；dw3 边界补 q=-128。
 - 量化语义：激活 zp=-128，输入 zp=-4，SE fc2 zp=-5，logits zp=63，权重 zp=0；与 onnxruntime 逐位一致。
-- 实测（NUCLEO-H723ZG，544 MHz，1000 次，10 次预热）：**Mean 0.966 ms（min 0.965 / max 0.967）**，比 X-CUBE-AI 快 47%，比论文 1.183 ms 快 18%。
+- 实测（NUCLEO-H723ZG，544 MHz，1000 次，10 次预热）：**0.951 ms（全零）/ 0.960 ms（真实窗口）**（全零 min=max=0.951；真实窗 min=0.960 / max=0.962），比 X-CUBE-AI 运行时（1.827 ms）快 **1.90×**，比论文 1.183 ms 快 **18.8%**。
 - 数值：QPSK@10 dB 样本 `[MYS] 55 31 0 48 30 34 51 64 60 60 34` 与 ORT 完全相同。
 
-部署工程 `D:\DSC_AMCNet_Deployment` 的 `Src/inference_main.c` 已改为调用 `dsc_infer_run`（benchmark 与分类循环均走自研引擎），X-CUBE-AI 仅保留作对照。烧录镜像：`D:\DSC_AMCNet_Deployment\firmware_DSC_AMCNet_INT8.hex`（22:08 构建，Code 63,108 B / RO 16,620 B / RW 8,456 B / ZI 40,024 B）。
+部署工程 `D:\DSC_AMCNet_Deployment` 的 `Src/inference_main.c` 已改为调用 `dsc_infer_run`（benchmark 与分类循环均走自研引擎），X-CUBE-AI 仅保留作对照。烧录镜像：`D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.hex`（0.951/0.960 ms 版；Code 61,788 B / RO 16,092 B / RW 8,452 B / ZI 39,972 B → ROM 80,904 B、RAM 48,424 B）。产生该镜像的 `dwt_measure.{c,h}`、`uvprojx`、`.sct` 已于 2026-10-30 收回 `custom_engine/`，见 `docs/BUILD.md` §1.1。
 
 ## 11. P0–P5 精度验收与证据（已完成，2026-10-29）
 
@@ -280,7 +280,7 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 
 **P1 基准规范化（2026-10-29）**
 - 双 benchmark：全零 0.967 ms，真实 QPSK(+10 dB) 窗口 **0.975 ms**（+0.8%，数据相关分支/缓存）
-- 对外口径用 0.975 ms；论文 1.183 ms → 快 17.6%
+- 对外口径（P1 阶段）用 0.975 ms；论文 1.183 ms → 快 17.6%（清理探针后最终为 0.960 ms，快 18.8%）
 - 方法学与数据：`docs/P1_BENCHMARK.md`
 
 **P2 可复现（2026-10-29）**
@@ -293,7 +293,7 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 - 部署配置快照：`stm32_deployment/custom_engine/DSC_AMCNet_Deployment.ioc`
 
 **P4 性能优化（2026-10-29）**
-- 全零 **0.958 ms**、真实样本 **0.968 ms**（优化前 0.967 / 0.975）
+- 全零 **0.958 ms**、真实样本 **0.968 ms**（优化前 0.967 / 0.975；清理调试探针后最终 **0.951 / 0.960 ms**）
 - 逐层 profile：pw1/pw2/pw3 合计 283k cycles（55%），dw 合计 119k（23%）
 - 成功：dw3 改为成对 SMLAD（−4k cycles）；失败并回退：conv1x1 全时间打包（+45%）、tile 16+4 累加器（+76%）、双累加器（+76%）
 - 详见 `docs/P4_OPTIMIZATION.md`
@@ -312,7 +312,7 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 
 
 **P5-3 资源（2026-10-29）**
-- Flash **87,408 B（85.36 KB）**、RAM **48,560 B（47.42 KB）**；组成与论文口径差异见 `docs/P5_RESOURCES.md`
+- Flash **80,904 B（79.01 KB）**、RAM **48,424 B（47.29 KB）**（清理调试探针后的 15:52 构建 map 实测；此前 87,408 / 48,560 B 为旧固件）；组成与论文口径差异见 `docs/P5_RESOURCES.md`
 - 能耗无法本地测量（无电流表），方法已写入文档，不伪造数值
 
 **P5-4/5/6 文档、回归与发布（2026-10-29）**

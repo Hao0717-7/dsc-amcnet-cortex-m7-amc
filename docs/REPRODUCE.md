@@ -72,7 +72,7 @@ python stm32_deployment/tools/p0_replay.py --n 5000 --flash
 |---|---|---|
 | 参数量 | 4,961 | 4,961 |
 | INT8 +10 dB 精度 | 86.92% | 89.36%（重训后；论文 FP32 87.01% 不可复现） |
-| Latency | 1.183 ms | **0.958 ms（全零）/ 0.968 ms（真实样本）** |
+| Latency | 1.183 ms | **0.951 ms（全零）/ 0.960 ms（真实样本）** |
 | 运行时 | X-CUBE-AI（未注明版本） | 自研 SMLAD 引擎（X-CUBE-AI 10.2.1 实测 1.827 ms） |
 
 ## 7. 许可与引用
@@ -84,6 +84,6 @@ python stm32_deployment/tools/p0_replay.py --n 5000 --flash
 
 ## 8. 已知限制
 
-- 板端精度验收用了 5,000 样本子集（非全 44k），置信区间 ±0.7 pp。
+- 板端精度验收已跑全量 44,000 窗口（`p5_accuracy_44k.json`，59.2045% vs 参考 59.2091%）；早期 5,000 子集只是一次抽样复核。
 - `D:\DSC_AMCNet_Deployment` 不在仓库内；CubeMX 重新生成会覆盖 `Src/main.c`，补丁清单见 `docs/BUILD.md`。
 - OTA 链路未验证（需 HackRF + RTL-SDR）。

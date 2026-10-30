@@ -27,11 +27,19 @@ acc = json.loads(read(RES / "p5_accuracy_44k.json"))
 zero = re.search(r"\[DWT\] N=1000\s+mean=([\d.]+) ms", boot)
 real = re.findall(r"\[DWT\] N=1000\s+mean=([\d.]+) ms", boot)
 
+# 资源数字优先读 Keil map（部署工程），读不到才用 2026-10-29 15:52 构建的实测值
+MAP = Path("D:/DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment/DSC_AMCNet_Deployment.map")
+_mtxt = read(MAP)
+_mrom = re.search(r"Total ROM\s+Size[^()]*?([\d,]+)\s*\(", _mtxt)
+_mrw = re.search(r"Total RW\s+Size[^()]*?([\d,]+)\s*\(", _mtxt)
+rom_b = int(_mrom.group(1).replace(",", "")) if _mrom else 80904
+ram_b = int(_mrw.group(1).replace(",", "")) if _mrw else 48424
+
 # ---------- figures ----------
 plt.rcParams.update({"figure.dpi": 130, "font.size": 9})
 fig, ax = plt.subplots(figsize=(6.2, 2.9))
 labels = ["paper\n(1.183)", "X-CUBE-AI\nruntime", "custom\nzero input", "custom\nreal window"]
-vals = [1.183, 1.827, float(real[0]) if real else 0.959, float(real[1]) if len(real) > 1 else 0.969]
+vals = [1.183, 1.827, float(real[0]) if real else 0.951, float(real[1]) if len(real) > 1 else 0.960]
 colors = ["#8a8a8a", "#c0504d", "#4f81bd", "#2e7d32"]
 bars = ax.bar(labels, vals, color=colors, width=0.55)
 for b, v in zip(bars, vals):
@@ -64,7 +72,7 @@ plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(5.2, 2.6))
 x = [0, 1]
-used = [87408 / 1024, 48560 / 1024]
+used = [rom_b / 1024, ram_b / 1024]
 paperv = [51.26, 12.09]
 b1 = ax.bar([i - 0.18 for i in x], used, width=0.34, label="this build", color="#2e7d32")
 b2 = ax.bar([i + 0.18 for i in x], paperv, width=0.34, label="paper (Table II)", color="#8a8a8a")
@@ -126,7 +134,7 @@ a {{ color:#0969da; }}
 <div class="sub">NUCLEO-H723ZG · Cortex-M7 @544 MHz · 自研 INT8 SMLAD 引擎 · 生成于 {datetime.now():%Y-%m-%d %H:%M}</div>
 
 <div class="kpi">
-  <div><b>{float(real[1]) if len(real)>1 else 0.969:.3f} ms</b><span>单次推理（真实窗口，DWT N=1000）</span></div>
+  <div><b>{float(real[1]) if len(real)>1 else 0.960:.3f} ms</b><span>单次推理（真实窗口，DWT N=1000）</span></div>
   <div><b>{100*acc['board_acc']:.2f}%</b><span>44,000 窗口板端精度（参考 {100*acc['ref_acc']:.2f}%）</span></div>
   <div><b>{100*acc['bit_exact_match_rate']:.2f}%</b><span>logits 逐位一致率</span></div>
   <div><b>{g}</b><span>golden vectors（±1 LSB + argmax）</span></div>
@@ -136,17 +144,17 @@ a {{ color:#0969da; }}
 <div class="card">
 <table>
 <tr><th>数字</th><th>来源（本仓库文件）</th><th>产生方式</th></tr>
-<tr><td>0.959 / 0.969 ms</td><td><code>stm32_deployment/results/evidence/serial_boot.log</code></td><td>板端 DWT CYCCNT，1000 次、10 次预热剔除，串口原样打印</td></tr>
+<tr><td>0.951 / 0.960 ms</td><td><code>stm32_deployment/results/evidence/serial_boot.log</code></td><td>板端 DWT CYCCNT，1000 次、10 次预热剔除，串口原样打印</td></tr>
 <tr><td>59.20% / 59.21%</td><td><code>stm32_deployment/results/p5_accuracy_44k.json</code></td><td>44,000 个 locked-test 窗口逐个回放，板端 logits vs onnxruntime</td></tr>
 <tr><td>98.80% 逐位一致</td><td>同上</td><td>11 个 int8 logits 全部相等才计一致</td></tr>
 <tr><td>{g} golden</td><td><code>stm32_deployment/results/evidence/golden.log</code></td><td>22 条固定向量（11 类 × +10/0 dB）</td></tr>
-<tr><td>30/30 窗口、{compute.group(1) if compute else '979'} µs</td><td><code>stm32_deployment/results/evidence/stream.log</code></td><td>921600 波特流式链路，板端直接算完回结果</td></tr>
+<tr><td>20/20 窗口、{compute.group(1) if compute else '972.6'} µs</td><td><code>stm32_deployment/results/evidence/stream.log</code></td><td>921600 波特流式链路，板端直接算完回结果</td></tr>
 </table>
 </div>
 
 <h2>2. 延迟对比</h2>
 <div class="card"><img src="{b64(p1)}" alt="latency">
-<div class="note">论文值 1.183 ms 取自仓库 README；X-CUBE-AI 1.827 ms 为其运行时在 time 优化下的实测上限；自研引擎 0.959/0.969 ms。</div></div>
+<div class="note">论文值 1.183 ms 取自仓库 README；X-CUBE-AI 1.827 ms 为其运行时在 time 优化下的实测上限；自研引擎 0.951/0.960 ms。</div></div>
 
 <h2>3. 精度随 SNR（44,000 窗口）</h2>
 <div class="card"><img src="{b64(p2)}" alt="per-snr">
@@ -154,7 +162,7 @@ a {{ color:#0969da; }}
 
 <h2>4. 资源占用</h2>
 <div class="card"><img src="{b64(p3)}" alt="resources">
-<div class="note">构建产物 Code+RO 共 87,408 B、RW+ZI 共 48,560 B；论文 51.26 KB / 12.09 KB 为官方运行时口径，包含其静态库。</div></div>
+<div class="note">构建产物 ROM 共 {rom_b:,} B（{rom_b/1024:.2f} KB）、RW+ZI 共 {ram_b:,} B（{ram_b/1024:.2f} KB）；论文 51.26 KB / 12.09 KB 为官方运行时口径，包含其静态库。</div></div>
 
 <h2>5. 原始日志（可直接核对）</h2>
 <div class="card"><b>构建</b> <span class="{'ok' if build_ok else 'bad'}">{'0 Error(s)' if build_ok else '见日志'}</span>

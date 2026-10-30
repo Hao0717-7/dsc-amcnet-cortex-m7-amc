@@ -1,0 +1,140 @@
+{
+  "schema": "dsc-amcnet-measured-v1",
+  "generated_at": "2026-10-29T18:52+08:00",
+  "provenance": {
+    "offline_recalc": "python stm32_deployment/tools/measure_results.py（读取数据集/locked split/ONNX，重算 FP32/INT8 44k 精度，复核 JSON 自洽与 evidence 日志）",
+    "live_board": "串口 COM3（STLink VCP，921600/115200），板端为 2026-10-29 15:52 构建的固件；golden_test.py + p0_replay.py --n 300 直接对板实测",
+    "claim": "本文件只放本轮亲自复算/亲测得到的数字；论文值与其他历史值不写入此处"
+  },
+  "environment": {
+    "python": "3.14.5",
+    "numpy": "2.5.1",
+    "onnx": "1.23.2",
+    "onnxruntime": "1.31.1",
+    "torch": null,
+    "note": "torch/scipy 缺失；FP32 精度用 quantization/outputs/dscamcnet_fp32.onnx 复算"
+  },
+  "dataset": {
+    "path": "datasets/RML2016.10a_dict.dat",
+    "bytes": 225292173,
+    "sha256": "889ac64827e44224d2229acc870ca44e3b487e594d588de75372184c05a80b4a",
+    "n_windows": 220000,
+    "n_keys": 220,
+    "classes": 11,
+    "snrs": 20,
+    "per_cell": 1000,
+    "q_std_min": 0.00321,
+    "q_std_max": 0.00801,
+    "q_all_zero": false
+  },
+  "split": {
+    "path": "datasets/split_indices.npz",
+    "md5": "bb8bc1e7c41a58fad6f08a23ae7ef76d",
+    "train": 176000,
+    "test": 44000,
+    "no_overlap": true,
+    "full_cover": true,
+    "stratified": false,
+    "test_per_cell_min": 166,
+    "test_per_cell_max": 239,
+    "test_per_class": {
+      "8PSK": 4001, "AM-DSB": 3923, "AM-SSB": 3978, "BPSK": 4033,
+      "CPFSK": 4027, "GFSK": 4025, "PAM4": 3991, "QAM16": 3960,
+      "QAM64": 3989, "QPSK": 3951, "WBFM": 4122
+    }
+  },
+  "model": {
+    "checkpoint": "models/checkpoints/dscamcnet_best.pt",
+    "checkpoint_bytes": 36437,
+    "checkpoint_sha256": "f7a05c25672a0074cff30673c87acb097897fa96662264cb57f9a959a91baab6",
+    "onnx_int8": "quantization/outputs/dscamcnet_int8.onnx",
+    "onnx_int8_bytes": 27989,
+    "onnx_fp32": "quantization/outputs/dscamcnet_fp32.onnx",
+    "onnx_fp32_bytes": 23952,
+    "onnx_nodes": 93,
+    "onnx_initializer_elements": 4869,
+    "note": "initializer 元素数 4,869 与模型定义 4,961 参数不是同一口径（偏置/未落盘常量），文档引用参数数时以模型定义为准"
+  },
+  "accuracy_locked_44k": {
+    "split": "datasets/split_indices.npz test_idx（44,000，论文口径）",
+    "fp32_onnx": { "acc": 0.5956, "acc_plus10db": 0.8973 },
+    "int8_onnx": { "acc": 0.5920909, "acc_plus10db": 0.8936 },
+    "int8_vs_results_ref_accuracy_json": {
+      "ref_json_acc": 0.5920909090909091,
+      "diff": 0.0,
+      "conclusion": "重算与 stm32_deployment/results/ref_accuracy.json 完全一致"
+    }
+  },
+  "board_json_selfcheck": {
+    "file": "stm32_deployment/results/p5_accuracy_44k.json",
+    "board_acc": 0.5920454545454545,
+    "ref_acc": 0.5920909090909091,
+    "n_from_confusion": 44000,
+    "trace_from_confusion": 26050,
+    "recomputed_from_confusion": 0.5920454545454545,
+    "conclusion": "JSON 自洽：board 26,050/44,000，ref 26,052/44,000"
+  },
+  "evidence_logs": {
+    "serial_boot_dwt": [
+      { "n": 1000, "mean_ms": 0.951, "min_ms": 0.951, "max_ms": 0.951 },
+      { "n": 1000, "mean_ms": 0.960, "min_ms": 0.960, "max_ms": 0.962 }
+    ],
+    "golden": { "pass": 22, "fail": 0, "tail": "22/22 vectors within +/-1 LSB and argmax-equal" },
+    "stream_tail": [
+      "windows=20/20  board_acc=0.650",
+      "compute  mean=972.6us  min=971.0  max=976.5",
+      "round-trip mean=7.5ms (UART 921600: 512 B payload ~= 5.6 ms)"
+    ]
+  },
+  "resources_map": {
+    "map": "D:/DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment/DSC_AMCNet_Deployment.map",
+    "build_mtime": "2026-10-29 15:52",
+    "code": 61788,
+    "ro_data": 16092,
+    "rw_data": 8452,
+    "zi_data": 39972,
+    "total_rom": 80904,
+    "total_rom_kb": 79.01,
+    "total_rw": 48424,
+    "total_rw_kb": 47.29
+  },
+  "live_board_2026_10_29": {
+    "classify_loop_latency_us": {
+      "frames": 257,
+      "mean": 960.58,
+      "min": 960.58,
+      "max": 960.58,
+      "ms": 0.961,
+      "note": "固件 classify 循环每帧打印的 Latency 字段，串口原文；与 DWT 的 0.960 ms 一致"
+    },
+    "golden_test": {
+      "port": "COM3",
+      "pass": 22,
+      "total": 22,
+      "exit_code": 0,
+      "note": "21 条 logits 全等，PAM4_0dB 最大差 1 LSB；WBFM_0dB argmax=1 与期望 logits 一致（对该向量而言分类≠真类）"
+    },
+    "replay_300": {
+      "port": "COM3",
+      "n_requested": 300,
+      "n_ok": 300,
+      "exact_11_logits": 297,
+      "argmax_agree": 300,
+      "acc_board": 0.62,
+      "acc_ref": 0.62,
+      "mean_abs_diff_q": 0.0018181818181818182,
+      "note": "板端与 onnxruntime 参考 argmax 100% 一致，准确率相同"
+    }
+  },
+  "consistency": {
+    "authoritative_latency": "0.951 ms（全零）/ 0.960 ms（真实窗），DWT N=1000",
+    "authoritative_resources": "ROM 80,904 B（79.01 KB）/ RAM 48,424 B（47.29 KB）",
+    "authoritative_accuracy": "44k 板端 59.2045% vs 参考 59.2091%，逐位一致 98.80%",
+    "stale_values": "0.958/0.968/0.969 ms、87,408/48,560 B、85.36/47.42 KB 均为清理联调探针前的旧固件数据，已从文档中替换",
+    "open_gaps": [
+      "仓库内 stm32_deployment/firmware/dwt_measure.{c,h} 是旧版（float* + HAL_RCC_GetHCLKFreq），部署工程用的是 uint32_t*×100 + SystemCoreClock；仓库无法原样重建 0.951/0.960",
+      ".ioc 仍是 192 MHz 时钟配置，CubeMX 重新 Generate 会破坏 544 MHz",
+      "REPORT.html 与 figs 已按本文件重生成；docs/REPORT_preview.png 仍是旧截图"
+    ]
+  }
+}

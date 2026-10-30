@@ -18,14 +18,14 @@
 
 | 输入 | Mean | Min | Max | 折算周期 @544 MHz |
 |---|---|---|---|---|
-| 全零窗口 | 0.958 ms | 0.957 ms | 0.959 ms | ≈521,000 |
-| **真实 QPSK(+10 dB) 窗口** | **0.968 ms** | 0.965 ms | 0.970 ms | **≈526,600** |
+| 全零窗口 | 0.951 ms | 0.951 ms | 0.951 ms | ≈517,300 |
+| **真实 QPSK(+10 dB) 窗口** | **0.960 ms** | 0.960 ms | 0.962 ms | **≈522,200** |
 | 论文（X-CUBE-AI，544 MHz） | 1.183 ms | — | — | 643,552 |
 | X-CUBE-AI 10.2.1 实测（同板） | 1.827 ms | — | — | ≈995,000 |
 
-真实数据比全零慢约 **0.8%**：ReLU 分支与缓存行为随数据变化，所以**对外报数用 0.968 ms**，全零的 0.958 ms 只作对照（P4 优化后；优化前的 0.967/0.975 ms 见 `docs/P4_OPTIMIZATION.md`）。
+真实数据比全零慢约 **0.9%**：ReLU 分支与缓存行为随数据变化，所以**对外报数用 0.960 ms**，全零的 0.951 ms 只作对照（清理固件调试探针后的最终值；清理前为 0.958/0.968 ms，优化前为 0.967/0.975 ms，见 `docs/P4_OPTIMIZATION.md`）。
 
-即便如此，仍比论文的 1.183 ms 快 **18.2%**（0.968 / 1.183 = 0.818）。
+即便如此，仍比论文的 1.183 ms 快 **18.8%**（0.960 / 1.183 = 0.812）。
 
 ## 3. 复现
 
@@ -33,10 +33,10 @@
 
 ```
 [BENCH] Running 1000 inferences (10 warm-up discarded) ...
-[DWT] N=1000  mean=0.967 ms  min=0.966 ms  max=0.971 ms
-[RESULT] ... Mean : 0.967 ms
+[DWT] N=1000  mean=0.951 ms  min=0.951 ms  max=0.951 ms
+[RESULT] ... Mean : 0.951 ms
 [RESULT-SAMPLE] same engine, real QPSK(+10 dB) window
-         Mean : 0.975 ms
+         Mean : 0.960 ms
 ```
 
 对应源码：`D:\DSC_AMCNet_Deployment\Src\inference_main.c`（两段 `DWT_BenchmarkN(run_custom_once, 1000, ...)`）。

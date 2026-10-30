@@ -7,11 +7,15 @@
 **File:** `RML2016.10a_dict.dat` (pickled Python dict, ~215 MB for the
 1,000-per-cell build used here)
 
-### Built from the per-modulation CSV export
+### 当前 canonical 文件：DeepSig 官方 I/Q pickle（2026-10-29 实测复核）
 
-This copy was **not** downloaded as the original pickle. It was rebuilt from a
-per-modulation CSV export (`<MOD>.csv`, 11 files) with
-[`build_rml2016_from_csv.py`](build_rml2016_from_csv.py):
+`datasets/RML2016.10a_dict.dat` 当前是 **DeepSig 官方 I/Q pickle 格式**（`{(mod, snr): (1000, 2, 128) float32}`），
+sha256 `889ac64827e44224d2229acc870ca44e3b487e594d588de75372184c05a80b4a`（225,292,173 B）。
+2026-10-29 实测：I 通道 std 0.0027–0.0080、Q 通道 std 0.0015–0.0080（量级相当，I/Q 相关性 ≈ 0）→ 真正的双通道 I/Q，
+**不是** “I = payload, Q = 0” 的重建版本。
+
+> 下面保留的是**历史 CSV 重建命令**，已废弃：`--q-mode zero`（默认）会把 Q 全填 0，用该版本训练 +10 dB 只有 **74.99%**；
+> 且脚本会直接覆盖 `datasets/RML2016.10a_dict.dat`，不要再运行。
 
 ```bash
 python datasets/build_rml2016_from_csv.py \
@@ -41,12 +45,12 @@ columns are 0.96 correlated at high SNR, which is impossible for the I and Q
 halves of a PSK/QAM window. The export therefore carries 128 values where the
 canonical file needs 128 (I) + 128 (Q).
 
-Until the export convention is confirmed, the build fills the (2, 128) window as
-**I = payload, Q = 0** (`--q-mode zero`, the default). `--q-mode copy` and
-`--q-mode hilbert` exist for re-generating the canonical file if the payload
-turns out to be one channel of a complex window (Hilbert gives the analytic
-quadrature). Only the canonical 1,000/cell file changes with that flag; the
-440,000-row source is the same rows either way, so re-running is cheap.
+Until the export convention is confirmed, the build filled the (2, 128) window as
+**I = payload, Q = 0** (`--q-mode zero`, the default) —— 这是旧路径，产物 +10 dB 只有 74.99%，已废弃；
+当前仓库文件不是该路径产物（见上文 sha256 与 Q 通道实测）。
+
+> `--q-mode copy` / `--q-mode hilbert` 只是备选；脚本写死输出 `datasets/RML2016.10a_dict.dat`，
+> 在任何情况下都不要用它覆盖官方 I/Q 文件。`--q-mode zero` 的同时也掩盖了“CSV 只有单通道”的根因。
 
 ### Sampling rule for the canonical file
 
@@ -70,6 +74,7 @@ the class/SNR structure is identical.
 | Samples per class/SNR | 1,000 |
 | Total samples | 220,000 |
 | Sample format | Complex IQ, 128 samples → shape (2, 128) float32 |
+| sha256 | `889ac64827e44224d2229acc870ca44e3b487e594d588de75372184c05a80b4a`（225,292,173 B） |
 
 ### Acquisition
 
@@ -89,7 +94,7 @@ the class/SNR structure is identical.
    Total samples : 220,000
    Unique classes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
    SNR range     : -20 to 18 dB
-   Locked split (80/20 stratified, SEED = 42):
+   Locked split (80/20, SEED = 42):
      Train : 176,000
      Test  :  44,000
    ```
@@ -104,10 +109,10 @@ The train/val/test split is **locked** and archived on Zenodo:
 
 Download `split_indices.npz` from Zenodo and place it in this directory.
 
-The split was generated with a fixed random seed (seed = 42) and stratified
-sampling to ensure equal class/SNR representation across splits. It must not
-be regenerated — doing so will produce different accuracy numbers than those
-reported in the paper.
+The split was generated with a fixed random seed (seed = 42); 2026-10-29 复核：**并非按类分层**
+（每类 test 3,923–4,122，每 (mod, snr) cell 的 test 数 166–239），train/test 无重叠且覆盖全部 220,000 个索引。
+It must not be regenerated — doing so will produce different accuracy numbers than those
+reported in the paper. md5 = `bb8bc1e7c41a58fad6f08a23ae7ef76d`。
 
 ### Why is the split locked?
 

@@ -21,7 +21,7 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 
 ---
 
-## Key Results (Locked, Silicon-Measured)
+## Key Results (论文报告值 / paper-reported)
 
 | Model | Latency (ms) | Flash (KB) | RAM (KB) | INT8 Acc. @+10 dB | PTQ Degr. |
 |---|---|---|---|---|---|
@@ -29,18 +29,22 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 | ULCNN-simplified INT8 | 2.104 | 49.25 | 36.78 | 87.55% | 1.95 pp |
 | **DSC vs ULCNN** | **1.78× faster** | — | **−24.69 KB** | within ±1.4 pp Wilson CI | **22× lower** |
 
-> All values measured on physical hardware (DWT cycle counters, 544 MHz, ICache + DCache). Energy: **0.091 mJ**/inference (955.1 acc/mJ). No extrapolation.
+> 上表是论文（IEEE IoT-J 投稿）报告值，不是本仓库的复现结果；本仓库实测见下一节。能耗 0.091 mJ 为论文口径，本地无电流表、未复测。
+>
+> The table above lists the paper's reported values, not this repository's reproduction (see the measured-results section below). The 0.091 mJ energy figure is the paper's; it was not re-measured locally (no current probe).
 
 ### 本仓库实测（2026-10，NUCLEO-H723ZG）
 
 | 项 | 实测 | 说明 |
 |---|---|---|
-| 推理时延 | **0.958 ms**（全零）/ **0.968 ms**（真实 QPSK 窗口） | 自研 SMLAD INT8 引擎，544 MHz，I/D Cache 开 |
+| 推理时延 | **0.951 ms**（全零）/ **0.960 ms**（真实 QPSK 窗口） | 自研 SMLAD INT8 引擎，544 MHz，I/D Cache 开 |
 | 对照 | X-CUBE-AI 10.2.1 同模型 1.827 ms | 官方运行时是标量 C 内核，已确认是上限 |
 | 全量精度 | **59.20%**（44k locked test，全 SNR） | onnxruntime 参考 59.21%，逐位一致 98.8% |
 | +10 dB 精度 | **89.36%** | 与论文 89.5% 一致 |
-| Flash / RAM | 85.36 KB / 47.42 KB | 双推理栈 + HAL；组成见 `docs/P5_RESOURCES.md` |
+| Flash / RAM | 79.01 KB / 47.29 KB | 双推理栈 + HAL；组成见 `docs/P5_RESOURCES.md` |
 | 能耗 | 未本地复测 | 缺电流测量硬件，保留论文 0.091 mJ 作为文献值 |
+
+> 2026-10-29 重新复核：FP32/INT8 44k 精度重算与 `results/ref_accuracy.json` 完全一致；板端 golden 22/22、300 窗回放 argmax 300/300；资源数取 15:52 构建 map。全部数值与来源见 `stm32_deployment/results/measured_latest.json`。
 
 复现入口：`docs/REPRODUCE.md`；基准方法 `docs/P1_BENCHMARK.md`；优化记录 `docs/P4_OPTIMIZATION.md`；
 实时链路 `docs/P5_REALTIME.md`；全量精度 `docs/P5_ACCURACY.md`；回归向量 `stm32_deployment/results/golden_vectors.json`。
@@ -162,7 +166,7 @@ python ota_collection/collect_ota.py \
 | FP32 accuracy 87.01% @ +10 dB | `models/train.py` | 89.73% locally (paper's 87.01% not reproducible from the released weights) |
 | INT8 Flash 51.26 KB, RAM 12.09 KB | `stm32_deployment/` + ST Edge AI Core | Analyze report |
 | INT8 latency 1.183 ms @ 544 MHz | `hardware_characterization/measure_latency.py` | Serial log |
-| 自研引擎 0.968 ms（优于论文 1.183 ms） | `stm32_deployment/tools/build_flash.ps1` | `docs/P1_BENCHMARK.md` |
+| 自研引擎 0.960 ms（优于论文 1.183 ms） | `stm32_deployment/tools/build_flash.ps1` | `docs/P1_BENCHMARK.md` |
 | 板端全量精度 59.20% | `stm32_deployment/tools/p5_full_accuracy.py` | `docs/P5_ACCURACY.md` |
 | 回归：22 golden vectors | `stm32_deployment/tools/golden_test.py` | `stm32_deployment/results/golden_vectors.json` |
 | Tier-3 OTA accuracy 82.76% | `ota_collection/collect_ota.py` | `.npz` results file |
@@ -188,7 +192,7 @@ Download and place files as described in `models/checkpoints/README.md`.
 | PyTorch | 2.x |
 | ONNX | 1.26.0 |
 | STM32CubeIDE | 1.15.x |
-| X-CUBE-AI / ST Edge AI Core | 10.2.0 / 2.2.0 |
+| X-CUBE-AI / ST Edge AI Core | 10.2.1 (pack) / 2.2.0 |
 | Hardware | STM32H723ZG Nucleo, HackRF One, RTL-SDR Blog V3 |
 
 ---

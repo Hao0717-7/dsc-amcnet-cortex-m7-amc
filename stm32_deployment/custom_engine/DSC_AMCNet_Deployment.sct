@@ -1,0 +1,14 @@
+LR_IROM1 0x08000000 0x00100000  {
+  ER_IROM1 0x08000000 0x00100000  {
+    startup_stm32h723xx.o (RESET, +First)
+    startup_stm32h723xx.o (+RO)
+    system_stm32h7xx.o (+RO)
+    *(InRoot$$Sections)
+  }
+  ER_ITCM 0x00000000 0x00010000  {
+    * (+RO)
+  }
+  RW_IRAM1 0x20000000 0x00020000  {
+    * (+RW +ZI)
+  }
+}
