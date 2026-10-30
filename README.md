@@ -185,7 +185,17 @@ python ota_collection/collect_ota.py \
 | X-CUBE-AI 版本 | ⚠️ 实测 pack **10.2.1** | 固件 banner 字符串硬编码 "10.2.0"（`Src/inference_main.c:202`），以 pack 版本为准 |
 | PTQ 后端 | ✅ 等价实现 | 官方写 "fbgemm backend"（= signed INT8、zp 0）；本仓库用 `onnxruntime.quantization.quantize_static + QuantType.QInt8`，量化方案等价 |
 
-**未复现项一律不借论文数字**：OTA、ULCNN 对照、能耗（0.091 mJ）只作为文献值引用，详见 [`docs/COMPARISON_vs_OFFICIAL_README.md`](docs/COMPARISON_vs_OFFICIAL_README.md)。
+### 未复现 / 未验证项（如实声明）
+
+下面三项**没有本地复现**，只有论文 / 官方 README 的报告值。本仓库任何位置都不把它们当成本仓库的实测结果，也不用它们计算"加速比"或"能耗指标"：
+
+| 项 | 论文 / 官方值 | 未复现原因 | 本仓库能提供的 |
+|---|---|---|---|
+| OTA 过采样采集精度（`collect_ota.py`） | 82.76%（85.80%→82.76%，多 10× 样本） | 需要 HackRF One + RTL-SDR 采集真实空口 IQ；本机无射频硬件，且 `ota_collection/collect_ota.py` 尚未做整窗 L2 归一化 | `ota_collection/` 脚本框架 + `docs/P5_BLOCKED.md` 的缺口说明 |
+| ULCNN-simplified 对照（2.104 ms / 1.78× / RAM 省 24.69 KB） | 2.104 ms，1.78× | 上游没有 ULCNN 部署代码；Zenodo 仅有 FP32 ONNX（`ulcnn_fp32_fixed.onnx`，53,288 B），要同口径对比需自行转 INT8、写引擎并上板 | 仅作文献引用；**不声称**本仓库的 1.90× 是"对 ULCNN 的 1.78×" |
+| 能耗（0.091 mJ / inference） | 0.091 mJ | 需要电流表；NUCLEO-H723ZG 的 `JP4` 跳线可串入 mA 表（原理图 sheet 4 已核对），但本机无万用表 | 测量路径说明 + `docs/P5_BLOCKED.md`；**不伪造数字** |
+
+同类"声明值 vs 实测值"还有：550 MHz（本仓库 HSI 64→PLL1 实测 **544 MHz**）、X-CUBE-AI 10.2.0（实测 pack **10.2.1**）——均以本仓库实测为准。详细对照见 [`docs/COMPARISON_vs_OFFICIAL_README.md`](docs/COMPARISON_vs_OFFICIAL_README.md)。
 
 ---
 

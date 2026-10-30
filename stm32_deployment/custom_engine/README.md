@@ -39,6 +39,36 @@
 `HAL_RCC_GetHCLKFreq()` = HCLK 272 MHz，会把时间算成 2 倍），只服务于 `firmware/inference_main.c`
 那条旧路径。**自研引擎必须用本目录这两个文件**，两者不要混用。
 
+## 工程文件的完整度（2026-10-30 补齐）
+
+下表说明本目录文件与仓库外部署工程 `D:\DSC_AMCNet_Deployment` 的对应关系，以及 clone 后还差什么才能编译。
+
+| 本目录文件 | 部署工程 | 说明 |
+|---|---|---|
+| `app_main.c` | `Src/main.c` | 逐字相同（main + 时钟 + USART3，HSI→544 MHz） |
+| `app_inference_main.c` | `Src/inference_main.c` | 逐字相同（DWT benchmark + classify / replay / stream） |
+| `dsc_infer.c` | `Src/dsc_infer.c` | 内容相同，仅头注释不同 |
+| `dsc_infer.h` / `dsc_model_data.h` / `test_sample.h` | `Inc/`、`Src/` | 逐字相同 |
+| `dwt_measure.c` / `dwt_measure.h` | `Src/`、`Inc/` | 逐字相同（头注释已修正为 SystemCoreClock） |
+| `retarget_keil_h723.c` | `Src/retarget_keil.c` | 逐字相同（`$Sub$$_sys_open` 等重定向） |
+| `startup_stm32h723xx.s` | `MDK-ARM/` | 逐字相同 |
+| `main.h`、`stm32h7xx_hal_conf.h`、`stm32h7xx_it.h`、`stm32h7xx_it.c`、`stm32h7xx_hal_msp.c`、`system_stm32h7xx.c`、`uart_printf.h`、`inference_main.h` | `Inc/`、`Src/` | 工程胶水（CubeMX 生成或手写），2026-10-30 原样收回，逐字节相同 |
+| `DSC_AMCNet_Deployment.uvprojx` / `.sct` / `.ioc` | `MDK-ARM/`、根 | Keil 工程、分散加载、CubeMX 配置（`.ioc` 已改为 HSI→544 MHz） |
+
+仍然**不在仓库**里（由 ST 工具生成、体积大）：
+
+- `Drivers/STM32H7xx_HAL_Driver` 与 `Drivers/CMSIS`（CubeMX 的 H7 包，约 10 MB 级）；
+- `Middlewares/ST/AI`（X-CUBE-AI 运行时 `NetworkRuntime1020_CM7_Keil.lib` + 生成的 `network*.c`）；
+- Keil 构建产物（`MDK-ARM/DSC_AMCNet_Deployment/` 下的 `.axf` / `.hex` / `.map` 等）；
+- `uvoptx`、RTE、DebugConfig 等 IDE 本地状态。
+
+重建步骤（细节见 `docs/BUILD.md` §1.1）：
+
+1. 用 STM32CubeMX 打开 `.ioc` 生成 HAL 工程（已配置 HSI 64 → PLL1 M=8/N=68/P=1 → 544 MHz、USART3 PD8/PD9、VOS0、LDO）；
+2. 把 `app_main.c` 重命名为 `Src/main.c`、`app_inference_main.c` 重命名为 `Src/inference_main.c`，其余 `.c` / `.h` 放入 `Src/` / `Inc/`；
+3. 用 X-CUBE-AI CLI（命令见 `docs/BUILD.md`）生成并加入 AI 运行时与 `network*.c`；
+4. 编译，期望启动打印 `[DWT] N=1000 mean=0.951 ms`。
+
 ## 集成
 
 1. 将 `dsc_infer.c`、`dsc_infer.h`、`dsc_model_data.h`、`test_sample.h`、`dwt_measure.c`、`dwt_measure.h` 加入 Keil 工程（Application/AI 组）。
