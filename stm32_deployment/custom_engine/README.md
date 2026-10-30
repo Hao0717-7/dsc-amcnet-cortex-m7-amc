@@ -67,7 +67,7 @@
 1. 用 STM32CubeMX 打开 `.ioc` 生成 HAL 工程（已配置 HSI 64 → PLL1 M=8/N=68/P=1 → 544 MHz、USART3 PD8/PD9、VOS0、LDO）；
 2. 把 `app_main.c` 重命名为 `Src/main.c`、`app_inference_main.c` 重命名为 `Src/inference_main.c`，其余 `.c` / `.h` 放入 `Src/` / `Inc/`；
 3. 用 X-CUBE-AI CLI（命令见 `docs/BUILD.md`）生成并加入 AI 运行时与 `network*.c`；
-4. 编译，期望启动打印 `[DWT] N=1000 mean=0.951 ms`。
+4. 编译前跑一次 `python stm32_deployment/tools/check_clock_config.py`（校验 .ioc 分频与 CubeMX 不保存的 VOS0/LDO/FLASH_LATENCY_3/USART3，当前全 OK）；编译，期望启动打印 `[DWT] N=1000 mean=0.951 ms`。
 
 ## 集成
 

@@ -39,6 +39,15 @@ D:\DSC_AMCNet_Deployment\
 
 `DSC_AMCNet_Deployment.ioc` 已从旧的 192 MHz（PLL1 DIVM1=4 / DIVN1=12，VCO 输入 16 MHz）改为与 `main.c` 一致的 544 MHz（DIVM1=8 / DIVN1=68，VCO 输入 8 MHz；HCLK 272 MHz、APB 136 MHz）。注意 `.ioc` 没有 VOS0 / FLASH_LATENCY 条目，重新 Generate 后仍必须按 §2 恢复 `main.c` 里的补丁。
 
+**CubeMX 重新生成后必查清单**（也可直接跑 `python stm32_deployment/tools/check_clock_config.py`，失败会指回本节）：
+
+1. `.ioc` 侧：PLL1 源 = HSI、`DIVM1=8`、`DIVN1=68`、`DIVP1=1` → SYSCLK 544 MHz；HPRE `/2` → HCLK 272 MHz；APB1-4 `/2` → 136 MHz。
+2. `main.c` 侧：`HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY)`、`__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0)`、等待 `PWR_FLAG_VOSRDY`、`FLASH_LATENCY_3`、`MX_USART3_UART_Init()` 仍在。
+3. 计时文件：必须是 `custom_engine/dwt_measure.h` 的 `uint32_t *_us_x100` 接口（`firmware/dwt_measure.h` 是旧 `float*` 版，会把时间算成 2 倍）。
+4. `uvprojx`：`<pCCUsed>6070000::V6.7::ARMCLANG</pCCUsed>`、`<uAC6>1</uAC6>`、Stack/Heap 各 `0x2000`。
+5. 串口：NUCLEO-H723ZG 用 `USART3 PD8/PD9`（ST-LINK VCP → COM3）；`USART1 PA9/PA10` 是另一块自制核心板 LXB723ZG-P1 的调试排针。
+6. 烧录镜像路径：`D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.hex`（项目根那份 `firmware_DSC_AMCNet_INT8.hex` 是旧构建，不要用）。
+
 ## 2. CubeMX 重新生成会丢什么
 
 `Project → Generate Code` 会**覆盖** `Src/main.c`，以下补丁必须重新打：

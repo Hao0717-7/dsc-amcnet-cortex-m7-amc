@@ -167,11 +167,11 @@ python ota_collection/collect_ota.py \
 
 | 官方 claim | 官方要求产物 | 本仓库状态 | 产物 / 证据 |
 |---|---|---|---|
-| FP32 85.80%（SNR≥10，`train.py` eval log） | Val acc ≥ 85.5% | ⚠️ 本地重训权重：+10 dB **89.73%**、≥10 dB **88.93%**（n=11,039），但非官方权重、非官方格式 log | `models/checkpoints/`（权重 sha256 `f7a05c25…`） |
+| FP32 85.80%（SNR≥10，`train.py` eval log） | Val acc ≥ 85.5% | ✅ 用 `models/eval_checkpoint.py` 加载仓库内 `.pt` 跑 44k：+10 dB **89.73%**、≥10 dB **88.93%**（n=11,039）、整体 59.56%；与 FP32 ONNX argmax 一致 44,000/44,000（max logit diff 3.8e-05）。权重是本地重训（Zenodo 官方 `.pt` 已损坏，见下），故不比 85.80% 这一具体数字 | `docs/evidence/fp32_eval_log.txt`、`models/checkpoints/`（权重 sha256 `f7a05c25…`） |
 | INT8 Flash 51.26 / RAM 12.09 KB（ST Edge AI Core **analyze report**） | Analyze report | ⚠️ 口径不同：官方为模型+运行时估算；本仓库为完整可烧录固件 **79.01 / 47.29 KB**（map 实测），另有 analyze report 的模型足迹（weights 5,804 B / activations 7,488 B / ram 7,755 B / MACC 163,081） | `docs/evidence/stedgeai_analyze/dscamcnet_int8_analyze_report.txt`、`docs/P5_RESOURCES.md` |
 | INT8 延迟 1.183 ms（`measure_latency.py` 串口 CSV） | Serial log / CSV | ✅ 同脚本、同判据实测 **0.951 ms（全零）/ 0.960 ms（真实窗）**，比论文快 18.8% | `docs/evidence/latency_dscamcnet_int8.csv`、`docs/P1_BENCHMARK.md` |
 | OTA 82.76%（`collect_ota.py` `.npz`） | `.npz` 结果 | ❌ 未复现：本机无 HackRF One + RTL-SDR（脚本本身还缺整窗 L2 归一化） | 仅论文声明，无产物 |
-| PTQ 掉点 <0.5%（`ptq_quantize.py` eval log） | Eval log | ✅ 实测整体 **0.35 pp**（59.5614%→59.2091%，26,207→26,052 / 44,000）；+10 dB 89.73%→89.36%（0.37 pp）；≥10 dB 0.49 pp（仍 < 0.5） | `docs/evidence/ptq_eval_log.txt` |
+| PTQ 掉点 <0.5%（`ptq_quantize.py` eval log） | Eval log | ✅ 实测整体 **0.35 pp**（59.5614%→59.2091%，26,207→26,052 / 44,000）；+10 dB 89.73%→89.36%（0.37 pp）；≥10 dB 0.49 pp（仍 < 0.5）。另：从 `.pt` 重跑 PTQ 可复现出同尺寸/同结构 ONNX，98 个 initializer 中 96 个逐字节相同，精度逐位一致（两处 scale 常量有 1e-7 级舍入差） | `docs/evidence/ptq_eval_log.txt`、`docs/evidence/ptq_regen_log.txt` |
 
 补充状态：
 
@@ -184,6 +184,26 @@ python ota_collection/collect_ota.py \
 | 22 条 golden 回归向量 | ✅ | `golden_test.py`，±1 LSB，22/22 |
 | X-CUBE-AI 版本 | ⚠️ 实测 pack **10.2.1** | 固件 banner 字符串硬编码 "10.2.0"（`Src/inference_main.c:202`），以 pack 版本为准 |
 | PTQ 后端 | ✅ 等价实现 | 官方写 "fbgemm backend"（= signed INT8、zp 0）；本仓库用 `onnxruntime.quantization.quantize_static + QuantType.QInt8`，量化方案等价 |
+
+### 参数口径说明（4,961 / 4,793 / 4,869）
+
+仓库里出现三个"参数个数"，统计对象不同，**不能互相校验**：
+
+| 数字 | 口径 | 来源 |
+|---|---|---|
+| **4,961** | PyTorch 可训练参数（含 6 个 BN 的 γ/β 共 336 个） | `models/dsc_amcnet.py`（论文 Table V 口径） |
+| **4,793** | BN 折进相邻卷积后的权重+偏置元素数（4,625 原有 + 168 折叠偏置），按 4 B/参数折算 = 19,172 B = 18.72 KiB | `stedgeai analyze` 报告（`docs/evidence/stedgeai_analyze/`） |
+| **4,869** | INT8 QDQ ONNX 的 98 个 initializer 元素总数 = 4,520 个 int8 权重 + 273 个 int32 偏置 + 38 个 per-tensor scale + 38 个 zero-point 元素 | `quantization/outputs/dscamcnet_int8.onnx`（93 节点） |
+
+换算关系：`4,793 = 4,961 − 336(BN) + 168(折叠偏置)`；`4,869 = 4,793 + 76（38 个 scale + 38 个 zero-point）`。三者都对，只是统计层面不同。
+
+### 工程一致性自动检查
+
+```bash
+python stm32_deployment/tools/check_clock_config.py
+```
+
+校验 `.ioc` 里的 PLL/分频（HSI 64 MHz → M=8/N=68/P=1 → **544 MHz**、HCLK 272、APB 136）与 **CubeMX 不写进 .ioc 的四项**（`PWR_LDO_SUPPLY`、`PWR_REGULATOR_VOLTAGE_SCALE0`、`VOSRDY` 等待、`FLASH_LATENCY_3`，外加 `USART3`）是否仍在 main 源码里。当前输出全部 `OK`。
 
 ### 未复现 / 未验证项（如实声明）
 

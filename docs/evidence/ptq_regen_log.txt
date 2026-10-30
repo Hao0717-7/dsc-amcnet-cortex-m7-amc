@@ -1,0 +1,24 @@
+==========================================================================
+PTQ reproducibility check — regenerate INT8 ONNX from the checkpoint
+==========================================================================
+generated     : 2026-10-30T22:27:38+08:00
+command       : ptq_quantize.py --checkpoint models/checkpoints/dscamcnet_best.pt
+                (QDQ, signed INT8, 1,024 calibration windows, seed 42)
+
+[FP32] shipped     : 23,952 B  sha256=b0017c65d1c171dfd0a8f4027a8fd0a6f907d675a95a8fe9b8a4eda690de9766
+[FP32] regenerated : 23,952 B  sha256=7196bd3396a4fe4e7c6ac8ca61b2560c98332b8442d95cfa3d989517538aa6a1
+[FP32] identical   : NO  (IR 7/7, opset [('ai.onnx', 13)]/[('ai.onnx', 13)], nodes 34/34, initializers 22/22)
+[FP32] initializers equal: 22/22
+
+[INT8] shipped     : 27,989 B  sha256=7b12da1c31a847696a0d43d72d6237cfbf06375095e5310c6785efa9887da304
+[INT8] regenerated : 27,989 B  sha256=8a01ba346c3eb019d1f73f326e82844de6ec7133446122286d4c078a63f1528f
+[INT8] identical   : NO  (IR 7/7, opset [('ai.onnx', 13)]/[('ai.onnx', 13)], nodes 93/93, initializers 98/98)
+[INT8] initializers equal: 96/98   differing: ['/se/fc2/Gemm_output_0_scale', 'logits_scale']
+
+[INT8 accuracy] locked 44,000-window test split, onnxruntime
+  shipped    : overall 59.2091%   +10 dB 89.3646%   >=10 dB 88.4410%   (n=44,000)
+  regenerated: overall 59.2091%   +10 dB 89.3646%   >=10 dB 88.4410%   (n=44,000)
+  argmax agreement: 44,000/44,000 = 100.0000%
+  max |logit diff| : 7.629e-06
+
+==========================================================================
