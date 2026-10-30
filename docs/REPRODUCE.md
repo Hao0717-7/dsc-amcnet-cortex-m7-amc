@@ -27,9 +27,9 @@ python models/train.py --data datasets/RML2016.10a_dict.dat `
 ```powershell
 python quantization/ptq_quantize.py --checkpoint models/checkpoints/dscamcnet_best.pt `
     --data datasets/RML2016.10a_dict.dat --split datasets/split_indices.npz `
-    --backend fbgemm --output quantization/outputs/dscamcnet_int8.onnx
+    --output quantization/outputs/dscamcnet_int8.onnx
 ```
-`qnnpack` 会得到 unsigned 量化（zero-point 128），与 X-CUBE-AI/自研引擎都不兼容。
+该脚本用 `onnxruntime.quantization.quantize_static` + `QuantType.QInt8`（激活/权重都是 signed，zero-point 0），天然满足 X-CUBE-AI/自研引擎的要求；旧版本说明里提到的 `--backend fbgemm` 参数已不存在（那套 torch eager 对比在 `validate_backend.py` 里）。
 
 ## 3. 模型 C 代码（可选，仅作对照）
 

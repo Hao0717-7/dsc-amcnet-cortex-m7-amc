@@ -5,7 +5,7 @@
 - 实测时间：2026-10-29 22:42–22:53（CST），板子 COM3 在线，固件为 15:52 构建
 - 结构化数据：`stm32_deployment/results/compare_official_readme.json`
 - 原始证据：`stm32_deployment/results/evidence/serial_boot_run_2026-10-29.log`、
-  `stm32_deployment/results/replay_compare.json`
+  `stm32_deployment/results/p0_replay_compare.json`
 
 ## 1. 主表（DSC-AMCNet INT8）
 

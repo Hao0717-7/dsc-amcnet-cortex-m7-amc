@@ -44,7 +44,7 @@ def main(args):
     print("See docstring and paper Section V-C for analysis.\n")
 
     # Load data
-    train_X, train_y, _, _, _, _ = load_splits(args.data, args.split)
+    train_X, train_y, _, _      = load_splits(args.data, args.split)
     X_hi, y_hi, _                = load_by_snr(args.data, args.split, snr_min=10)
 
     train_loader = DataLoader(

@@ -8,13 +8,14 @@ Protocol (firmware `Src/main.c`, stream mode):
 """
 import argparse
 import pickle
+import tempfile
 import time
 from pathlib import Path
 
 import numpy as np
 import serial
 
-ROOT = Path(r"D:\dsc-amcnet-cortex-m7-amc")
+ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "datasets" / "RML2016.10a_dict.dat"
 SPLIT = ROOT / "datasets" / "split_indices.npz"
 
@@ -48,6 +49,10 @@ def main():
     ap.add_argument("--port", default="COM3")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--flash", action="store_true", help="flash first so 'S' lands in the 1.5 s boot window")
+    ap.add_argument("--uv4", default=r"D:\APP\Keil5\UV4\UV4.exe",
+                    help="UV4.exe path used by --flash")
+    ap.add_argument("--project", default=r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
+                    help="Keil .uvprojx path used by --flash")
     args = ap.parse_args()
 
     X, y = load_rml(DATA)
@@ -59,9 +64,8 @@ def main():
     ser.reset_input_buffer()
     if args.flash:
         import subprocess
-        subprocess.run([r"D:\APP\Keil5\UV4\UV4.exe", "-f",
-                        r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
-                        "-o", str(pathlib.Path(tempfile.gettempdir()) / "dsc_stream_flash.log")],
+        subprocess.run([args.uv4, "-f", args.project,
+                        "-o", str(Path(tempfile.gettempdir()) / "dsc_stream_flash.log")],
                        capture_output=True)
     line = ""
     for _ in range(40):

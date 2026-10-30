@@ -92,9 +92,9 @@ def quantize_with_backend(checkpoint_path, data_path, split_path, backend):
 def inspect_zero_point(model):
     """Check zero-point of first quantized conv layer to identify signed vs unsigned."""
     for name, module in model.named_modules():
-        if hasattr(module, "weight") and hasattr(module.weight(), "q_zero_point"):
-            zp = module.weight().q_zero_point()
-            dtype = module.weight().dtype
+        if hasattr(module, "weight") and hasattr(module.weight, "q_zero_point"):
+            zp = module.weight.q_zero_point()
+            dtype = module.weight.dtype
             return name, dtype, zp
     return None, None, None
 

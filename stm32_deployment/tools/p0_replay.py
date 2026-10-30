@@ -17,7 +17,7 @@ import numpy as np
 import onnxruntime as ort
 import serial
 
-ROOT = Path(r"D:\dsc-amcnet-cortex-m7-amc")
+ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "datasets" / "RML2016.10a_dict.dat"
 SPLIT = ROOT / "datasets" / "split_indices.npz"
 MODEL = ROOT / "quantization" / "outputs" / "dscamcnet_int8.onnx"
@@ -160,9 +160,9 @@ def main():
                                  for c in range(11) if (ys[:n] == c).any()},
     }
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "replay_compare.json").write_text(json.dumps(res, indent=2), encoding="utf-8")
+    (OUT / "p0_replay_compare.json").write_text(json.dumps(res, indent=2), encoding="utf-8")
     print(json.dumps(res, indent=2))
-    print("saved:", OUT / "replay_compare.json")
+    print("saved:", OUT / "p0_replay_compare.json")
 
 
 if __name__ == "__main__":

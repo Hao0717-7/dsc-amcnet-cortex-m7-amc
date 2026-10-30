@@ -8,12 +8,13 @@ Exit code 0 iff every vector matches exactly.
 """
 import argparse
 import json
+import tempfile
 import time
 from pathlib import Path
 
 import serial
 
-ROOT = Path(r"D:\dsc-amcnet-cortex-m7-amc")
+ROOT = Path(__file__).resolve().parents[2]
 VEC = ROOT / "stm32_deployment" / "results" / "golden_vectors.json"
 
 
@@ -40,6 +41,10 @@ def main():
     ap.add_argument("--json", default=str(VEC))
     ap.add_argument("--flash", action="store_true",
                     help="flash first and wait for [CLASSIFY] so the board is in 115200 replay mode")
+    ap.add_argument("--uv4", default=r"D:\APP\Keil5\UV4\UV4.exe",
+                    help="UV4.exe path used by --flash")
+    ap.add_argument("--project", default=r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
+                    help="Keil .uvprojx path used by --flash")
     args = ap.parse_args()
 
     vecs = json.loads(Path(args.json).read_text(encoding="utf-8"))
@@ -48,9 +53,8 @@ def main():
     time.sleep(0.3)
     if args.flash:
         import subprocess
-        subprocess.run([r"D:\APP\Keil5\UV4\UV4.exe", "-f",
-                        r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
-                        "-o", str(pathlib.Path(tempfile.gettempdir()) / "dsc_golden_flash.log")],
+        subprocess.run([args.uv4, "-f", args.project,
+                        "-o", str(Path(tempfile.gettempdir()) / "dsc_golden_flash.log")],
                        capture_output=True)
         deadline = time.time() + 25
         while time.time() < deadline:
