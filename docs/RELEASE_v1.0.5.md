@@ -47,6 +47,8 @@ cycles：全零 ≈492,320、真实窗 ≈497,216（544 MHz）→ **≈3.01–3.
 - `docs/evidence/latency_dscamcnet_int8.csv`：两行 → `2026-10-30T22:35:30.553..,1000,0.905,0.905,0.905` 与 `…,0.914,0.914,0.914`。
 - `stm32_deployment/results/measured_latest.json`：新增 `c1_kernel_optimization_2026_10_30` 段（改动、前后延迟、资源、验收、证据清单）。
 - `docs/REPORT.html` + `docs/REPORT_preview.png` + `stm32_deployment/results/figs/*.png`：全部以 C1 数字重生成。
+- `docs/evidence/mcu_live_bench_2026-10-30.png`：COM3 实时抓包截图（banner、`[DWT] mean=0.905/0.914 ms`、
+  `Latency: 914.4x µs` 分类循环）；`docs/evidence/mcu_golden_2026-10-30.png`：同晚 golden 回放串口截图。
 - 文档口径统一到 0.905/0.914 ms、78.23/47.29 KB、22.7%、2.00×、3.04 cycles/MACC：
   `README.md`、`PROJECT_STATUS.md`、`docs/P0_ACCURACY.md`、`docs/P1_BENCHMARK.md`（加历史说明）、
   `docs/P4_OPTIMIZATION.md`（新增 C1 明细表）、`docs/P5_RESOURCES.md`、`docs/P5_BLOCKED.md`、
