@@ -29,9 +29,11 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 | ULCNN-simplified INT8 | 2.104 | 49.25 | 36.78 | 87.55% | 1.95 pp |
 | **DSC vs ULCNN** | **1.78× faster** | — | **−24.69 KB** | within ±1.4 pp Wilson CI | **22× lower** |
 
-> 上表是论文（IEEE IoT-J 投稿）报告值，不是本仓库的复现结果；本仓库实测见下一节。能耗 0.091 mJ 为论文口径，本地无电流表、未复测。
+> **引用时必须注明来源。** 上表是 **IEEE IoT-J 稿**（Zenodo `21167587`，v2.0.0）的报告值，不是本仓库实测。
+> 同作者的 **TCCN 在审稿**（Zenodo `20579317`，v1.0.0，官方仓库 `_official/repo/DSC-AMCNet` 的 README）报告的是另一套数：85.80% High-SNR、Flash 51.26 KB、RAM 12.09 KB、ULCNN 44.26 KB / 36.78 KB、加速 1.78×、RAM 省 24.69 KB、OSNR 口径 550 MHz。**两稿数字不同，不要混用。**
+> 能耗 0.091 mJ 为论文口径，本地无电流表、未复测。
 >
-> The table above lists the paper's reported values, not this repository's reproduction (see the measured-results section below). The 0.091 mJ energy figure is the paper's; it was not re-measured locally (no current probe).
+> The table above lists the **IoT-J manuscript** (Zenodo `21167587`, v2.0.0) reported values, not this repository's reproduction. The companion **TCCN submission** (Zenodo `20579317`, v1.0.0, whose README is mirrored under `_official/repo/DSC-AMCNet/`) reports a different set (85.80% High-SNR, ULCNN 44.26 KB, 24.69 KB RAM saving, 550 MHz). Do not mix the two.
 
 ### 本仓库实测（2026-10，NUCLEO-H723ZG）
 
@@ -159,28 +161,45 @@ python ota_collection/collect_ota.py \
 
 ---
 
-## Reproducing Paper Claims
+## Reproducing Paper Claims（对照官方 README 的完成状态）
 
-| Paper Claim | Script | Expected Output |
+官方仓库 README 列了 5 条 "Reproducing Paper Claims"。本表把每条映射到本仓库的脚本/产物，并如实标注状态：
+
+| 官方 claim | 官方要求产物 | 本仓库状态 | 产物 / 证据 |
+|---|---|---|---|
+| FP32 85.80%（SNR≥10，`train.py` eval log） | Val acc ≥ 85.5% | ⚠️ 本地重训权重：+10 dB **89.73%**、≥10 dB **88.93%**（n=11,039），但非官方权重、非官方格式 log | `models/checkpoints/`（权重 sha256 `f7a05c25…`） |
+| INT8 Flash 51.26 / RAM 12.09 KB（ST Edge AI Core **analyze report**） | Analyze report | ⚠️ 口径不同：官方为模型+运行时估算；本仓库为完整可烧录固件 **79.01 / 47.29 KB**（map 实测），另有 analyze report 的模型足迹（weights 5,804 B / activations 7,488 B / ram 7,755 B / MACC 163,081） | `docs/evidence/stedgeai_analyze/dscamcnet_int8_analyze_report.txt`、`docs/P5_RESOURCES.md` |
+| INT8 延迟 1.183 ms（`measure_latency.py` 串口 CSV） | Serial log / CSV | ✅ 同脚本、同判据实测 **0.951 ms（全零）/ 0.960 ms（真实窗）**，比论文快 18.8% | `docs/evidence/latency_dscamcnet_int8.csv`、`docs/P1_BENCHMARK.md` |
+| OTA 82.76%（`collect_ota.py` `.npz`） | `.npz` 结果 | ❌ 未复现：本机无 HackRF One + RTL-SDR（脚本本身还缺整窗 L2 归一化） | 仅论文声明，无产物 |
+| PTQ 掉点 <0.5%（`ptq_quantize.py` eval log） | Eval log | ✅ 实测整体 **0.35 pp**（59.5614%→59.2091%，26,207→26,052 / 44,000）；+10 dB 89.73%→89.36%（0.37 pp）；≥10 dB 0.49 pp（仍 < 0.5） | `docs/evidence/ptq_eval_log.txt` |
+
+补充状态：
+
+| 项 | 状态 | 说明 |
 |---|---|---|
-| FP32 accuracy 87.01% @ +10 dB | `models/train.py` | 89.73% locally (paper's 87.01% not reproducible from the released weights) |
-| INT8 Flash 51.26 KB, RAM 12.09 KB | `stm32_deployment/` + ST Edge AI Core | Analyze report |
-| INT8 latency 1.183 ms @ 544 MHz | `hardware_characterization/measure_latency.py` | Serial log |
-| 自研引擎 0.960 ms（优于论文 1.183 ms） | `stm32_deployment/tools/build_flash.ps1` | `docs/P1_BENCHMARK.md` |
-| 板端全量精度 59.20% | `stm32_deployment/tools/p5_full_accuracy.py` | `docs/P5_ACCURACY.md` |
-| 回归：22 golden vectors | `stm32_deployment/tools/golden_test.py` | `stm32_deployment/results/golden_vectors.json` |
-| Tier-3 OTA accuracy 82.76% | `ota_collection/collect_ota.py` | `.npz` results file |
-| PTQ degradation 0.09 pp @ +10 dB | `quantization/ptq_quantize.py` | Eval log |
+| ULCNN-simplified 对照（2.104 ms / 1.78×） | ❌ 未复现 | 仓库无 ULCNN 部署代码；Zenodo 有 `ulcnn_fp32_fixed.onnx`（53,288 B）但需转 INT8 + 上板才能测 |
+| 550 MHz | ⚠️ 本仓库 544 MHz | 固件时钟为 HSI 64 MHz → PLL1 M=8/N=68/P=1 → **544 MHz**（HCLK 272 / APB 136）；官方声称 550 MHz，差 1.1% |
+| 自研引擎 0.960 ms（优于论文） | ✅ | `stm32_deployment/custom_engine/`，1.90× vs X-CUBE-AI 运行时 1.827 ms |
+| 板端全量精度 59.20% | ✅ | 44,000 窗，逐位一致 98.80%，argmax 一致 99.98% |
+| 22 条 golden 回归向量 | ✅ | `golden_test.py`，±1 LSB，22/22 |
+| X-CUBE-AI 版本 | ⚠️ 实测 pack **10.2.1** | 固件 banner 字符串硬编码 "10.2.0"（`Src/inference_main.c:202`），以 pack 版本为准 |
+| PTQ 后端 | ✅ 等价实现 | 官方写 "fbgemm backend"（= signed INT8、zp 0）；本仓库用 `onnxruntime.quantization.quantize_static + QuantType.QInt8`，量化方案等价 |
+
+**未复现项一律不借论文数字**：OTA、ULCNN 对照、能耗（0.091 mJ）只作为文献值引用，详见 [`docs/COMPARISON_vs_OFFICIAL_README.md`](docs/COMPARISON_vs_OFFICIAL_README.md)。
 
 ---
 
 ## Pre-trained Weights
 
-Model checkpoints and dataset split indices are archived on Zenodo:
+两个 Zenodo 记录（同一作者、两篇稿件）都归档了权重、ONNX 与 locked split：
 
-> **DOI:** [10.5281/zenodo.21167587](https://doi.org/10.5281/zenodo.21167587)
+| 记录 | 版本 | 对应稿件 | 文件 |
+|---|---|---|---|
+| [`10.5281/zenodo.21167587`](https://doi.org/10.5281/zenodo.21167587) | v2.0.0 | IoT-J（本仓库 README 引用） | `dscamcnet_best.pt`、`dscamcnet_int8.onnx`、`ulcnn_fp32_fixed.onnx`、`split_indices.npz`、repo zip |
+| [`10.5281/zenodo.20579317`](https://doi.org/10.5281/zenodo.20579317) | v1.0.0 | TCCN（`_official/repo/DSC-AMCNet`） | 同上 |
 
-Download and place files as described in `models/checkpoints/README.md`.
+> ⚠️ **不要直接使用 Zenodo 的 `dscamcnet_best.pt`**：两个记录的该文件完全相同（37,397 B，md5 `56c214ad…` / sha256 `4827d8dc…`），在正确 I/Q 数据与 locked split 上 +10 dB 只有 **26.05%**——与论文 85.80% 不符（详见 [`models/checkpoints/README.md`](models/checkpoints/README.md) 的 provenance 段与 [`docs/P0_ACCURACY.md`](docs/P0_ACCURACY.md)）。本仓库的 **89.73%** 来自本地重训权重 `f7a05c25…`（36,437 B，已随仓库提供）。
+> `dscamcnet_int8.onnx`（58,169 B）与 `ulcnn_fp32_fixed.onnx`（53,288 B）仍在 Zenodo 上，可用于对照实验（ULCNN 需自行转 INT8 + 上板，本仓库未复现）。
 
 ---
 
@@ -188,12 +207,12 @@ Download and place files as described in `models/checkpoints/README.md`.
 
 | Component | Version |
 |---|---|
-| Python | 3.10+ (developed on 3.14) |
-| PyTorch | 2.x |
-| ONNX | 1.26.0 |
-| STM32CubeIDE | 1.15.x |
+| Python | 3.10+（开发/实测：3.14.5） |
+| PyTorch | 2.x（仅训练与 `.pt` 评估需要；量化→上板链路不需要） |
+| ONNX / ONNX Runtime | 1.16+ / 1.18+（实测 1.23.2 / 1.31.1） |
+| STM32CubeIDE | 1.15.x（官方流程；本仓库实际用 Keil MDK 5.24a + AC6 6.7 编译，见 `docs/BUILD.md`） |
 | X-CUBE-AI / ST Edge AI Core | 10.2.1 (pack) / 2.2.0 |
-| Hardware | STM32H723ZG Nucleo, HackRF One, RTL-SDR Blog V3 |
+| Hardware | STM32H723ZG Nucleo；OTA 对照另需 HackRF One + RTL-SDR Blog V3（本仓库未做 OTA） |
 
 ---
 

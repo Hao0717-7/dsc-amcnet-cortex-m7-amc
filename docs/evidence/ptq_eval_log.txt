@@ -1,0 +1,67 @@
+==============================================================================
+PTQ EVALUATION LOG — DSC-AMCNet INT8 vs FP32 (RML2016.10a, 44,000-window test split)
+==============================================================================
+generated_at      : 2026-10-30T19:40:23
+python            : 3.14.5
+numpy             : 2.5.1
+onnxruntime       : 1.31.1
+
+Model files
+  FP32 : quantization\outputs\dscamcnet_fp32.onnx (23,952 B)
+         sha256 b0017c65d1c171dfd0a8f4027a8fd0a6f907d675a95a8fe9b8a4eda690de9766
+  INT8 : quantization\outputs\dscamcnet_int8.onnx (27,989 B)
+         sha256 7b12da1c31a847696a0d43d72d6237cfbf06375095e5310c6785efa9887da304
+
+Dataset
+  datasets\RML2016.10a_dict.dat (225,292,173 B)
+  sha256 889ac64827e44224d2229acc870ca44e3b487e594d588de75372184c05a80b4a
+  split datasets\split_indices.npz (md5 of file: bb8bc1e7c41a58fad6f08a23ae7ef76d)
+  test windows: 44,000   load time: 0.2 s
+  preprocessing: per-window L2 normalization over the 256 I/Q points
+
+Quantization recipe
+  backend   : onnxruntime.quantization.quantize_static (QuantType.QInt8)
+  scheme    : signed int8 activations, symmetric weights (zero-point 0)
+  I/O       : float32 in float32 out (QDQ graph, opset 13)
+  input Q  : scale 0.002135044, zero-point -4
+  logits Q : scale 0.350085318, zero-point 63
+
+Accuracy (44,000 windows)
+  FP32 overall          : 59.5614%  (26,207/44,000)
+  INT8 overall          : 59.2091%  (26,052/44,000)
+  drop (overall)        : 0.352 pp
+  FP32 high-SNR (>=10)  : 88.9302%  (n=11,039)
+  INT8 high-SNR (>=10)  : 88.4410%
+  drop (high-SNR)       : 0.489 pp
+
+Per-SNR accuracy
+     SNR   n     FP32      INT8      drop(pp)
+  -20 dB   2165   8.8222%   9.0531%   -0.231
+  -18 dB   2133   9.2827%   9.7984%   -0.516
+  -16 dB   2138   10.1497%   10.4771%   -0.327
+  -14 dB   2168   13.1919%   12.8229%   +0.369
+  -12 dB   2230   16.3677%   15.6951%   +0.673
+  -10 dB   2108   25.0474%   23.5769%   +1.471
+   -8 dB   2314   37.7701%   37.0354%   +0.735
+   -6 dB   2192   50.5018%   51.7336%   -1.232
+   -4 dB   2218   62.3084%   63.4806%   -1.172
+   -2 dB   2113   74.4439%   73.1188%   +1.325
+   +0 dB   2207   83.0086%   81.5134%   +1.495
+   +2 dB   2196   85.3825%   85.0182%   +0.364
+   +4 dB   2265   87.2848%   86.8874%   +0.397
+   +6 dB   2248   87.3221%   87.0552%   +0.267
+   +8 dB   2266   89.2321%   88.2613%   +0.971
+  +10 dB   2219   89.7251%   89.3646%   +0.361
+  +12 dB   2195   88.8838%   89.0661%   -0.182
+  +14 dB   2200   89.4091%   88.0909%   +1.318
+  +16 dB   2223   88.1691%   88.3491%   -0.180
+  +18 dB   2202   88.4650%   87.3297%   +1.135
+
+Runtime (CPU, 44,000 windows each): FP32 4.1 s, INT8 2.6 s
+
+Verdict
+  overall drop 0.35 pp < 0.5 pp -> PASS
+  NOTE: this log evaluates the ONNX models on the host with onnxruntime;
+        the board number (59.2045%) comes from replaying the same test split
+        through the custom engine, see stm32_deployment/results/p5_accuracy_44k.json.
+==============================================================================

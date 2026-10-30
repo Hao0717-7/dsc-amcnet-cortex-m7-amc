@@ -5,8 +5,10 @@
 # Core ML
 torch>=2.0.0
 torchvision>=0.15.0
-onnx>=1.26.0
+onnx>=1.16.0
 onnxruntime>=1.18.0
+# 本仓库实测版本：python 3.14.5 / onnx 1.23.2 / onnxruntime 1.31.1 / numpy 2.5.1
+# torch 仅在训练与 .pt 评估时需要（本机未安装，量化/上板/证据复核不需要 torch）
 
 # Data
 numpy>=1.24.0
