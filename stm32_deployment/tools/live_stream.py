@@ -68,13 +68,20 @@ def main():
                         "-o", str(Path(tempfile.gettempdir()) / "dsc_stream_flash.log")],
                        capture_output=True)
     line = ""
-    for _ in range(40):
+    # keep knocking for a few seconds: after a reflash the MCU is still booting
+    # and only samples 'S' during its 1.5 s boot window, so early bytes are lost.
+    deadline = time.time() + 8.0
+    while time.time() < deadline:
         ser.write(b"S")
-        got = ser.readline().decode("ascii", "replace").strip()
-        if got:
-            print("board:", got)
-        if "STREAM" in got:
-            line = got
+        time.sleep(0.05)
+        while ser.in_waiting:
+            got = ser.readline().decode("ascii", "replace").strip()
+            if got:
+                print("board:", got)
+            if "STREAM" in got:
+                line = got
+                break
+        if line:
             break
     if not line:
         print("no STREAM handshake")

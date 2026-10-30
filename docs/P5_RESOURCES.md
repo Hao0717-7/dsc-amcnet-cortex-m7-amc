@@ -3,14 +3,16 @@
 ## 实测 Flash / RAM（当前双模式固件）
 
 数据来源：`D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.map`
-（2026-10-29 15:52 构建，已移除固件调试探针）与同目录 Keil 构建报告。
+（2026-10-30 22:33 构建，C1 内核优化后、已移除固件调试探针）与同目录 Keil 构建报告。
+
+> 2026-10-29 15:52 构建（C1 前）为 Code 61,788 / RO 16,092 / RW 8,452 / ZI 39,972 → ROM 80,904 B（79.01 KB）。C1 只改内核：Code −944 B、RO +144 B → ROM 80,104 B（78.23 KB），RAM 不变。
 
 | 项 | 字节 | 说明 |
 |---|---|---|
-| Code | 61,788 | 含 HAL、自研引擎、X-CUBE-AI 运行时、串口格式化 |
-| RO Data | 16,092 | 含 5,804 B X-CUBE-AI 权重、自研引擎权重表 |
+| Code | 60,844 | 含 HAL、自研引擎、X-CUBE-AI 运行时、串口格式化 |
+| RO Data | 16,236 | 含 5,804 B X-CUBE-AI 权重、自研引擎权重表 |
 | RW Data（初始值占 Flash） | 8,452 | 含 X-CUBE-AI 层描述符 |
-| **Flash 合计（ROM）** | **80,904（79.01 KB）** | Code+RO+RW |
+| **Flash 合计（ROM）** | **80,104（78.23 KB）** | Code+RO+RW |
 | **RAM 合计（RW+ZI）** | **48,424（47.29 KB）** | RW 8,452 + ZI 39,972，不含 16 MB 外部 SDRAM（未用） |
 
 ### 组成（按 map 符号归类，Code / RO）
@@ -28,11 +30,11 @@
 
 | 项 | 论文（Table II） | 本机实测 | 差异原因 |
 |---|---|---|---|
-| Flash | 51.26 KB | 79.01 KB | 我们同时链了 X-CUBE-AI 与自研引擎两套推理栈，且带 HAL/串口/双模式 |
+| Flash | 51.26 KB | 78.23 KB | 我们同时链了 X-CUBE-AI 与自研引擎两套推理栈，且带 HAL/串口/双模式 |
 | RAM | 12.09 KB | 47.29 KB | 栈+堆 16 KB、自研引擎工作缓冲、X-CUBE-AI 激活/IO 约 8.5 KB |
 
 **只保留自研引擎、去掉 X-CUBE-AI 链路的估算**：
-Flash ≈ 79.0 − 42.2（AI 运行时 28,902 + network*.o 与描述符 code/RO/RW/ZI）≈ **37–39 KB**，低于论文 51.26 KB；
+Flash ≈ 78.2 − 42.2（AI 运行时 28,902 + network*.o 与描述符 code/RO/RW/ZI）≈ **37–39 KB**，低于论文 51.26 KB；
 RAM 去掉 8.5 KB AI 缓冲、把栈/堆从 16 KB 收到 4.5 KB 后 ≈ **26–28 KB**，仍高于论文，
 差额主要是自研引擎的 3 个 24×128 int8 工作缓冲与 packed 权重副本。
 
@@ -53,7 +55,7 @@ RAM 去掉 8.5 KB AI 缓冲、把栈/堆从 16 KB 收到 4.5 KB 后 ≈ **26–2
 
 ## 结论
 
-- Flash/RAM 实测可用（79.01 KB / 47.29 KB），组成清楚；
+- Flash/RAM 实测可用（78.23 KB / 47.29 KB），组成清楚；
 - 若目标是贴近论文的 51/12 KB，需要做“单栈最小固件” target（去掉 X-CUBE-AI 与调试字符串、缩栈堆），
   估算可到 ~41 KB Flash / ~24 KB RAM，但 RAM 仍会高于论文口径；
 - 能耗需要外部电流测量硬件，本次不伪造数据。

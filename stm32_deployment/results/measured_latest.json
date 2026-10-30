@@ -38,9 +38,17 @@
     "test_per_cell_min": 166,
     "test_per_cell_max": 239,
     "test_per_class": {
-      "8PSK": 4001, "AM-DSB": 3923, "AM-SSB": 3978, "BPSK": 4033,
-      "CPFSK": 4027, "GFSK": 4025, "PAM4": 3991, "QAM16": 3960,
-      "QAM64": 3989, "QPSK": 3951, "WBFM": 4122
+      "8PSK": 4001,
+      "AM-DSB": 3923,
+      "AM-SSB": 3978,
+      "BPSK": 4033,
+      "CPFSK": 4027,
+      "GFSK": 4025,
+      "PAM4": 3991,
+      "QAM16": 3960,
+      "QAM64": 3989,
+      "QPSK": 3951,
+      "WBFM": 4122
     }
   },
   "model": {
@@ -57,8 +65,14 @@
   },
   "accuracy_locked_44k": {
     "split": "datasets/split_indices.npz test_idx（44,000，论文口径）",
-    "fp32_onnx": { "acc": 0.5956, "acc_plus10db": 0.8973 },
-    "int8_onnx": { "acc": 0.5920909, "acc_plus10db": 0.8936 },
+    "fp32_onnx": {
+      "acc": 0.5956,
+      "acc_plus10db": 0.8973
+    },
+    "int8_onnx": {
+      "acc": 0.5920909,
+      "acc_plus10db": 0.8936
+    },
     "int8_vs_results_ref_accuracy_json": {
       "ref_json_acc": 0.5920909090909091,
       "diff": 0.0,
@@ -76,10 +90,24 @@
   },
   "evidence_logs": {
     "serial_boot_dwt": [
-      { "n": 1000, "mean_ms": 0.951, "min_ms": 0.951, "max_ms": 0.951 },
-      { "n": 1000, "mean_ms": 0.960, "min_ms": 0.960, "max_ms": 0.962 }
+      {
+        "n": 1000,
+        "mean_ms": 0.951,
+        "min_ms": 0.951,
+        "max_ms": 0.951
+      },
+      {
+        "n": 1000,
+        "mean_ms": 0.96,
+        "min_ms": 0.96,
+        "max_ms": 0.962
+      }
     ],
-    "golden": { "pass": 22, "fail": 0, "tail": "22/22 vectors within +/-1 LSB and argmax-equal" },
+    "golden": {
+      "pass": 22,
+      "fail": 0,
+      "tail": "22/22 vectors within +/-1 LSB and argmax-equal"
+    },
     "stream_tail": [
       "windows=20/20  board_acc=0.650",
       "compute  mean=972.6us  min=971.0  max=976.5",
@@ -135,6 +163,82 @@
       "仓库内 stm32_deployment/firmware/dwt_measure.{c,h} 是旧版（float* + HAL_RCC_GetHCLKFreq），部署工程用的是 uint32_t*×100 + SystemCoreClock；仓库无法原样重建 0.951/0.960",
       ".ioc 仍是 192 MHz 时钟配置，CubeMX 重新 Generate 会破坏 544 MHz",
       "REPORT.html 与 figs 已按本文件重生成；docs/REPORT_preview.png 仍是旧截图"
+    ]
+  },
+  "c1_kernel_optimization_2026_10_30": {
+    "source_file": "stm32_deployment/custom_engine/dsc_infer.c",
+    "changes": [
+      "rq(): int64 mul -> smull asm with Q32 multiplier, hi + (lo>>31) (bit-exact)",
+      "conv_dw3: boundary pairs moved out of loop, branchless inner loop",
+      "conv1x1: unchanged (all three rewrites measured slower, reverted)"
+    ],
+    "latency_ms": {
+      "zero_input": {
+        "mean": 0.905,
+        "min": 0.905,
+        "max": 0.905
+      },
+      "real_window": {
+        "mean": 0.914,
+        "min": 0.914,
+        "max": 0.914
+      }
+    },
+    "latency_before_ms": {
+      "zero_input": 0.951,
+      "real_window": 0.96
+    },
+    "improvement_pct": 4.8,
+    "vs_paper_1_183_ms_pct": 22.7,
+    "vs_xcubeai_1_827_ms_x": 2.0,
+    "cycles_approx": {
+      "zero": 492320,
+      "real": 497216
+    },
+    "cycles_per_macc": {
+      "zero": 3.01,
+      "real": 3.04
+    },
+    "resources_after": {
+      "code": 60844,
+      "ro": 16236,
+      "rw": 8452,
+      "zi": 39972,
+      "rom_b": 80104,
+      "rom_kb": 78.23,
+      "ram_b": 48424,
+      "ram_kb": 47.29
+    },
+    "resources_before": {
+      "code": 61788,
+      "ro": 16092,
+      "rom_b": 80904,
+      "rom_kb": 79.01
+    },
+    "board_checks": {
+      "golden": "22/22 PASS",
+      "replay": {
+        "n_ok": 300,
+        "exact_11_logits": 297,
+        "argmax": 300,
+        "acc": 0.62,
+        "ref": 0.62
+      },
+      "stream": {
+        "windows": "20/20",
+        "board_acc": 0.65,
+        "compute_us_mean": 926.7,
+        "compute_us_min": 925.2,
+        "compute_us_max": 929.8,
+        "rtt_ms": 7.5
+      }
+    },
+    "evidence": [
+      "stm32_deployment/results/evidence/serial_boot.log",
+      "stm32_deployment/results/evidence/build.log",
+      "stm32_deployment/results/evidence/flash.log",
+      "stm32_deployment/results/evidence/stream.log",
+      "docs/evidence/latency_dscamcnet_int8.csv"
     ]
   }
 }

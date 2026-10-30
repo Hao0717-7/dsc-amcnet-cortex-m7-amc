@@ -13,7 +13,7 @@
 - 需要：ULCNN-simplified 的训练权重或 ONNX（仓库内没有），以及 PyTorch 训练环境
   （当前解释器没有 torch；数据集在，训练需要数小时 CPU）。
 - 现状：README 中 ULCNN 的 2.104 ms / 49.25 KB / 87.55% 仍是论文值，未本地复测；
-  本仓库的 0.960 ms 不能直接与论文 ULCNN 的 2.104 ms 做同机对比（后者是另一套运行时/口径）。
+  本仓库的 0.914 ms 不能直接与论文 ULCNN 的 2.104 ms 做同机对比（后者是另一套运行时/口径）。
 - 方法：clone ULCNN 结构 → 用同一 split 训练 → PTQ → 同一 544 MHz 板级基准脚本测量。
 
 ## 3. 能耗（mJ/inference）
@@ -31,7 +31,7 @@
 
 ## 5. 进一步提速
 
-- 当前 0.960 ms ≈ 3.19 cycles/MACC（522,240 cycles @544 MHz ÷ 163,615 MACC）；已试并回退：conv1x1 全时间打包（+45%）、
+- 当前 0.914 ms ≈ 3.04 cycles/MACC（497,216 cycles @544 MHz ÷ 163,615 MACC；C1 前 0.960 ms ≈ 3.19）；已试并回退：conv1x1 全时间打包（+45%）、
   tile 16+4 累加器（+76%）、双累加器（+76%）。
 - 尚可尝试：SE/GAP 归约 SIMD 化、packed 权重常驻 DTCM、dw3 与 pw 流水、
   logits 层手写展开；预计收益 5–15%，风险中等。

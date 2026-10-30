@@ -30,8 +30,8 @@ real = re.findall(r"\[DWT\] N=1000\s+mean=([\d.]+) ms", boot)
 # 资源数字优先读 Keil map（部署工程），读不到才用 2026-10-29 15:52 构建的实测值
 MAP = Path("D:/DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment/DSC_AMCNet_Deployment.map")
 _mtxt = read(MAP)
-_mrom = re.search(r"Total ROM\s+Size[^()]*?([\d,]+)\s*\(", _mtxt)
-_mrw = re.search(r"Total RW\s+Size[^()]*?([\d,]+)\s*\(", _mtxt)
+_mrom = re.search(r"Total ROM\s+Size[^\n]*?([\d,]+)\s+\(\s*([\d.]+)\s*kB", _mtxt)
+_mrw = re.search(r"Total RW\s+Size[^\n]*?([\d,]+)\s+\(\s*([\d.]+)\s*kB", _mtxt)
 rom_b = int(_mrom.group(1).replace(",", "")) if _mrom else 80904
 ram_b = int(_mrw.group(1).replace(",", "")) if _mrw else 48424
 
@@ -144,7 +144,7 @@ a {{ color:#0969da; }}
 <div class="card">
 <table>
 <tr><th>数字</th><th>来源（本仓库文件）</th><th>产生方式</th></tr>
-<tr><td>0.951 / 0.960 ms</td><td><code>stm32_deployment/results/evidence/serial_boot.log</code></td><td>板端 DWT CYCCNT，1000 次、10 次预热剔除，串口原样打印</td></tr>
+<tr><td>{vals[2]:.3f} / {vals[3]:.3f} ms</td><td><code>stm32_deployment/results/evidence/serial_boot.log</code></td><td>板端 DWT CYCCNT，1000 次、10 次预热剔除，串口原样打印</td></tr>
 <tr><td>59.20% / 59.21%</td><td><code>stm32_deployment/results/p5_accuracy_44k.json</code></td><td>44,000 个 locked-test 窗口逐个回放，板端 logits vs onnxruntime</td></tr>
 <tr><td>98.80% 逐位一致</td><td>同上</td><td>11 个 int8 logits 全部相等才计一致</td></tr>
 <tr><td>{g} golden</td><td><code>stm32_deployment/results/evidence/golden.log</code></td><td>22 条固定向量（11 类 × +10/0 dB）</td></tr>
@@ -154,7 +154,7 @@ a {{ color:#0969da; }}
 
 <h2>2. 延迟对比</h2>
 <div class="card"><img src="{b64(p1)}" alt="latency">
-<div class="note">论文值 1.183 ms 取自仓库 README；X-CUBE-AI 1.827 ms 为其运行时在 time 优化下的实测上限；自研引擎 0.951/0.960 ms。</div></div>
+<div class="note">论文值 1.183 ms 取自仓库 README；X-CUBE-AI 1.827 ms 为其运行时在 time 优化下的实测上限；自研引擎 {vals[2]:.3f}/{vals[3]:.3f} ms。</div></div>
 
 <h2>3. 精度随 SNR（44,000 窗口）</h2>
 <div class="card"><img src="{b64(p2)}" alt="per-snr">

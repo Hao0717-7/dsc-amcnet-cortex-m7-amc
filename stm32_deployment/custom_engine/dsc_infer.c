@@ -37,10 +37,17 @@ static inline int32_t smlad(uint32_t a, uint32_t b, int32_t acc)
     return r;
 }
 
-static inline int32_t rq(int32_t acc, int32_t mq31)
+/* Q31 requant, expressed with a Q32 multiplier so that the whole rounding
+ * step is one SMULL + add-carry:
+ *   q = floor((acc*mq31 + 2^30) / 2^31)  ==  floor((acc*(2mq31) + 2^31) / 2^32)
+ * The right hand form only needs the 64-bit product's high word plus the
+ * carry out of the low word (bit 31 of lo), which is bit-exact. */
+static inline int32_t rq(int32_t acc, int32_t mq32)
 {
-    int64_t p = (int64_t)acc * (int64_t)mq31;
-    return (int32_t)((p + (1LL << 30)) >> 31);
+    int32_t hi;
+    uint32_t lo;
+    __asm volatile("smull %0, %1, %2, %3" : "=r"(lo), "=r"(hi) : "r"(acc), "r"(mq32));
+    return hi + (int32_t)(lo >> 31);
 }
 
 /* ---- packed weights + multipliers ---- */
@@ -58,7 +65,9 @@ static int32_t sumdw1[24], sumdw2[24], sumdw3[24];
 static int32_t m_c1, m_c2, m_c3, m_c4, m_c5, m_c6, m_c7;
 static int32_t m_fc1, m_fc2, m_cl0, m_cl3;
 
-static int32_t q31(float m) { return (int32_t)lrint((double)m * 2147483648.0); }
+/* 2 * round(m * 2^31): Q32 multiplier for rq(); |m| is ~1e-3..3e-2 for this
+ * model, so doubling the Q31 multiplier never overflows int32. */
+static int32_t q31(float m) { return (int32_t)(2.0 * lrint((double)m * 2147483648.0)); }
 
 static void pack_w(const int8_t *w, int rows, int ic, uint32_t *out)
 {
@@ -174,17 +183,34 @@ static void conv_dw3(const int8_t *in, int ch, int len, const int8_t *w,
         const uint32_t w01 = pk2(wc[0], wc[1]);
         const uint32_t w12 = pk2(wc[1], wc[2]);
         const int32_t b = base[c];
-        for (i = 0; i < len / 2; i++) {
-            const int t0 = 2 * i, t1 = t0 + 1;
-            const uint32_t P = pk2(x[t0], x[t1]);
-            const int32_t xm1 = (t0 == 0) ? -128 : x[t0 - 1];
-            const int32_t xp2 = (t1 + 1 >= len) ? -128 : x[t1 + 1];
-            int32_t a0 = b + (int32_t)xm1 * wc[0];
-            int32_t a1 = b + (int32_t)xp2 * wc[2];
-            a0 = smlad(P, w12, a0);
-            a1 = smlad(P, w01, a1);
+        const int32_t w0 = wc[0], w2 = wc[2];
+        const int n = len / 2;
+        /* first pair: left padding q = -128 */
+        {
+            const uint32_t P = pk2(x[0], x[1]);
+            const int32_t xp2 = (len > 2) ? x[2] : -128;
+            int32_t a0 = smlad(P, w12, b + (int32_t)(-128) * w0);
+            int32_t a1 = smlad(P, w01, b + (int32_t)xp2 * w2);
+            o[0] = (int8_t)clampi(rq(a0, m) - 128, QMIN, QMAX);
+            o[1] = (int8_t)clampi(rq(a1, m) - 128, QMIN, QMAX);
+        }
+        /* interior pairs: no boundary tests inside the loop */
+        for (i = 1; i < n - 1; i++) {
+            const int t0 = 2 * i;
+            const uint32_t P = pk2(x[t0], x[t0 + 1]);
+            int32_t a0 = smlad(P, w12, b + (int32_t)x[t0 - 1] * w0);
+            int32_t a1 = smlad(P, w01, b + (int32_t)x[t0 + 2] * w2);
             o[t0] = (int8_t)clampi(rq(a0, m) - 128, QMIN, QMAX);
-            o[t1] = (int8_t)clampi(rq(a1, m) - 128, QMIN, QMAX);
+            o[t0 + 1] = (int8_t)clampi(rq(a1, m) - 128, QMIN, QMAX);
+        }
+        /* last pair: right padding q = -128 */
+        if (n > 1) {
+            const int t0 = 2 * (n - 1);
+            const uint32_t P = pk2(x[t0], x[t0 + 1]);
+            int32_t a0 = smlad(P, w12, b + (int32_t)x[t0 - 1] * w0);
+            int32_t a1 = smlad(P, w01, b + (int32_t)(-128) * w2);
+            o[t0] = (int8_t)clampi(rq(a0, m) - 128, QMIN, QMAX);
+            o[t0 + 1] = (int8_t)clampi(rq(a1, m) - 128, QMIN, QMAX);
         }
     }
 }

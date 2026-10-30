@@ -27,12 +27,12 @@ D:\DSC_AMCNet_Deployment\
 
 ### 1.1 仓库内收口的真实源码（2026-10-30）
 
-板端 0.951/0.960 ms 的固件与本文描述的部署工程同源；为可复现，已把当时实际编译的关键文件原样收回
+板端 0.905/0.914 ms 的固件（C1 内核优化后）与本文描述的部署工程同源；为可复现，已把当时实际编译的关键文件原样收回
 `stm32_deployment/custom_engine/`：
 
 | 文件 | 来源 | 说明 |
 |---|---|---|
-| `dwt_measure.c` / `dwt_measure.h` | `D:\DSC_AMCNet_Deployment` | 唯一能产生 0.951/0.960 的计时实现：`uint32_t *_us_x100` 接口 + `SystemCoreClock` 按 544 MHz 换算。仓库 `stm32_deployment/firmware/dwt_measure.*` 是 X-CUBE-AI 时代旧版（`float*` + `HAL_RCC_GetHCLKFreq()` = HCLK 272 MHz），会把时间算成 2 倍，**两者不要混用** |
+| `dwt_measure.c` / `dwt_measure.h` | `D:\DSC_AMCNet_Deployment` | 唯一能产生 0.905/0.914（及 C1 前 0.951/0.960）的计时实现：`uint32_t *_us_x100` 接口 + `SystemCoreClock` 按 544 MHz 换算。仓库 `stm32_deployment/firmware/dwt_measure.*` 是 X-CUBE-AI 时代旧版（`float*` + `HAL_RCC_GetHCLKFreq()` = HCLK 272 MHz），会把时间算成 2 倍，**两者不要混用** |
 | `DSC_AMCNet_Deployment.uvprojx` | 同上 | Keil AC6 6.7 工程：`pCCUsed 6070000::V6.7::ARMCLANG`、Stack/Heap 各 0x2000，链接 `NetworkRuntime1020_CM7_Keil.lib`（X-CUBE-AI 10.2.0） |
 | `DSC_AMCNet_Deployment.sct` | 同上 | 分散加载文件（默认分配，无特殊段） |
 | `app_main.c` / `app_inference_main.c` | 与部署工程 `Src/main.c`、`Src/inference_main.c` 逐字一致 | uvprojx 按 `../Src`、`../Inc`、`../Drivers`、`../Middlewares/ST/AI` 相对路径引用，从仓库重建时需把这些文件放回部署工程对应位置 |
@@ -91,5 +91,5 @@ $proj = "D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
 
 1. 串口出现 `[UART] formatter test: int=-42 ...`
 2. `[AI] weights=5804 B (flash) | activations=4488 B | io=1024+44 B`
-3. `[DWT] N=1000 mean=0.951 ms`（全零）与 `[RESULT-SAMPLE] Mean : 0.960 ms`
+3. `[DWT] N=1000 mean=0.905 ms`（全零）与 `[RESULT-SAMPLE] Mean : 0.914 ms`
 5. 回放模式：上电 1.5 s 内发 `R`，出现 `[REPLAY] ready`

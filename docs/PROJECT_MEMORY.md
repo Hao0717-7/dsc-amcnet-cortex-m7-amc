@@ -14,7 +14,7 @@
 复现论文 DSC-AMCNet：把 **4,961 参数**的调制识别网络用 **INT8** 跑在 **STM32H723ZGT6（Cortex-M7 @ 544 MHz）**上。
 论文目标延迟 **1.183 ms**、`+10 dB` 准确率 **87.01%**。
 当前状态：**数据 → 训练 → 量化 → 模型转 C → 编译烧录 → 板上实测，全链路打通**；
-自研 SMLAD INT8 引擎板上实测 **0.951 ms（全零输入）/ 0.960 ms（真实窗）**，比论文的 1.183 ms 快约 18%；
+自研 SMLAD INT8 引擎板上实测 **0.914 ms（真实窗）/ 0.905 ms（全零）**（2026-10-30 C1 内核优化后；优化前 0.951/0.960），比论文的 1.183 ms 快 **22.7%**；
 板端 44,000 窗回放准确率 **59.2045%**（参考实现 59.2091%），logits 逐位一致率 **98.80%**。
 
 ## 2. 硬件与时钟（真值）
@@ -57,9 +57,9 @@
 | 路径 | 延迟 | 说明 |
 |---|---|---|
 | X-CUBE-AI 10.2.1 运行时 | 1.827–1.843 ms | 基线，只为证明能跑通；数值与 onnxruntime 不完全一致，**不作为精度主张** |
-| 自研 SMLAD INT8 引擎（`custom_engine/dsc_infer.c`） | **0.951 / 0.960 ms** | 最终结论；通道两两打包 + 内联 SMLAD，Q31 定点 requant，每层 sumw 吸收输入零点 |
+| 自研 SMLAD INT8 引擎（`custom_engine/dsc_infer.c`） | **0.905 / 0.914 ms** | 最终结论（C1 后）；通道两两打包 + 内联 SMLAD，Q32 乘数 + SMULL requant（bit-exact 等价 Q31），dw3 无分支，每层 sumw 吸收输入零点 |
 
-引擎口径：163,615 MACC，515,323 cycles @544 MHz ≈ 0.947 ms（实测 0.951）。
+引擎口径：163,615 MACC；P4 时 515,323 cycles @544 MHz ≈ 0.947 ms（实测 0.951），C1 后 ≈497k cycles ≈ 0.914 ms（实测 0.914）。
 层序：`2→24→dw3→24→pool→dw3→24→pool→dw3→24→pool(16)→SE→shuffle4→GAP→FC24→64→FC64→11`。
 工作区 `A[24*128] B[24*128] C[24*16+64]`，单栈最小约 41 KB Flash / 24 KB RAM。
 
@@ -67,15 +67,15 @@
 
 | 指标 | 值 | 证据 |
 |---|---|---|
-| 延迟（全零，N=1000） | **0.951 ms**（min=max=0.951） | `serial_boot.log` `[DWT] N=1000 mean=0.951` |
-| 延迟（真实窗，N=1000） | **0.960 ms**（0.960–0.962） | `serial_boot.log` `[RESULT-SAMPLE]` |
+| 延迟（全零，N=1000） | **0.905 ms**（min=max=0.905） | `serial_boot.log` `[DWT] N=1000 mean=0.905`（C1 后） |
+| 延迟（真实窗，N=1000） | **0.914 ms**（min=max=0.914） | `serial_boot.log` `[RESULT-SAMPLE]`（C1 后） |
 | 44k 板端准确率 | **59.2045%**（26,050/44,000） | `results/p5_accuracy_44k.json` |
 | 44k 参考准确率 | 59.2091%（26,052/44,000） | 同上 |
 | logits 逐位一致 | **98.80%**；argmax 一致 99.98% | 同上 |
 | `+10 dB` 准确率 | 89.36% | `docs/P5_ACCURACY.md`、`results/ref_accuracy.json` |
 | golden 向量 | **22/22**（±1 LSB 且 argmax 等） | `evidence/golden.log` 末尾 `22/22 vectors within +/-1 LSB and argmax-equal` |
 | 流式（UART int16） | 20/20 窗，board_acc 0.650，**972.6 µs/窗**，往返 7.5 ms | `evidence/stream.log` |
-| 单栈资源（权威构建） | Code 61,788 / RO 16,092 / RW 8,452 / ZI 39,972 → **ROM 80,904 B = 79.01 KB，RAM 48,424 B = 47.29 KB**；0 Error / 23 Warning | 15:52 axf 的 map `Program Size` |
+| 单栈资源（权威构建，C1 后） | Code 60,844 / RO 16,236 / RW 8,452 / ZI 39,972 → **ROM 80,104 B = 78.23 KB，RAM 48,424 B = 47.29 KB**；0 Error / 481 Warning（全量 rebuild） | 22:33 axf 的 map `Program Size`；C1 前 61,788/16,092 → 80,904 B |
 
 补充：`p5_accuracy_full.json` 是旧的 300 窗小样本（board 55.33% vs ref 55.67%），不要引用其准确率；
 `results/p0_replay_compare.json` 是 5,000 子集回放（n_ok 4,995，逐位 98.46%，argmax 99.88%，acc 59.04 vs 59.12），已被 44k 全量取代。
@@ -93,7 +93,7 @@
 
 ## 8. 证据链现状
 
-**可信**：0.951/0.960 ms、44k 59.2045%/98.80%、golden 22/22、stream 972.6 µs、map 的 79.01/47.29 KB —— 都对应 15:27 烧录、15:52 构建、15:54 采集的那一版固件。
+**可信**：44k 59.2045%/98.80%、golden 22/22 与 15:27 烧录、15:52 构建、15:54 采集的那版固件一致；**0.951/0.960 ms、79.01/47.29 KB** 是该版读数，**C1 后**（2026-10-30 22:33 构建、22:36 烧录）为 **0.905/0.914 ms、78.23/47.29 KB、stream 926.7 µs**。
 
 **已过期 / 不可引用（2026-10-29 18:5x 已按实测重生成/改写，见 §8.1）**：
 - ~~`docs/REPORT.html`、`docs/figs/*.png`（15:28）是按旧日志（0.959/0.969）生成的~~ → 已用修正后的 `gen_report.py` 重生成（0.951/0.960、79.01/47.29 KB）。
@@ -118,6 +118,23 @@
 - 注意：进入 replay 模式后板子无法自行退出，需断电复位。
 
 本轮落盘改动：`stm32_deployment/results/measured_latest.json`（全部实测与来源）、`docs/REPORT.html` + `stm32_deployment/results/figs/*.png` 重生成、`gen_report.py` 去掉 87,408/48,560 与 0.959/0.969 硬编码（资源改为读 map）、README/PROJECT_STATUS/RELEASE/REPRODUCE/P1/P4/P5_RESOURCES/P5_BLOCKED 数据统一。
+
+## 8.2 C1 内核优化（2026-10-30 22:xx，已上板验收）
+
+- 改动（`stm32_deployment/custom_engine/dsc_infer.c`，已与部署工程 `Src/dsc_infer.c` 同步）：
+  1. `rq()`：int64 乘 + 舍入 → `smull` 内联汇编 + Q32 乘数，返回 `hi + (lo>>31)`；与旧 `floor((acc*mq31+2^30)/2^31)` 数学等价（bit-exact）。`q31()` 改为 `2*lrint(m*2^31)`（各层乘数 ≤0.034，不溢出）。
+  2. `conv_dw3`：pair 0 与最后一对（边界补 q=−128）移出循环，内部循环无分支。
+  3. `conv1x1` 保持原实现（三种重构均实测变慢并回退）；工作区 `A/B/C` 仍为 24×128 int8，无新增 ZI。
+- 实测（COM3，544 MHz，`-O3`，Keil AC6 6.7 全量 rebuild 0 Error / 481 Warning）：
+  - `[DWT] N=1000 mean=0.905 ms min=0.905 max=0.905`（全零）→ `[RESULT] Mean : 0.905 ms (paper: 1.183)`
+  - `[DWT] N=1000 mean=0.914 ms min=0.914 max=0.914`（真实 QPSK +10 dB）→ `[RESULT-SAMPLE] Mean : 0.914 ms`
+  - classify 循环 `Pred: QAM16 | Conf: 0.645 | Latency 914.5 us`（Conf 回到 0.645 = 数值逐位一致）
+  - 相对 C1 前 0.951/0.960：**−4.8%**；相对论文 1.183：快 **22.7%**；相对 X-CUBE-AI 1.827 ms：**2.00×**
+  - 资源：ROM 80,104 B（78.23 KB，−800 B）、RAM 48,424 B（47.29 KB，不变）；Code 60,844 / RO 16,236 / RW 8,452 / ZI 39,972
+- 验收：`golden_test.py` 22/22 PASS；`p0_replay.py --n 300`：n_ok 300、exact_11_logits 297、argmax 300、acc 62.00%=参考、mean_abs_diff_q 0.001818；`live_stream.py --n 20`：20/20、board_acc 0.650、compute mean 926.7 µs（925.2–929.8）、rtt 7.5 ms。
+- 证据：`stm32_deployment/results/evidence/serial_boot.log`（新固件全量 2,047 行）、`build.log`、`flash.log`（22:36:44）、`stream.log`；`docs/evidence/latency_dscamcnet_int8.csv` 已更新为 0.905/0.914。
+- 工具修复：`live_stream.py` 握手改为 8 s 内循环发 'S'（原来 40 次快速发送会在板子启动前打完）；`gen_report.py` map 正则改为可跨 `(Code + RO Data + RW Data)`，表格数字改动态。
+- 产物：`docs/REPORT.html`（113,548 B，C1 数字）、`docs/REPORT_preview.png`（332,540 B）、`stm32_deployment/results/figs/*.png` 全部重生成。
 
 ## 9. 可复现性缺口（2026-10-29 代码审计，只读）
 
@@ -150,8 +167,8 @@
 
 ## 10. 文档口径（2026-10-29 18:5x 已统一到实测值）
 
-- 延迟：**0.951 ms（全零）/ 0.960 ms（真实窗）**；历史值 0.958/0.968（清理前）、0.967/0.975（P4 前）只在标注为历史时保留。
-- 资源：**80,904 B（79.01 KB）/ 48,424 B（47.29 KB）**；87,408/48,560 已标注为旧固件。
+- 延迟：**0.905 ms（全零）/ 0.914 ms（真实窗）**（C1 后）；历史值 0.951/0.960（C1 前）、0.958/0.968（清理前）、0.967/0.975（P4 前）只在标注为历史时保留。
+- 资源：**80,104 B（78.23 KB）/ 48,424 B（47.29 KB）**（C1 后）；80,904（79.01 KB）为 C1 前，87,408/48,560 为更早固件。
 - 参数：4,961（模型/论文口径）vs 4,793（`X-CUBE-AI/network_generate_report.txt`，差 168 = 7×24 偏置口径）；INT8 ONNX initializer 元素数复算为 4,869（第三种口径，勿混用）。
 - 版本：**pack = X-CUBE-AI 10.2.1**（安装目录 `~\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI\10.2.1`，ST Edge AI Core 2.2.0），运行时库文件名 `NetworkRuntime1020_CM7_Keil.lib`，固件 banner 字符串硬编码写着 “X-CUBE-AI 10.2.0” —— **以 pack 版本 10.2.1 为准**；优化等级：仓库内 `stm32_deployment/X-CUBE-AI/` 生成件是 balanced，板端实跑 time 版（激活 7,488 B，生成物未入库）。
 - README 已把论文值表标题改为 “论文报告值 / paper-reported”，并注明 0.091 mJ 未本地复测。
