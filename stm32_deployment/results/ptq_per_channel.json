@@ -1,0 +1,127 @@
+{
+  "schema": "dsc-amcnet-ptq-per-channel-v1",
+  "calib_windows": 1024,
+  "per_tensor": {
+    "model": "quantization\\outputs\\dscamcnet_int8.onnx",
+    "bytes": 27989,
+    "overall": 0.5920909090909091,
+    "plus10db": 0.8936457863902659,
+    "ge10db": 0.8844098197300481
+  },
+  "per_channel": {
+    "model": ".tmp\\per_channel\\dscamcnet_int8_per_channel.onnx",
+    "bytes": 31802,
+    "overall": 0.594,
+    "plus10db": 0.8945470932852636,
+    "ge10db": 0.8881239242685026
+  },
+  "delta_pp": {
+    "overall": 0.19090909090908603,
+    "plus10db": 0.09013068949976777,
+    "ge10db": 0.37141045384545546
+  },
+  "argmax_agreement": 0.9483863636363636,
+  "verdict": "per-channel gives no accuracy gain -> keep per-tensor (weights are only ~4.5 KB; extra scales are pure metadata cost)",
+  "per_snr": {
+    "-20": {
+      "n": 2165,
+      "per_tensor": 0.09053117782909931,
+      "per_channel": 0.09006928406466513
+    },
+    "-18": {
+      "n": 2133,
+      "per_tensor": 0.09798406000937647,
+      "per_channel": 0.0947022972339428
+    },
+    "-16": {
+      "n": 2138,
+      "per_tensor": 0.10477081384471469,
+      "per_channel": 0.10477081384471469
+    },
+    "-14": {
+      "n": 2168,
+      "per_tensor": 0.1282287822878229,
+      "per_channel": 0.1231549815498155
+    },
+    "-12": {
+      "n": 2230,
+      "per_tensor": 0.15695067264573992,
+      "per_channel": 0.15739910313901345
+    },
+    "-10": {
+      "n": 2108,
+      "per_tensor": 0.2357685009487666,
+      "per_channel": 0.23719165085388993
+    },
+    "-8": {
+      "n": 2314,
+      "per_tensor": 0.3703543647363872,
+      "per_channel": 0.3690579083837511
+    },
+    "-6": {
+      "n": 2192,
+      "per_tensor": 0.5173357664233577,
+      "per_channel": 0.510492700729927
+    },
+    "-4": {
+      "n": 2218,
+      "per_tensor": 0.6348061316501352,
+      "per_channel": 0.6348061316501352
+    },
+    "-2": {
+      "n": 2113,
+      "per_tensor": 0.7311878845243729,
+      "per_channel": 0.7406530998580217
+    },
+    "0": {
+      "n": 2207,
+      "per_tensor": 0.8151336656094246,
+      "per_channel": 0.8201178069777979
+    },
+    "2": {
+      "n": 2196,
+      "per_tensor": 0.8501821493624773,
+      "per_channel": 0.8583788706739527
+    },
+    "4": {
+      "n": 2265,
+      "per_tensor": 0.8688741721854305,
+      "per_channel": 0.8754966887417218
+    },
+    "6": {
+      "n": 2248,
+      "per_tensor": 0.8705516014234875,
+      "per_channel": 0.87144128113879
+    },
+    "8": {
+      "n": 2266,
+      "per_tensor": 0.8826125330979699,
+      "per_channel": 0.8870255957634599
+    },
+    "10": {
+      "n": 2219,
+      "per_tensor": 0.8936457863902659,
+      "per_channel": 0.8945470932852636
+    },
+    "12": {
+      "n": 2195,
+      "per_tensor": 0.8906605922551253,
+      "per_channel": 0.8883826879271071
+    },
+    "14": {
+      "n": 2200,
+      "per_tensor": 0.8809090909090909,
+      "per_channel": 0.89
+    },
+    "16": {
+      "n": 2223,
+      "per_tensor": 0.8834907782276203,
+      "per_channel": 0.8812415654520918
+    },
+    "18": {
+      "n": 2202,
+      "per_tensor": 0.8732970027247956,
+      "per_channel": 0.8864668483197093
+    }
+  }
+}

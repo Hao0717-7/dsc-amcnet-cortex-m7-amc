@@ -65,8 +65,14 @@ def load_raw(data_path: str):
     with open(data_path, "rb") as f:
         data_dict = pickle.load(f, encoding="latin1")
 
+    # Flatten in the CANONICAL order used when split_indices.npz was built:
+    # sorted by (modulation, snr).  A pickled dict preserves insertion order,
+    # which is NOT that order — iterating data_dict.items() would silently pair
+    # the locked split indices with the wrong windows.
+    keys = sorted(data_dict.keys(), key=lambda k: (k[0], k[1]))
     samples, labels, snrs = [], [], []
-    for (mod, snr), iq in data_dict.items():
+    for mod, snr in keys:
+        iq = data_dict[(mod, snr)]
         if mod not in MODULATIONS:
             continue
         label = MODULATIONS.index(mod)

@@ -1,0 +1,62 @@
+==========================================================================
+QAT vs PTQ comparison - DSC-AMCNet (RML2016.10a, 44,000 locked test)
+torch 2.15.0+cpu | python 3.14.5
+==========================================================================
+
+[1/5] Loading data ...
+  train=176,000  test=44,000  (+10 dB n=2,219, >=10 dB n=11,039)
+  QAT fine-tune subset: 60,000 windows (--train-limit)
+
+[2/5] FP32 baseline ...
+  FP32 overall 59.5614% | +10 dB 89.7251% | >=10 dB 88.9302%
+
+[3/5] PTQ reference (shipped INT8 QDQ ONNX, onnxruntime) ...
+  PTQ  overall 59.2091% | +10 dB 89.3646% | >=10 dB 88.4410%  (vs FP32 +0.3523 pp)
+
+[4/5] QAT: fuse conv+BN -> fake-quant -> fine-tune 3 epoch(s) ...
+  fused FP32 overall 59.5614% (must equal the FP32 baseline)
+  epoch 1: loss 1.1049 | 8k-test fake-quant acc 58.59%
+  epoch 2: loss 1.1056 | 8k-test fake-quant acc 58.46%
+  epoch 3: loss 1.1050 | 8k-test fake-quant acc 58.31%
+  QAT (fake-quant, torch) overall 58.8205% | +10 dB 89.0041% | >=10 dB 88.1692%
+  QAT (converted INT8) FAILED - quantized backend cannot run the SE
+    scale multiply: NotImplementedError: Could not run 'aten::mul.out' with arguments from the 'QuantizedCPU' backend. This could be because the operator doesn't exist for this bac
+    -> INT8 deployment of the SE path needs the custom engine (float/Q31 sigmoid), not torch static-quant
+  QAT -> QDQ ONNX export: skipped (torch exporter does not support QAT fake-quant ops; SE multiply has no QuantizedCPU kernel)
+
+[5/5] Per-SNR accuracy
+      SNR |      n |     FP32 |      PTQ |      QAT
+  -------------------------------------------------
+      -20 |   2165 |    8.82% |    9.05% |    9.05%
+      -18 |   2133 |    9.28% |    9.80% |    9.47%
+      -16 |   2138 |   10.15% |   10.48% |    9.82%
+      -14 |   2168 |   13.19% |   12.82% |   12.22%
+      -12 |   2230 |   16.37% |   15.70% |   14.62%
+      -10 |   2108 |   25.05% |   23.58% |   21.58%
+       -8 |   2314 |   37.77% |   37.04% |   35.48%
+       -6 |   2192 |   50.50% |   51.73% |   52.10%
+       -4 |   2218 |   62.31% |   63.48% |   63.30%
+       -2 |   2113 |   74.44% |   73.12% |   75.86%
+       +0 |   2207 |   83.01% |   81.51% |   81.20%
+       +2 |   2196 |   85.38% |   85.02% |   85.15%
+       +4 |   2265 |   87.28% |   86.89% |   86.45%
+       +6 |   2248 |   87.32% |   87.06% |   85.14%
+       +8 |   2266 |   89.23% |   88.26% |   87.82%
+      +10 |   2219 |   89.73% |   89.36% |   89.00%
+      +12 |   2195 |   88.88% |   89.07% |   87.88%
+      +14 |   2200 |   89.41% |   88.09% |   88.18%
+      +16 |   2223 |   88.17% |   88.35% |   87.67%
+      +18 |   2202 |   88.47% |   87.33% |   88.10%
+
+==========================================================================
+SUMMARY (44,000 locked test windows)
+==========================================================================
+  FP32          : 59.5614% overall | 89.7251% @+10 dB | 88.9302% @>=10 dB
+  PTQ  (INT8)   : 59.2091% overall | 89.3646% @+10 dB | 88.4410% @>=10 dB  (-0.3523 pp)
+  QAT  (fake-q) : 58.8205% overall | 89.0041% @+10 dB | 88.1692% @>=10 dB
+  QAT  (INT8)   : n/a - torch QuantizedCPU cannot execute the SE scale multiply (see above); DSC has no portable QAT-INT8 path
+
+  QAT* column above = fake-quant model (INT8 convert unsupported for the SE path).
+  Paper reference (App. C): FP32 57%, DSC QAT 48.2%, PTQ within +0.03 pp; LiteAMCNet QAT 56.60% (+1.40 pp).
+  Verdict: QAT does not beat PTQ for DSC-AMCNet: keep PTQ (reproduces the paper's negative result)
+  Elapsed: 22.8 s

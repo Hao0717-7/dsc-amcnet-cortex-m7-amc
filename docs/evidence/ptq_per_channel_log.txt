@@ -1,0 +1,41 @@
+==============================================================================
+A5: per-channel vs per-tensor INT8 PTQ - DSC-AMCNet (44,000 locked test)
+==============================================================================
+test=44,000 (+10 dB n=2,219, >=10 dB n=11,039)
+quantizing with per_channel=True (1024 calibration windows) ...
+
+evaluating ...
+  per-tensor  (shipped): 59.2091% | +10 dB 89.3646% | >=10 dB 88.4410% | 27,989 B
+  per-channel          : 59.4000% | +10 dB 89.4547% | >=10 dB 88.8124% | 31,802 B  (+3,813 B)
+  delta                : +0.1909 pp overall | +0.0901 pp @+10 dB | +0.3714 pp @>=10 dB
+  argmax agreement per-channel vs per-tensor: 94.8386%
+
+per-SNR accuracy
+      SNR |      n | per-tensor | per-channel |    delta
+  ------------------------------------------------------
+      -20 |   2165 |      9.05% |       9.01% |   -0.05 pp
+      -18 |   2133 |      9.80% |       9.47% |   -0.33 pp
+      -16 |   2138 |     10.48% |      10.48% |   +0.00 pp
+      -14 |   2168 |     12.82% |      12.32% |   -0.51 pp
+      -12 |   2230 |     15.70% |      15.74% |   +0.04 pp
+      -10 |   2108 |     23.58% |      23.72% |   +0.14 pp
+       -8 |   2314 |     37.04% |      36.91% |   -0.13 pp
+       -6 |   2192 |     51.73% |      51.05% |   -0.68 pp
+       -4 |   2218 |     63.48% |      63.48% |   +0.00 pp
+       -2 |   2113 |     73.12% |      74.07% |   +0.95 pp
+       +0 |   2207 |     81.51% |      82.01% |   +0.50 pp
+       +2 |   2196 |     85.02% |      85.84% |   +0.82 pp
+       +4 |   2265 |     86.89% |      87.55% |   +0.66 pp
+       +6 |   2248 |     87.06% |      87.14% |   +0.09 pp
+       +8 |   2266 |     88.26% |      88.70% |   +0.44 pp
+      +10 |   2219 |     89.36% |      89.45% |   +0.09 pp
+      +12 |   2195 |     89.07% |      88.84% |   -0.23 pp
+      +14 |   2200 |     88.09% |      89.00% |   +0.91 pp
+      +16 |   2223 |     88.35% |      88.12% |   -0.22 pp
+      +18 |   2202 |     87.33% |      88.65% |   +1.32 pp
+
+  frames with different argmax: 2,271 / 44,000 (5.161%)
+  on those frames: per-channel right 728, per-tensor right 644
+
+VERDICT: per-channel gives no accuracy gain -> keep per-tensor (weights are only ~4.5 KB; extra scales are pure metadata cost)
+Elapsed: 8.4 s | model: .tmp\per_channel\dscamcnet_int8_per_channel.onnx

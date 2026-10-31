@@ -54,3 +54,6 @@ _doc/*.docx
 # 2026-10 on-board bring-up scratch: diagnostic scripts, serial logs, screenshots,
 # generated reference projects. Keep the findings in PROJECT_STATUS.md instead.
 .tmp/
+
+# ST Edge AI analyze debug dump (large, regenerated on demand)
+*_c_info.json

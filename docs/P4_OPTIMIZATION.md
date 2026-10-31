@@ -116,6 +116,40 @@ python stm32_deployment/tools/host_sim/compare_engine.py      # 结果与板端�
 
 参考结果：bit-exact 98.775%、argmax 一致 99.9795%、engine acc 59.2045% / +10 dB 89.3646%。
 
+## 量化方案对照（A4 / A5，2026-10-31）
+
+在同一个 44,000 窗 locked test split、同一份 FP32 checkpoint 上比较三种量化路线（`quantization/qat_compare.py`、`quantization/ptq_per_channel.py`）：
+
+| 方案 | overall | +10 dB | ≥10 dB | INT8 模型大小 | 结论 |
+|---|---|---|---|---|---|
+| FP32 checkpoint | **59.5614%** | **89.7251%** | **88.9302%** | — | 基线 |
+| PTQ per-tensor（当前固件） | **59.2091%** | 89.3646% | 88.4410% | 27,989 B | 采用（−0.35 pp） |
+| PTQ per-channel | 59.4000% | 89.4547% | 88.8124% | 31,802 B（+3,813 B） | **不采用**：+0.19 pp 未达 0.2 pp 门槛，额外 scale 纯属元数据开销 |
+| QAT fake-quant（3 epoch / 60k 窗微调） | 58.8205% | 89.0041% | 88.1692% | — | **不采用**：低于 PTQ |
+| QAT INT8（torch `convert()`） | n/a | n/a | n/a | — | 不可行（见下） |
+
+- **QAT 失败原因（量化后端级证据）**：`convert()` 在 SE 的逐通道缩放 `x = x * s.unsqueeze(2)` 处报
+  `NotImplementedError: Could not run 'aten::mul.out' with arguments from the 'QuantizedCPU' backend`；
+  同时 QAT→QDQ ONNX 导出失败（`aten::fused_moving_avg_obs_fake_quant` 在 opset 13 无对应算子）。
+  即 DSC-AMCNet 的 SE 注意力在 torch 静态量化路径上没有可部署出口 —— 这复现了论文附录 C「DSC-QAT 反而变差」的结论方向（本机 58.82% vs 论文 48.2%，差异来自微调子集/epoch 不同）。
+- **per-channel**：2,271/44,000 窗 argmax 与 per-tensor 不同（5.16%），其中 per-channel 对 728 窗、per-tensor 对 644 窗；总体增益不显著，且权重只有约 4.5 KB，额外 scale 会让 INT8 模型 +3.8 KB —— 结论不变。
+- **数据加载口径修正**（A4 过程中发现并修复）：`datasets/prepare_dataset.py:load_raw()` 此前按 pickle 字典插入顺序展平，而 `split_indices.npz` 按 canonical `sorted(key=(mod, snr))` 生成；修正后在 canonical 顺序下 `snr==10: n=2,219`、`>=10: n=11,039`（与文档一致）。训练脚本与 `tools/` 下的评估脚本本来就用 canonical 顺序，**已发布的 59.2091% / 89.36% 等数字不受影响**。
+- 证据：`docs/evidence/qat_eval_log.txt`、`docs/evidence/ptq_per_channel_log.txt`、`results/qat_compare.json`、`results/ptq_per_channel.json`。
+
+## A7：ITCM 热循环（2026-10-31，已回退）
+
+把自研引擎搬进 64 KB ITCM（0x00000000）以减少取指延迟。用 3 次构建 + 板端 benchmark 做对照（`stm32_deployment/custom_engine/DSC_AMCNet_Deployment_itcm.sct` 保留为实验记录）：
+
+| 构建 | 布局 | Program Size | 板端（全零 / 真实窗） |
+|---|---|---|---|
+| 基线（Target 对话框布局） | 全部 Flash + AXI SRAM | Code 60,844 / RO 16,236 | **0.895 / 0.904 ms** |
+| 对照：scatter 文件、无 ITCM | 同基线布局 | Code 60,844 / RO 16,236（相同） | **0.895 / 0.904 ms** |
+| A7-a：整个 `dsc_infer.o` 进 ITCM | 代码+常量 15,168 B 在 ITCM | Code 60,924 / RO 16,252 | 0.906 / 0.914 ms（**慢 1.2%**） |
+| A7-b：仅 `dsc_infer.o` 代码进 ITCM | 代码 9,464 B 在 ITCM，常量留 Flash | Code 60,924 / RO 16,252 | 0.906 / 0.914 ms（**慢 1.2%**） |
+
+- 对照构建证明 slowdown 不是 scatter 文件本身，而是 ITCM 放置；两种 ITCM 变体数值逐位一致（golden 22/22、replay 297/300 逐位），但都慢 11 µs。
+- 结论：这个引擎是**数据流型**（权重/激活端口压力），不是取指瓶颈；Flash 的 ART 预取已经把取指延迟藏住，而 ITCM 单端口同时服务取指与自己内容的读访问，反而增加冲突。→ 回退，板端恢复 0.895/0.904 ms（golden 22/22、replay 300 已复验）。
+
 ## 复现
 
 固件启动自动打印两轮 benchmark（全零 + 真实窗口）。逐层 `[PROF]` 探针仅用于调优，收口时已从固件移除，表 4 的数据为当时的测量结果。串口 115200（2026-10-31 起为 550 MHz）：

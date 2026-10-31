@@ -1,0 +1,172 @@
+{
+  "schema": "dsc-amcnet-ulcnn-eval-v1",
+  "onnx": ".tmp\\ulcnn\\ulcnn_fp32_fixed.onnx",
+  "onnx_bytes": 53288,
+  "onnx_sha256": "7c4936039fb0df17e7fa15322a9d5c4cd81847cea5fa7b54a39bd79e5b22a8e9",
+  "nodes": 12,
+  "initializer_elements": 8396,
+  "variants": {
+    "raw": {
+      "overall": 0.4875909090909091,
+      "plus10db": 0.7314105452906715,
+      "ge10db": 0.7332185886402753
+    },
+    "l2-window": {
+      "overall": 0.12554545454545454,
+      "plus10db": 0.1149166291122127,
+      "ge10db": 0.12410544433372588
+    },
+    "maxabs-window": {
+      "overall": 0.12213636363636364,
+      "plus10db": 0.11041009463722397,
+      "ge10db": 0.1192136968928345
+    },
+    "zscore-window": {
+      "overall": 0.14545454545454545,
+      "plus10db": 0.1469130238846327,
+      "ge10db": 0.1549053356282272
+    }
+  },
+  "best_variant": "raw",
+  "overall": 0.4875909090909091,
+  "plus10db": 0.7314105452906715,
+  "ge10db": 0.7332185886402753,
+  "per_snr": {
+    "-20": {
+      "n": 2165,
+      "accuracy": 0.08775981524249422
+    },
+    "-18": {
+      "n": 2133,
+      "accuracy": 0.09892170651664323
+    },
+    "-16": {
+      "n": 2138,
+      "accuracy": 0.10944808231992516
+    },
+    "-14": {
+      "n": 2168,
+      "accuracy": 0.1392988929889299
+    },
+    "-12": {
+      "n": 2230,
+      "accuracy": 0.15695067264573992
+    },
+    "-10": {
+      "n": 2108,
+      "accuracy": 0.2120493358633776
+    },
+    "-8": {
+      "n": 2314,
+      "accuracy": 0.27960242005185826
+    },
+    "-6": {
+      "n": 2192,
+      "accuracy": 0.3521897810218978
+    },
+    "-4": {
+      "n": 2218,
+      "accuracy": 0.454463480613165
+    },
+    "-2": {
+      "n": 2113,
+      "accuracy": 0.5797444391859915
+    },
+    "0": {
+      "n": 2207,
+      "accuracy": 0.6778432260987767
+    },
+    "2": {
+      "n": 2196,
+      "accuracy": 0.7099271402550091
+    },
+    "4": {
+      "n": 2265,
+      "accuracy": 0.7262693156732892
+    },
+    "6": {
+      "n": 2248,
+      "accuracy": 0.7032918149466192
+    },
+    "8": {
+      "n": 2266,
+      "accuracy": 0.7471315092674315
+    },
+    "10": {
+      "n": 2219,
+      "accuracy": 0.7314105452906715
+    },
+    "12": {
+      "n": 2195,
+      "accuracy": 0.7403189066059226
+    },
+    "14": {
+      "n": 2200,
+      "accuracy": 0.7318181818181818
+    },
+    "16": {
+      "n": 2223,
+      "accuracy": 0.7282950967161493
+    },
+    "18": {
+      "n": 2202,
+      "accuracy": 0.7343324250681199
+    }
+  },
+  "per_class": {
+    "8PSK": {
+      "n": 4001,
+      "accuracy": 0.5301174706323419
+    },
+    "AM-DSB": {
+      "n": 3923,
+      "accuracy": 0.29467244455773645
+    },
+    "AM-SSB": {
+      "n": 3978,
+      "accuracy": 0.40774258421317244
+    },
+    "BPSK": {
+      "n": 4033,
+      "accuracy": 0.6422018348623854
+    },
+    "CPFSK": {
+      "n": 4027,
+      "accuracy": 0.6371989073752173
+    },
+    "GFSK": {
+      "n": 4025,
+      "accuracy": 0.6375155279503105
+    },
+    "PAM4": {
+      "n": 3991,
+      "accuracy": 0.42721122525682786
+    },
+    "QAM16": {
+      "n": 3960,
+      "accuracy": 0.4823232323232323
+    },
+    "QAM64": {
+      "n": 3989,
+      "accuracy": 0.5261970418651291
+    },
+    "QPSK": {
+      "n": 3951,
+      "accuracy": 0.5573272589217919
+    },
+    "WBFM": {
+      "n": 4122,
+      "accuracy": 0.22246482290150413
+    }
+  },
+  "footprint_float": {
+    "params": 8395,
+    "params_kib": 32.79,
+    "macc": 455819,
+    "weights_b": 33580,
+    "activations_b": 49280,
+    "ram_total_b": 50348
+  },
+  "analyze_report": "docs\\evidence\\stedgeai_analyze\\ulcnn\\ulcnn_fp32_analyze_report.txt",
+  "note": "upstream releases FP32 ONNX only (legacy axes-input graph, repaired); no preprocessing documented; board latency/RAM row not reproducible; best accuracy over 4 variants stays below the paper's 85.80%"
+}

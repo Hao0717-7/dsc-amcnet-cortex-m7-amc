@@ -1,0 +1,32 @@
+; *****************************************************************************
+; A7 (2026-10-31): ITCM placement for the INT8 engine hot loops.
+;
+; The stock Keil "Target" memory layout puts everything in Flash / AXI SRAM.
+; This scatter file additionally copies the code of dsc_infer.o (the
+; SMLAD inference kernels + model constants) into the 64 KB ITCM at 0x00000000,
+; so the per-inference hot loops run at core speed instead of through the
+; ART/flash path.  Everything else keeps the stock placement:
+;   * vectors + all remaining code / RO data -> internal Flash 0x08000000
+;   * RW + ZI                                -> AXI SRAM 0x24000000 (48,424 B)
+;
+; The ITCM region has its own load region in Flash; the C runtime startup
+; (__scatterload) copies it to 0x00000000 before main().
+; *****************************************************************************
+LR_ITCM 0x08020000 0x00010000  {
+  ER_ITCM 0x00000000 0x00010000  {
+    dsc_infer.o (+RO-CODE)
+  }
+}
+
+LR_IROM1 0x08000000 0x00100000  {
+  ER_IROM1 0x08000000 0x00100000  {
+    startup_stm32h723xx.o (RESET, +First)
+    startup_stm32h723xx.o (+RO)
+    system_stm32h7xx.o (+RO)
+    *(InRoot$$Sections)
+    * (+RO)
+  }
+  RW_IRAM2 0x24000000 0x00050000  {
+    * (+RW +ZI)
+  }
+}

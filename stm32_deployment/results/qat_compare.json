@@ -1,0 +1,169 @@
+{
+  "schema": "dsc-amcnet-qat-compare-v1",
+  "checkpoint": "models/checkpoints/dscamcnet_best.pt",
+  "epochs": 3,
+  "train_limit": 60000,
+  "fp32": {
+    "overall": 0.5956136363636364,
+    "plus10db": 0.8972510139702569,
+    "ge10db": 0.8893015671709394
+  },
+  "ptq": {
+    "overall": 0.5920909090909091,
+    "plus10db": 0.8936457863902659,
+    "ge10db": 0.8844098197300481
+  },
+  "qat_fake": {
+    "overall": 0.5882045454545455,
+    "plus10db": 0.8900405588102749,
+    "ge10db": 0.8816921822628861
+  },
+  "qat_int8": {
+    "overall": NaN,
+    "plus10db": NaN,
+    "ge10db": NaN
+  },
+  "qat_int8_error": "NotImplementedError: Could not run 'aten::mul.out' with arguments from the 'QuantizedCPU' backend. This could be because the operator doesn't exist for this backend, or was omitted during the selective/custom build process (if using custom build). If you are a Facebook employee using PyTorch on mobile, please visit https://fburl.com/ptmfixes for possible resolutions. 'aten::mul.out' is only available for these backends: [CPU, Meta, MkldnnCPU, SparseCPU, SparseCsrCPU, SparseCsrMeta, BackendSelect, Python, FuncTorchDynamicLayerBackMode, Functionalize, Conjugate, Negative, ZeroTensor, ADInplaceOrView, AutogradOther, AutogradCPU, AutogradCUDA, AutogradHIP, AutogradXLA, AutogradMPS, AutogradIPU, AutogradXPU, AutogradHPU, AutogradVE, AutogradLazy, AutogradMTIA, AutogradMAIA, AutogradPrivateUse1, AutogradPrivateUse2, AutogradPrivateUse3, AutogradMeta, AutogradNestedTensor, Tracer, AutocastCPU, AutocastMTIA, AutocastMAIA, AutocastXPU, AutocastMPS, AutocastCUDA, FuncTorchBatched, BatchedNestedTensor, FuncTorchVmapMode, Batched, VmapMode, FuncTorchGradWrapper, PythonTLSSnapshot, FuncTorchDynamicLayerFrontMode, PreDispatch, PythonDispatcher].\n\nCPU: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\build\\aten\\src\\ATen\\RegisterCPU_0.cpp:3399 [kernel]\nMeta: registered at D:\\APP\\Pytorch\\Lib\\site-packages\\torch\\_meta_registrations.py:53 [kernel]\nMkldnnCPU: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\build\\aten\\src\\ATen\\RegisterMkldnnCPU_0.cpp:472 [kernel]\nSparseCPU: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\build\\aten\\src\\ATen\\RegisterSparseCPU_0.cpp:1387 [kernel]\nSparseCsrCPU: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\build\\aten\\src\\ATen\\RegisterSparseCsrCPU_0.cpp:1158 [kernel]\nSparseCsrMeta: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\build\\aten\\src\\ATen\\RegisterSparseCsrMeta_0.cpp:1123 [kernel]\nBackendSelect: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\BackendSelectFallbackKernel.cpp:3 [back",
+  "per_snr": {
+    "-20": {
+      "n": 2165,
+      "fp32": 0.08822170900692841,
+      "ptq": 0.09053117782909931,
+      "qat_fake": 0.09053117782909931,
+      "qat": 0.09053117782909931
+    },
+    "-18": {
+      "n": 2133,
+      "fp32": 0.09282700421940929,
+      "ptq": 0.09798406000937647,
+      "qat_fake": 0.0947022972339428,
+      "qat": 0.0947022972339428
+    },
+    "-16": {
+      "n": 2138,
+      "fp32": 0.10149672591206735,
+      "ptq": 0.10477081384471469,
+      "qat_fake": 0.09822263797942002,
+      "qat": 0.09822263797942002
+    },
+    "-14": {
+      "n": 2168,
+      "fp32": 0.13191881918819187,
+      "ptq": 0.1282287822878229,
+      "qat_fake": 0.12223247232472324,
+      "qat": 0.12223247232472324
+    },
+    "-12": {
+      "n": 2230,
+      "fp32": 0.16367713004484305,
+      "ptq": 0.15695067264573992,
+      "qat_fake": 0.14618834080717488,
+      "qat": 0.14618834080717488
+    },
+    "-10": {
+      "n": 2108,
+      "fp32": 0.2504743833017078,
+      "ptq": 0.2357685009487666,
+      "qat_fake": 0.21584440227703985,
+      "qat": 0.21584440227703985
+    },
+    "-8": {
+      "n": 2314,
+      "fp32": 0.3777009507346586,
+      "ptq": 0.3703543647363872,
+      "qat_fake": 0.35479688850475366,
+      "qat": 0.35479688850475366
+    },
+    "-6": {
+      "n": 2192,
+      "fp32": 0.5050182481751825,
+      "ptq": 0.5173357664233577,
+      "qat_fake": 0.5209854014598541,
+      "qat": 0.5209854014598541
+    },
+    "-4": {
+      "n": 2218,
+      "fp32": 0.6230838593327321,
+      "ptq": 0.6348061316501352,
+      "qat_fake": 0.6330027051397655,
+      "qat": 0.6330027051397655
+    },
+    "-2": {
+      "n": 2113,
+      "fp32": 0.7444391859914813,
+      "ptq": 0.7311878845243729,
+      "qat_fake": 0.7586370089919545,
+      "qat": 0.7586370089919545
+    },
+    "0": {
+      "n": 2207,
+      "fp32": 0.8300860897145447,
+      "ptq": 0.8151336656094246,
+      "qat_fake": 0.8119619392840961,
+      "qat": 0.8119619392840961
+    },
+    "2": {
+      "n": 2196,
+      "fp32": 0.8538251366120219,
+      "ptq": 0.8501821493624773,
+      "qat_fake": 0.8515482695810564,
+      "qat": 0.8515482695810564
+    },
+    "4": {
+      "n": 2265,
+      "fp32": 0.8728476821192053,
+      "ptq": 0.8688741721854305,
+      "qat_fake": 0.8644591611479029,
+      "qat": 0.8644591611479029
+    },
+    "6": {
+      "n": 2248,
+      "fp32": 0.873220640569395,
+      "ptq": 0.8705516014234875,
+      "qat_fake": 0.8514234875444839,
+      "qat": 0.8514234875444839
+    },
+    "8": {
+      "n": 2266,
+      "fp32": 0.8923212709620476,
+      "ptq": 0.8826125330979699,
+      "qat_fake": 0.8781994704324801,
+      "qat": 0.8781994704324801
+    },
+    "10": {
+      "n": 2219,
+      "fp32": 0.8972510139702569,
+      "ptq": 0.8936457863902659,
+      "qat_fake": 0.8900405588102749,
+      "qat": 0.8900405588102749
+    },
+    "12": {
+      "n": 2195,
+      "fp32": 0.8888382687927107,
+      "ptq": 0.8906605922551253,
+      "qat_fake": 0.8788154897494306,
+      "qat": 0.8788154897494306
+    },
+    "14": {
+      "n": 2200,
+      "fp32": 0.894090909090909,
+      "ptq": 0.8809090909090909,
+      "qat_fake": 0.8818181818181818,
+      "qat": 0.8818181818181818
+    },
+    "16": {
+      "n": 2223,
+      "fp32": 0.8816914080071975,
+      "ptq": 0.8834907782276203,
+      "qat_fake": 0.8767431399010346,
+      "qat": 0.8767431399010346
+    },
+    "18": {
+      "n": 2202,
+      "fp32": 0.8846503178928247,
+      "ptq": 0.8732970027247956,
+      "qat_fake": 0.8810172570390554,
+      "qat": 0.8810172570390554
+    }
+  }
+}

@@ -179,7 +179,7 @@ python ota_collection/collect_ota.py \
 
 | 项 | 状态 | 说明 |
 |---|---|---|
-| ULCNN-simplified 对照（2.104 ms / 1.78×） | ❌ 未复现 | 仓库无 ULCNN 部署代码；Zenodo 有 `ulcnn_fp32_fixed.onnx`（53,288 B）但需转 INT8 + 上板才能测 |
+| ULCNN-simplified 对照（2.104 ms / 1.78×） | ❌ 未复现（已做精度/足迹核对） | 仓库无 ULCNN 部署代码 ⇒ 2.104 ms/1.78× 无法同机复测；Zenodo 的 `ulcnn_fp32_fixed.onnx`（53,288 B）实测：raw 输入 overall **48.76%** / +10 dB **73.14%**（4 种预处理中最好），L2 预处理仅 12.6% ⇒ 发布的重量级低于论文 85.80%，且上游未公开预处理定义；FP32 足迹 params 8,395 / MACC 455,819 / weights 33,580 B（`docs/evidence/ulcnn_eval_log.txt`） |
 | 550 MHz | ✅ 本仓库 550 MHz | 固件时钟 HSI 64 MHz → PLL1 M=8 / N=68 + FRACN 6144/8192 → **550 MHz**（HCLK 275 / APB 137.5），`FLASH_LATENCY_4`；片内 `CPU_FREQ_BOOST` 已使能（否则 VOS0 上限 520 MHz），与官方口径一致 |
 | 自研引擎 0.904 ms（优于论文） | ✅ | `stm32_deployment/custom_engine/`，**2.02×** vs X-CUBE-AI 运行时 1.827 ms |
 | 板端全量精度 59.20% | ✅ | 44,000 窗，逐位一致 98.80%，argmax 一致 99.98% |
@@ -224,7 +224,7 @@ GitHub Actions 的离线 CI 在 `.github/workflows/ci.yml`（每次 push/PR 跑�
 | 项 | 论文 / 官方值 | 未复现原因 | 本仓库能提供的 |
 |---|---|---|---|
 | OTA 过采样采集精度（`collect_ota.py`） | 82.76%（85.80%→82.76%，多 10× 样本） | 需要 HackRF One + RTL-SDR 采集真实空口 IQ；本机无射频硬件，且 `ota_collection/collect_ota.py` 尚未做整窗 L2 归一化 | `ota_collection/` 脚本框架 + `docs/P5_BLOCKED.md` 的缺口说明 |
-| ULCNN-simplified 对照（2.104 ms / 1.78× / RAM 省 24.69 KB） | 2.104 ms，1.78× | 上游没有 ULCNN 部署代码；Zenodo 仅有 FP32 ONNX（`ulcnn_fp32_fixed.onnx`，53,288 B），要同口径对比需自行转 INT8、写引擎并上板 | 仅作文献引用；**不声称**本仓库的 1.90× 是"对 ULCNN 的 1.78×" |
+| ULCNN-simplified 对照（2.104 ms / 1.78× / RAM 省 24.69 KB） | 2.104 ms，1.78× | 上游没有 ULCNN 部署代码（无 C 工程、无板端 harness），要同口径对比需自行转 INT8、写引擎并上板；Zenodo 的 FP32 ONNX 经实测精度也低于论文（best 48.76% / +10 dB 73.14%，`docs/evidence/ulcnn_eval_log.txt`） | 仅作文献引用；**不声称**本仓库的 2.02× 是"对 ULCNN 的 1.78×" |
 | 能耗（0.091 mJ / inference） | 0.091 mJ | 需要电流表；NUCLEO-H723ZG 的 `JP4` 跳线可串入 mA 表（原理图 sheet 4 已核对），但本机无万用表 | 测量路径说明 + `docs/P5_BLOCKED.md`；**不伪造数字** |
 
 同类"声明值 vs 实测值"还有：550 MHz（本仓库 HSI 64→PLL1 实测 **550 MHz**）、X-CUBE-AI 10.2.0（实测 pack **10.2.1**）——均以本仓库实测为准。详细对照见 [`docs/COMPARISON_vs_OFFICIAL_README.md`](docs/COMPARISON_vs_OFFICIAL_README.md)。

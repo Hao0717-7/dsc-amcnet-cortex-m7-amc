@@ -1,0 +1,228 @@
+ST Edge AI Core v2.2.0-20266 2adc00962
+Created date          : 2026-10-31 11:09:34
+Parameters            : analyze --model .tmp\ulcnn\ulcnn_fp32_fixed.onnx --target stm32 --type onnx --name ulcnn_fp32 --no-inputs-allocation --no-outputs-allocation --optimization time --output docs\evidence\stedgeai_analyze\ulcnn
+
+Exec/report summary (analyze)
+------------------------------------------------------------------------------------------
+model file         :   D:\dsc-amcnet-cortex-m7-amc\.tmp\ulcnn\ulcnn_fp32_fixed.onnx       
+type               :   onnx                                                               
+c_name             :   ulcnn_fp32                                                         
+compression        :   lossless                                                           
+optimization       :   time                                                               
+target/series      :   stm32                                                              
+workspace dir      :   D:\dsc-amcnet-cortex-m7-amc\st_ai_ws                               
+output dir         :   D:\dsc-amcnet-cortex-m7-amc\docs\evidence\stedgeai_analyze\ulcnn   
+model_fmt          :   float                                                              
+model_name         :   ulcnn_fp32_fixed                                                   
+model_hash         :   0x423784d8add26de19e391f10ad6b5efe                                 
+params #           :   8,395 items (32.79 KiB)                                            
+------------------------------------------------------------------------------------------
+input 1/1          :   'input', f32(1x2x128), 1024 Bytes, user                            
+output 1/1         :   'logits', f32(1x11), 44 Bytes, user                                
+macc               :   455,819                                                            
+weights (ro)       :   33,580 B (32.79 KiB) (1 segment)                                   
+activations (rw)   :   49,280 B (48.12 KiB) (1 segment)                                   
+ram (total)        :   50,348 B (49.17 KiB) = 49,280 + 1,024 + 44                         
+------------------------------------------------------------------------------------------
+
+Model name - ulcnn_fp32_fixed
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+m_id   layer (type,original)                     oshape             param/size          macc          connected to   | c_size          c_macc            c_type                           
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+10     classifier_0_weight (Placeholder, Gemm)   [b:64,c:64]        4,096/16,384                                     | +256(+1.6%)     +4,160(+100.0%)   Dense_[10]                       
+       classifier_0_bias (Placeholder, Gemm)     [b:64]             64/256                                           | -256(-100.0%)                     
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+12     classifier_2_weight (Placeholder, Gemm)   [b:11,c:64]        704/2,816                                        | +44(+1.6%)      +715(+100.0%)     Dense_[o][12]                    
+       classifier_2_bias (Placeholder, Gemm)     [b:11]             11/44                                            | -44(-100.0%)                      
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+0      input (Input, )                           [b:1,h:128,c:2]                                                     |                                   
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+1      getitem (Conv2D, Conv)                    [b:1,h:128,c:32]   96/384             8,224                 input   |                                   Conv2D_[1]                       
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+2      relu (Nonlinearity, Relu)                 [b:1,h:128,c:32]                      4,096               getitem   |                 +128(+3.1%)       Transpose_/Nonlinearity_[0, 2]   
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+3      conv1d_1 (Conv2D, Conv)                   [b:1,h:128,c:32]   128/512           12,320                  relu   |                                   Conv2D_[3]                       
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+4      getitem_3 (Conv2D, Conv)                  [b:1,h:128,c:32]   1,056/4,224      131,104              conv1d_1   |                                   Conv2D_[4]                       
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+5      relu_1 (Nonlinearity, Relu)               [b:1,h:128,c:32]                      4,096             getitem_3   |                                   Nonlinearity_[5]                 
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+6      conv1d_3 (Conv2D, Conv)                   [b:1,h:128,c:32]   128/512           12,320                relu_1   |                                   Conv2D_[6]                       
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+7      getitem_6 (Conv2D, Conv)                  [b:1,h:128,c:64]   2,112/8,448      262,208              conv1d_3   |                                   Conv2D_[7]                       
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+8      relu_2 (Nonlinearity, Relu)               [b:1,h:128,c:64]                      8,192             getitem_6   |                                   Nonlinearity_[8]                 
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+9      mean (Reduce, ReduceMean)                 [b:1,c:64]                           16,384                relu_2   |                 -8,192(-50.0%)    Reduce_[9]                       
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+10     linear (Gemm, Gemm)                       [b:1,c:64]                            4,160                  mean   |                 -4,160(-100.0%)   
+                                                                                               classifier_0_weight   | 
+                                                                                                 classifier_0_bias   | 
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+11     relu_3 (Nonlinearity, Relu)               [b:1,c:64]                               64                linear   |                                   Nonlinearity_[11]                
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+12     logits (Gemm, Gemm)                       [b:1,c:11]                              715                relu_3   |                 -715(-100.0%)     
+                                                                                               classifier_2_weight   | 
+                                                                                                 classifier_2_bias   | 
+------ ----------------------------------------- ------------------ -------------- --------- --------------------- --- --------------- ----------------- -------------------------------- 
+model/c-model: macc=463,883/455,819 -8,064(-1.7%) weights=33,580/33,580  activations=--/49,280 io=--/1,068
+
+
+
+Generated C-graph summary
+------------------------------------------------------------------------------------------------------------------------
+model name            : ulcnn_fp32_fixed
+c-name                : ulcnn_fp32
+c-node #              : 13
+c-array #             : 31
+activations size      : 49280 (1 segment)
+weights size          : 33580 (1 segment)
+macc                  : 455819
+inputs                : ['input_output']
+outputs               : ['logits_output']
+
+C-Arrays (31)
+------ ------------------------ ------------ ------------------------- ------------- --------- 
+c_id   name (*_array)           item/size    domain/mem-pool           c-type        comment   
+------ ------------------------ ------------ ------------------------- ------------- --------- 
+0      conv1d_1_bias            32/128       weights/weights           const float             
+1      conv1d_1_output          4096/16384   activations/**default**   float                   
+2      conv1d_1_weights         96/384       weights/weights           const float             
+3      conv1d_3_bias            32/128       weights/weights           const float             
+4      conv1d_3_output          4096/16384   activations/**default**   float                   
+5      conv1d_3_weights         96/384       weights/weights           const float             
+6      getitem_3_bias           32/128       weights/weights           const float             
+7      getitem_3_output         4096/16384   activations/**default**   float                   
+8      getitem_3_scratch0       32/128       activations/**default**   float                   
+9      getitem_3_weights        1024/4096    weights/weights           const float             
+10     getitem_6_bias           64/256       weights/weights           const float             
+11     getitem_6_output         8192/32768   activations/**default**   float                   
+12     getitem_6_scratch0       32/128       activations/**default**   float                   
+13     getitem_6_weights        2048/8192    weights/weights           const float             
+14     getitem_bias             32/128       weights/weights           const float             
+15     getitem_output           4096/16384   activations/**default**   float                   
+16     getitem_scratch0         2/8          activations/**default**   float                   
+17     getitem_weights          64/256       weights/weights           const float             
+18     input_Transpose_output   256/1024     activations/**default**   float                   
+19     input_output             256/1024     user/                     float         /input    
+20     linear_bias              64/256       weights/weights           const float             
+21     linear_output            64/256       activations/**default**   float                   
+22     linear_weights           4096/16384   weights/weights           const float             
+23     logits_bias              11/44        weights/weights           const float             
+24     logits_output            11/44        user/                     float         /output   
+25     logits_weights           704/2816     weights/weights           const float             
+26     mean_output              64/256       activations/**default**   float                   
+27     relu_1_output            4096/16384   activations/**default**   float                   
+28     relu_2_output            8192/32768   activations/**default**   float                   
+29     relu_3_output            64/256       activations/**default**   float                   
+30     relu_output              4096/16384   activations/**default**   float                   
+------ ------------------------ ------------ ------------------------- ------------- --------- 
+
+C-Layers (13)
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+c_id   name (*_layer)    id   layer_type      macc     rom     tensors                     shape (array id)      
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+0      input_Transpose   2    Transpose       128      0       I: input_output             f32(1x2x128) (19)     
+                                                               O: input_Transpose_output   f32(1x128x2) (18)     
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+1      getitem           1    Conv2D          8224     384     I: input_Transpose_output   f32(1x128x2) (18)     
+                                                               S: getitem_scratch0                               
+                                                               W: getitem_weights          f32(32x1x1x2) (17)    
+                                                               W: getitem_bias             f32(32) (14)          
+                                                               O: getitem_output           f32(1x128x32) (15)    
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+2      relu              2    Nonlinearity    4096     0       I: getitem_output           f32(1x128x32) (15)    
+                                                               O: relu_output              f32(1x128x32) (30)    
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+3      conv1d_1          3    Conv2D          12320    512     I: relu_output              f32(1x128x32) (30)    
+                                                               W: conv1d_1_weights         f32(32x3x1x1) (2)     
+                                                               W: conv1d_1_bias            f32(32) (0)           
+                                                               O: conv1d_1_output          f32(1x128x32) (1)     
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+4      getitem_3         4    Conv2D          131104   4224    I: conv1d_1_output          f32(1x128x32) (1)     
+                                                               S: getitem_3_scratch0                             
+                                                               W: getitem_3_weights        f32(32x1x1x32) (9)    
+                                                               W: getitem_3_bias           f32(32) (6)           
+                                                               O: getitem_3_output         f32(1x128x32) (7)     
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+5      relu_1            5    Nonlinearity    4096     0       I: getitem_3_output         f32(1x128x32) (7)     
+                                                               O: relu_1_output            f32(1x128x32) (27)    
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+6      conv1d_3          6    Conv2D          12320    512     I: relu_1_output            f32(1x128x32) (27)    
+                                                               W: conv1d_3_weights         f32(32x3x1x1) (5)     
+                                                               W: conv1d_3_bias            f32(32) (3)           
+                                                               O: conv1d_3_output          f32(1x128x32) (4)     
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+7      getitem_6         7    Conv2D          262208   8448    I: conv1d_3_output          f32(1x128x32) (4)     
+                                                               S: getitem_6_scratch0                             
+                                                               W: getitem_6_weights        f32(64x1x1x32) (13)   
+                                                               W: getitem_6_bias           f32(64) (10)          
+                                                               O: getitem_6_output         f32(1x128x64) (11)    
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+8      relu_2            8    Nonlinearity    8192     0       I: getitem_6_output         f32(1x128x64) (11)    
+                                                               O: relu_2_output            f32(1x128x64) (28)    
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+9      mean              9    Reduce          8192     0       I: relu_2_output            f32(1x128x64) (28)    
+                                                               O: mean_output              f32(1x1x64) (26)      
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+10     linear            10   Dense           4160     16640   I: mean_output              f32(1x1x64) (26)      
+                                                               W: linear_weights           f32(64x64) (22)       
+                                                               W: linear_bias              f32(64) (20)          
+                                                               O: linear_output            f32(1x64) (21)        
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+11     relu_3            11   Nonlinearity    64       0       I: linear_output            f32(1x64) (21)        
+                                                               O: relu_3_output            f32(1x64) (29)        
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+12     logits            12   Dense           715      2860    I: relu_3_output            f32(1x64) (29)        
+                                                               W: logits_weights           f32(11x64) (25)       
+                                                               W: logits_bias              f32(11) (23)          
+                                                               O: logits_output            f32(1x11) (24)        
+------ ----------------- ---- --------------- -------- ------- --------------------------- --------------------- 
+
+
+
+Number of operations per c-layer
+------- ------ ----------------------------- --------- -------------- 
+c_id    m_id   name (type)                         #op           type 
+------- ------ ----------------------------- --------- -------------- 
+0       2      input_Transpose (Transpose)         128   smul_f32_f32 
+1       1      getitem (Conv2D)                  8,224   smul_f32_f32 
+2       2      relu (Nonlinearity)               4,096     op_f32_f32 
+3       3      conv1d_1 (Conv2D)                12,320   smul_f32_f32 
+4       4      getitem_3 (Conv2D)              131,104   smul_f32_f32 
+5       5      relu_1 (Nonlinearity)             4,096     op_f32_f32 
+6       6      conv1d_3 (Conv2D)                12,320   smul_f32_f32 
+7       7      getitem_6 (Conv2D)              262,208   smul_f32_f32 
+8       8      relu_2 (Nonlinearity)             8,192     op_f32_f32 
+9       9      mean (Reduce)                     8,192   smul_f32_f32 
+10      10     linear (Dense)                    4,160   smul_f32_f32 
+11      11     relu_3 (Nonlinearity)                64     op_f32_f32 
+12      12     logits (Dense)                      715   smul_f32_f32 
+------- ------ ----------------------------- --------- -------------- 
+total                                          455,819 
+
+Number of operation types
+---------------- --------- ----------- 
+operation type           #           % 
+---------------- --------- ----------- 
+smul_f32_f32       439,371       96.4% 
+op_f32_f32          16,448        3.6% 
+
+Complexity report (model)
+------ --------------------- ------------------------- ------------------------- -------- 
+m_id   name                  c_macc                    c_rom                     c_id     
+------ --------------------- ------------------------- ------------------------- -------- 
+10     classifier_0_weight   |                  0.9%   ||||||||||||||||  49.6%   [10]     
+12     classifier_2_weight   |                  0.2%   |||                8.5%   [12]     
+1      getitem               |                  1.8%   |                  1.1%   [1]      
+2      relu                  |                  0.9%   |                  0.0%   [0, 2]   
+3      conv1d_1              |                  2.7%   |                  1.5%   [3]      
+4      getitem_3             ||||||||          28.8%   ||||              12.6%   [4]      
+5      relu_1                |                  0.9%   |                  0.0%   [5]      
+6      conv1d_3              |                  2.7%   |                  1.5%   [6]      
+7      getitem_6             ||||||||||||||||  57.5%   ||||||||          25.2%   [7]      
+8      relu_2                |                  1.8%   |                  0.0%   [8]      
+9      mean                  |                  1.8%   |                  0.0%   [9]      
+11     relu_3                |                  0.0%   |                  0.0%   [11]     
+------ --------------------- ------------------------- ------------------------- -------- 
+macc=455,819 weights=33,580 act=49,280 ram_io=1,068

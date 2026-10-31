@@ -10,11 +10,12 @@
 
 ## 2. ULCNN 基线对比
 
-- 需要：ULCNN-simplified 的训练权重或 ONNX（仓库内没有），以及 PyTorch 训练环境
-  （当前解释器没有 torch；数据集在，训练需要数小时 CPU）。
-- 现状：README 中 ULCNN 的 2.104 ms / 49.25 KB / 87.55% 仍是论文值，未本地复测；
-  本仓库的 0.904 ms 不能直接与论文 ULCNN 的 2.104 ms 做同机对比（后者是另一套运行时/口径）。
-- 方法：clone ULCNN 结构 → 用同一 split 训练 → PTQ → 同一 550 MHz 板级基准脚本测量。
+- 需要：ULCNN 的部署工程（C 源码 + Keil 工程）才能复测 2.104 ms / 44.26 KB / 1.78×；上游**只发布了 FP32 ONNX**，没有转换/板端 harness。
+- 已做（2026-10-31）：用 Zenodo `21167587` 的 `ulcnn_fp32_fixed.onnx`（53,288 B，sha256 `7c493603…`）在同一个 44,000 窗 canonical split 上评估，并跑 `stedgeai analyze` 取模型足迹 → `docs/evidence/ulcnn_eval_log.txt`、`results/ulcnn_eval.json`：
+  - 该 ONNX 声明 opset 13 却用旧式「axes 作为第二输入」的 `ReduceMean`，onnxruntime 直接判 INVALID_GRAPH；脚本里把 axes 改写成属性后即可加载（可复现）。
+  - 上游**未定义输入预处理**：L2-per-window（DSC 的用法）→ 12.6%（接近随机）；raw → **48.76% overall / +10 dB 73.14%**（4 种变体里最好）。即发布模型的精度显著低于论文同表 85.80%。
+  - FP32 足迹：params 8,395、MACC 455,819、weights 33,580 B、activations 49,280 B —— 与论文的 INT8 部署口径（44.26 KB Flash / 36.78 KB RAM）不是同一层，不能直接比较。
+- 结论：2.104 ms / 1.78× / RAM 省 24.69 KB **仍不可复现**（缺部署工程）；并且发布的 ONNX 精度也不支持 85.80% 这一行，故只在本仓库以"文献引用 + 已核对精度/足迹"呈现。
 
 ## 3. 能耗（mJ/inference）
 
