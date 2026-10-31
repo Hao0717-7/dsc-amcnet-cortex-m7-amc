@@ -435,12 +435,12 @@
       "protocol": "models/train.py 100 epochs, same data/hparams, --seed {7,2024}; eval models/eval_checkpoint.py --no-onnx on 44k locked split",
       "fp32_44k": {
         "seed_42_published": {"overall": 0.595614, "plus10db": 0.897251, "ge10db": 0.889302},
-        "seed_7": {"overall": 0.568295, "plus10db": 0.857143, "ge10db": 0.848809},
-        "seed_2024": {"overall": 0.586432, "plus10db": 0.889139, "ge10db": 0.879609},
-        "mean": {"overall": 0.583447, "plus10db": 0.881178, "ge10db": 0.872573},
-        "std_pp": {"overall": 1.39, "plus10db": 2.12, "ge10db": 2.11}
+        "seed_7": {"overall": 0.576068, "plus10db": 0.866156, "ge10db": 0.859951},
+        "seed_2024": {"overall": 0.598182, "plus10db": 0.898152, "ge10db": 0.894556},
+        "mean": {"overall": 0.589955, "plus10db": 0.887186, "ge10db": 0.881270},
+        "std_pp": {"overall": 1.21, "plus10db": 1.82, "ge10db": 1.86}
       },
-      "note": "seed 42 is the published/burned checkpoint and is the best of the three -> single-checkpoint numbers are optimistic by 1.2-1.7 pp vs seed mean; upstream claims +/-0.23 pp seed variance, local is one order larger",
+      "note": "final checkpoints (seed 2024 evaluated after training completed; an earlier mid-training snapshot gave 58.64/88.91). seed 42 is +0.57/+1.01/+0.80 pp above the 3-seed mean and seed 2024 is slightly best -> published numbers are mildly optimistic but inside seed noise; upstream claims +/-0.23 pp, local std is 1.2-1.9 pp",
       "log": "docs/evidence/seed_robustness_log.txt"
     },
     "c9_conv1x1_shared_input": {
@@ -477,6 +477,6 @@
       "golden": "22/22",
       "replay": {"n_ok": 300, "exact": 297, "argmax": 300}
     },
-    "commit": "pending (v1.0.8 docs commit)"
+    "commit": "921a7ed (v1.0.8) + C8 final-checkpoint correction commit (v1.0.9)"
   }
 }

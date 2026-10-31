@@ -27,7 +27,7 @@
 | 量化方案对照（QAT / per-channel） | ✅ 完成，均不采用 | `quantization/qat_compare.py`、`ptq_per_channel.py` | QAT fake-quant 58.82% < PTQ 59.21%（SE 的 `x*s` 无 QuantizedCPU kernel，QAT 不可部署）；per-channel 59.40%（+0.19 pp，未达 0.2 pp 门槛，模型 +3.8 KB） |
 | ULCNN 精度/足迹核对 | ⚠️ 部署不可复现 | `models/eval_ulcnn.py`、`docs/evidence/ulcnn_eval_log.txt` | 发布 ONNX（53,288 B）raw 输入 48.76% / +10 dB 73.14%，L2 输入仅 12.6% ⇒ 达不到论文 85.80%；FP32 足迹 params 8,395 / MACC 455,819 ⇒ 2.104 ms / 1.78× 仍无部署件可复测 |
 | ITCM 热循环提速 | ⬜ 已试无收益（回退） | `custom_engine/DSC_AMCNet_Deployment_itcm.sct` | 整引擎 / 仅代码进 ITCM 均比当时基准慢 1.2%（历史实验值，见 P4 §A7）；板端维持 0.895/0.904 ms、golden 22/22、replay 300 |
-| C 组实验（种子/引擎/低功耗） | ⬜ 已试或跳过，均记录理由 | `docs/evidence/seed_robustness_log.txt`、`docs/P4_OPTIMIZATION.md` §C 组 | C8 三种子 +10 dB 85.71–89.73%（std 2.12 pp，单点发布偏乐观 1.2–1.7 pp）；C9 conv1x1 共享输入慢 6.4% 回退；C10 per-channel 上板跳过（收益 <0.2 pp）；C11 WFI 功能等价但功耗不可测，回退 |
+| C 组实验（种子/引擎/低功耗） | ⬜ 已试或跳过，均记录理由 | `docs/evidence/seed_robustness_log.txt`、`docs/P4_OPTIMIZATION.md` §C 组 | C8 三种子 +10 dB 86.62–89.82%（std 1.82 pp，seed42 相对均值 +1.01 pp，seed2024 最好）；C9 conv1x1 共享输入慢 6.4% 回退；C10 per-channel 上板跳过（收益 <0.2 pp）；C11 WFI 功能等价但功耗不可测，回退 |
 
 ## 2. 先看这八条，避免重复踩坑
 

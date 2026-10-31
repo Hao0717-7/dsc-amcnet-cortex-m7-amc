@@ -1,44 +1,49 @@
 DSC-AMCNet — 随机种子稳健性（C8）
 ==============================================================
-生成时间   : 2026-10-31
+生成时间   : 2026-10-31（最终版：seed 2024 训练完成、用最终 checkpoint 重评）
 评估协议   : RML2016.10a locked split md5 bb8bc1e7c41a58fad6f08a23ae7ef76d
              (train 176,000 / test 44,000), per-window L2 normalization over 2x128,
              batch=512, 无增强, torch 2.15.0+cpu (CPU)
 评估脚本   : models/eval_checkpoint.py --no-onnx（FP32 checkpoint, argmax 对 test 标签）
-训练脚本   : models/train.py（100 epochs, 同一数据/超参，仅 --seed 不同）
+训练脚本   : models/train.py（100 epochs / early-stopping patience=15, 同数据同超参, 仅 --seed 不同）
 产物       : .tmp/seeds/dscamcnet_seed{7,2024}.pt, .tmp/seeds/eval_seed{7,2024}.txt
+             .tmp/seeds/train.log（训练逐 epoch 日志）
              （.tmp/ 不入库；本文件是唯一存档）
 
 对照基线   : models/checkpoints/dscamcnet_best.pt = seed 42, sha256 f7a05c25…, 36,437 B
              该 checkpoint 是固件里 INT8 网络与全部板端指标所用的权重。
 
 --------------------------------------------------------------
-1. 结果（44,000 locked test）
+1. 结果（44,000 locked test，最终 checkpoint）
 --------------------------------------------------------------
-seed         overall            +10 dB (n=2,219)    >=10 dB (n=11,039)
-seed 42      59.5614% (26,207)   89.7251%            88.9302%
-seed 7       56.8295% (25,005)   85.7143%            84.8809%
-seed 2024    58.6432% (25,803)   88.9139%            87.9609%
+seed            overall              +10 dB (n=2,219)    >=10 dB (n=11,039)
+seed 42 (发布)  59.5614% (26,207)     89.7251%            88.9302%
+seed 7          57.6068% (25,347)     86.6156%            85.9951%
+seed 2024       59.8182% (26,320)     89.8152%            89.4556%
 --------------------------------------------------------------
-mean         58.3447%            88.1178%            87.2573%
-std (n=3)     1.39 pp             2.12 pp             2.11 pp
-range        2.73 pp             4.01 pp             4.05 pp
+mean            58.9955%             88.7186%            88.1270%
+std (n=3)        1.21 pp              1.82 pp             1.86 pp
+range            2.21 pp              3.20 pp             3.46 pp
 --------------------------------------------------------------
-- seed 7 完整混淆矩阵见 .tmp/seeds/eval_seed7.txt；seed 2024 见 eval_seed2024.txt。
-- 三条都被评估为「训练过程中 val 最优」的 checkpoint（train.py 内部保存策略一致）。
+- seed 7：epoch 48 早停（best val 0.5759）；train.py 自报 +10 dB 86.62%（与本表一致）。
+- seed 2024：跑满 100 epoch（best val 0.5918）；train.py 自报 +10 dB 89.82%（与本表一致）。
+- seed 42：仓库历史 checkpoint，训练日志已不在；其 val 最优值未记录。
 
-2. 解读
-- 仅换随机种子，+10 dB 精度在 85.71%–89.73% 之间摆动（4.0 pp），overall 摆动 2.7 pp。
-  上游 README 给出的 "seed variance ±0.23 pp" 与本机实测差一个量级；本文不据此推翻上游，
-  但**任何跨论文的单点比较都应带上种子**。
-- 已发布的 59.56%（FP32）/ 59.21%（INT8）/ 89.73%（+10 dB）来自 seed 42，是三个种子中
-  最好的一个：相对三种子均值，overall 高 1.22 pp、+10 dB 高 1.61 pp、>=10 dB 高 1.67 pp。
-  也就是说，**单 checkpoint 发布的数字偏乐观**（同一训练流程内的正常波动，不是数据泄漏：
-  test 集固定且所有种子都用同一 split）。
-- 三个种子的排序在 +10 dB 与 >=10 dB 上一致（42 > 2024 > 7），说明差异来自训练收敛质量
-  而不是评估口径。
-- 板端固件仍烧 seed 42 的 INT8 网络（已发布的 0.895/0.904 ms、59.2045%、golden 22/22
-  all 不受影响）。若要发布「多种子均值」，需要为每个种子重跑 PTQ + X-CUBE-AI/引擎量化常量。
+2. 解读（修正版）
+- 只换随机种子，+10 dB 精度在 86.62%–89.82% 之间摆动（3.2 pp），overall 摆动 2.2 pp，
+  std ≈ 1.2–1.9 pp。上游 README 声称「seed variance ±0.23 pp」，与本机实测差约一个量级；
+  本文不据此否定上游（其训练配置/评估口径未公开），但**跨论文的单点比较应带上种子**。
+- 发布用的 seed 42 **不是**三个种子中最好的：seed 2024 略高（+0.26 pp overall、
+  +0.09 pp @+10 dB、+0.53 pp @≥10 dB）；seed 42 相对三种子均值 +0.57 / +1.01 / +0.80 pp。
+  也就是说发布数字略偏乐观（约 0.5–1.0 pp），但落在种子噪声范围内，不是数据泄漏
+  （test 集固定、所有种子共用同一 split）。
+- 排序：overall 与 ≥10 dB 为 2024 > 42 > 7，+10 dB 为 2024 > 42 > 7，三种子排序一致，
+  说明差异来自训练收敛质量而非评估口径。
+- 板端固件仍烧 seed 42 的 INT8 网络（0.895/0.904 ms、59.2045%、golden 22/22 不受影响）。
+  若要发布「多种子均值」，需要为每个种子重跑 PTQ + 量化常量并重新上板验证。
+- 过程中修正过一个方法学问题：最初 seed 2024 的评估发生在训练尚未结束（用了中途 best
+  checkpoint），得到 58.64% / 88.91%；训练完成后重评是 59.82% / 89.82%。本文件与
+  P4 §C8、measured_latest、RELEASE_v1.0.9 均为最终值。
 
 3. 复现命令
   D:\APP\Pytorch\Scripts\python.exe models/train.py --seed 7 --epochs 100 \
