@@ -93,7 +93,12 @@ def main() -> int:
     ap.add_argument("--no-onnx", action="store_true", help="skip the ONNX cross-check")
     args = ap.parse_args()
 
-    ckpt, data, split = Path(args.checkpoint), Path(args.data), Path(args.split)
+    ckpt, data, split = (Path(p).resolve() for p in (args.checkpoint, args.data, args.split))
+    def disp(p: Path) -> str:
+        try:
+            return str(p.relative_to(ROOT))
+        except ValueError:
+            return str(p)
     lines: list[str] = []
     def say(s: str = "") -> None:
         print(s)
@@ -105,8 +110,8 @@ def main() -> int:
     say(f"generated      : {datetime.now(timezone.utc).astimezone().isoformat(timespec='seconds')}")
     say(f"torch          : {torch.__version__}  (device=cpu, no training performed)")
     say(f"python         : {sys.version.split()[0]}")
-    say(f"checkpoint     : {ckpt.relative_to(ROOT)}  sha256={sha256(ckpt)}  {ckpt.stat().st_size:,} B")
-    say(f"dataset        : {data.relative_to(ROOT)}  sha256={sha256(data)}  {data.stat().st_size:,} B")
+    say(f"checkpoint     : {disp(ckpt)}  sha256={sha256(ckpt)}  {ckpt.stat().st_size:,} B")
+    say(f"dataset        : {disp(data)}  sha256={sha256(data)}  {data.stat().st_size:,} B")
     say(f"split          : {split.relative_to(ROOT)}  md5={md5(split)}")
     say("")
 

@@ -429,5 +429,54 @@
       }
     },
     "commit": "e759179 (A4-A7), 6ce108a (A1-A3)"
+  },
+  "c8_c9_c11_experiments_2026_10_31": {
+    "c8_seed_robustness": {
+      "protocol": "models/train.py 100 epochs, same data/hparams, --seed {7,2024}; eval models/eval_checkpoint.py --no-onnx on 44k locked split",
+      "fp32_44k": {
+        "seed_42_published": {"overall": 0.595614, "plus10db": 0.897251, "ge10db": 0.889302},
+        "seed_7": {"overall": 0.568295, "plus10db": 0.857143, "ge10db": 0.848809},
+        "seed_2024": {"overall": 0.586432, "plus10db": 0.889139, "ge10db": 0.879609},
+        "mean": {"overall": 0.583447, "plus10db": 0.881178, "ge10db": 0.872573},
+        "std_pp": {"overall": 1.39, "plus10db": 2.12, "ge10db": 2.11}
+      },
+      "note": "seed 42 is the published/burned checkpoint and is the best of the three -> single-checkpoint numbers are optimistic by 1.2-1.7 pp vs seed mean; upstream claims +/-0.23 pp seed variance, local is one order larger",
+      "log": "docs/evidence/seed_robustness_log.txt"
+    },
+    "c9_conv1x1_shared_input": {
+      "change": "conv1x1: two output channels share one loaded buf[p] word (2 SMLAD, 2 accumulators)",
+      "keil": {"code_b": 59948, "ro_b": 16236, "delta_vs_baseline_b": -896, "errors": 0},
+      "host_parity_4k": {"bit_exact": 0.985, "argmax": 1.0},
+      "board_ms": {"zero": 0.952, "real": 0.961},
+      "delta_vs_baseline_pct": 6.4,
+      "verdict": "slow 6.4% (>5% stop rule) -> reverted; M7 single-issue: two SMLAD chains block each other",
+      "restored": {"code_b": 60844, "board_ms": {"zero": 0.895, "real": 0.904}}
+    },
+    "c10_per_channel_board": {
+      "decision": "skipped",
+      "reason": "A5 CPU-side gain only +0.19 pp overall (<0.2 pp threshold) and model +3.8 KB; board bring-up would need new X-CUBE-AI tables + dsc_model_data.h re-pin + full re-validation; kept as future option (.tmp/per_channel/*.onnx, not committed)"
+    },
+    "c11_wfi_idle": {
+      "change": "classify loop: HAL_Delay(10) busy-wait -> __DSB(); __WFI() inside 10 ms tick loop (SysTick wakes every 1 ms)",
+      "keil": {"code_b": 60892, "delta_vs_baseline_b": 48, "errors": 0},
+      "board": {
+        "bench_ms": {"zero": 0.895, "real": 0.904},
+        "classify_frames_per_2_5s": 178,
+        "classify_period_ms": 14.0,
+        "classify_latency_us": 904.49,
+        "prediction": "QAM16 / conf 0.645 (unchanged)",
+        "golden": "22/22 PASS"
+      },
+      "verdict": "functionally equivalent but power saving unmeasurable (no ammeter) and no long-idle path in current firmware -> not enabled by default, reverted",
+      "restored": {"code_b": 60844, "board_ms": {"zero": 0.895, "real": 0.904}}
+    },
+    "restored_baseline": {
+      "firmware": "v1.0.7 / v1.0.6 firmware (C1 engine, 550 MHz)",
+      "code_b": 60844,
+      "board_ms": {"zero": 0.895, "real": 0.904},
+      "golden": "22/22",
+      "replay": {"n_ok": 300, "exact": 297, "argmax": 300}
+    },
+    "commit": "pending (v1.0.8 docs commit)"
   }
 }

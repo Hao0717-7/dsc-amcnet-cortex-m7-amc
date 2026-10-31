@@ -1,0 +1,50 @@
+DSC-AMCNet — 随机种子稳健性（C8）
+==============================================================
+生成时间   : 2026-10-31
+评估协议   : RML2016.10a locked split md5 bb8bc1e7c41a58fad6f08a23ae7ef76d
+             (train 176,000 / test 44,000), per-window L2 normalization over 2x128,
+             batch=512, 无增强, torch 2.15.0+cpu (CPU)
+评估脚本   : models/eval_checkpoint.py --no-onnx（FP32 checkpoint, argmax 对 test 标签）
+训练脚本   : models/train.py（100 epochs, 同一数据/超参，仅 --seed 不同）
+产物       : .tmp/seeds/dscamcnet_seed{7,2024}.pt, .tmp/seeds/eval_seed{7,2024}.txt
+             （.tmp/ 不入库；本文件是唯一存档）
+
+对照基线   : models/checkpoints/dscamcnet_best.pt = seed 42, sha256 f7a05c25…, 36,437 B
+             该 checkpoint 是固件里 INT8 网络与全部板端指标所用的权重。
+
+--------------------------------------------------------------
+1. 结果（44,000 locked test）
+--------------------------------------------------------------
+seed         overall            +10 dB (n=2,219)    >=10 dB (n=11,039)
+seed 42      59.5614% (26,207)   89.7251%            88.9302%
+seed 7       56.8295% (25,005)   85.7143%            84.8809%
+seed 2024    58.6432% (25,803)   88.9139%            87.9609%
+--------------------------------------------------------------
+mean         58.3447%            88.1178%            87.2573%
+std (n=3)     1.39 pp             2.12 pp             2.11 pp
+range        2.73 pp             4.01 pp             4.05 pp
+--------------------------------------------------------------
+- seed 7 完整混淆矩阵见 .tmp/seeds/eval_seed7.txt；seed 2024 见 eval_seed2024.txt。
+- 三条都被评估为「训练过程中 val 最优」的 checkpoint（train.py 内部保存策略一致）。
+
+2. 解读
+- 仅换随机种子，+10 dB 精度在 85.71%–89.73% 之间摆动（4.0 pp），overall 摆动 2.7 pp。
+  上游 README 给出的 "seed variance ±0.23 pp" 与本机实测差一个量级；本文不据此推翻上游，
+  但**任何跨论文的单点比较都应带上种子**。
+- 已发布的 59.56%（FP32）/ 59.21%（INT8）/ 89.73%（+10 dB）来自 seed 42，是三个种子中
+  最好的一个：相对三种子均值，overall 高 1.22 pp、+10 dB 高 1.61 pp、>=10 dB 高 1.67 pp。
+  也就是说，**单 checkpoint 发布的数字偏乐观**（同一训练流程内的正常波动，不是数据泄漏：
+  test 集固定且所有种子都用同一 split）。
+- 三个种子的排序在 +10 dB 与 >=10 dB 上一致（42 > 2024 > 7），说明差异来自训练收敛质量
+  而不是评估口径。
+- 板端固件仍烧 seed 42 的 INT8 网络（已发布的 0.895/0.904 ms、59.2045%、golden 22/22
+  all 不受影响）。若要发布「多种子均值」，需要为每个种子重跑 PTQ + X-CUBE-AI/引擎量化常量。
+
+3. 复现命令
+  D:\APP\Pytorch\Scripts\python.exe models/train.py --seed 7 --epochs 100 \
+      --data datasets/RML2016.10a_dict.dat --split datasets/split_indices.npz \
+      --output .tmp/seeds/dscamcnet_seed7.pt
+  D:\APP\Pytorch\Scripts\python.exe models/eval_checkpoint.py \
+      --checkpoint .tmp/seeds/dscamcnet_seed7.pt --no-onnx \
+      --data datasets/RML2016.10a_dict.dat --split datasets/split_indices.npz \
+      --output .tmp/seeds/eval_seed7.txt
