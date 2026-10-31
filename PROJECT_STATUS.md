@@ -1,7 +1,7 @@
 # 项目状态与工作区地图
 
 > 面向：接手这个仓库的人或 AI。读完这一页就能知道项目在做什么、做到哪、每个文件夹装的是什么、哪些坑已经踩过。
-> 最后更新：2026-10-29 ｜ 分支 `main`
+> 最后更新：2026-10-31 ｜ 分支 `main`
 
 ## 0. 一句话
 
@@ -23,6 +23,10 @@
 | 实时流式链路 | ✅ 完成 | `stm32_deployment/results/evidence/stream.log` | 20/20 窗口、916.6 µs/窗（C1 后日志原值；C1 前 972.6）；300 窗压测 62.3% / 979 µs |
 | 证据报告与回归 | ✅ 完成 | `docs/REPORT.html`、`tools/golden_test.py` | golden 22/22；原始日志在 `results/evidence/` |
 | OTA 采集评估 | ⬜ 未做 | — | 需 HackRF + RTL-SDR |
+| 一键验收 + 离线 CI | ✅ 完成 | `stm32_deployment/tools/verify_all.ps1`、`.github/workflows/ci.yml`、`check_docs_consistency.py` | 8/8 ALL PASS（build/flash/golden/replay/stream/latency/report）；host parity 44k bit-exact 98.775% / argmax 99.98% |
+| 量化方案对照（QAT / per-channel） | ✅ 完成，均不采用 | `quantization/qat_compare.py`、`ptq_per_channel.py` | QAT fake-quant 58.82% < PTQ 59.21%（SE 的 `x*s` 无 QuantizedCPU kernel，QAT 不可部署）；per-channel 59.40%（+0.19 pp，未达 0.2 pp 门槛，模型 +3.8 KB） |
+| ULCNN 精度/足迹核对 | ⚠️ 部署不可复现 | `models/eval_ulcnn.py`、`docs/evidence/ulcnn_eval_log.txt` | 发布 ONNX（53,288 B）raw 输入 48.76% / +10 dB 73.14%，L2 输入仅 12.6% ⇒ 达不到论文 85.80%；FP32 足迹 params 8,395 / MACC 455,819 ⇒ 2.104 ms / 1.78× 仍无部署件可复测 |
+| ITCM 热循环提速 | ⬜ 已试无收益（回退） | `custom_engine/DSC_AMCNet_Deployment_itcm.sct` | 整引擎 / 仅代码进 ITCM 均 0.906/0.914 ms（慢 1.2%）；板端维持 0.895/0.904 ms、golden 22/22、replay 300 |
 
 ## 2. 先看这八条，避免重复踩坑
 

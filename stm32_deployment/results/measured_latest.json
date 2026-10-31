@@ -299,5 +299,135 @@
       "docs/evidence/latency_dscamcnet_int8.csv (0.895 / 0.904)",
       "stm32_deployment/results/p0_replay_compare.json (300 窗)"
     ]
+  },
+  "a4_a7_experiments_2026_10_31": {
+    "date": "2026-10-31",
+    "scope": "A4 QAT 对照 / A5 per-channel / A6 ULCNN 精度与足迹 / A7 ITCM（已回退）",
+    "split": "44,000 窗 locked test（canonical sorted(key=(mod,snr))，snr==10 n=2,219，>=10 n=11,039）",
+    "a4_qat": {
+      "script": "quantization/qat_compare.py",
+      "log": "docs/evidence/qat_eval_log.txt",
+      "json": "stm32_deployment/results/qat_compare.json",
+      "fp32": {
+        "overall": 0.595614,
+        "plus10db": 0.897251,
+        "ge10db": 0.889302
+      },
+      "ptq": {
+        "overall": 0.592091,
+        "plus10db": 0.893646,
+        "ge10db": 0.88441
+      },
+      "qat_fake_quant": {
+        "overall": 0.588205,
+        "plus10db": 0.890041,
+        "ge10db": 0.881692,
+        "epochs": 3,
+        "train_windows": 60000,
+        "seconds": 22.8
+      },
+      "qat_int8": null,
+      "verdict": "QAT 不如 PTQ，维持 PTQ；torch convert 在 SE 的 x*s 逐通道缩放处无 QuantizedCPU kernel，QAT->QDQ ONNX 亦无算子"
+    },
+    "a5_per_channel": {
+      "script": "quantization/ptq_per_channel.py",
+      "log": "docs/evidence/ptq_per_channel_log.txt",
+      "json": "stm32_deployment/results/ptq_per_channel.json",
+      "per_tensor": {
+        "overall": 0.592091,
+        "plus10db": 0.893646,
+        "model_bytes": 27989
+      },
+      "per_channel": {
+        "overall": 0.594,
+        "plus10db": 0.894547,
+        "model_bytes": 31802
+      },
+      "delta_overall_pp": 0.1909,
+      "argmax_agreement": 0.948386,
+      "verdict": "增益 +0.19 pp 未达 0.2 pp 门槛，模型 +3,813 B -> 维持 per-tensor"
+    },
+    "a6_ulcnn": {
+      "script": "models/eval_ulcnn.py",
+      "log": "docs/evidence/ulcnn_eval_log.txt",
+      "json": "stm32_deployment/results/ulcnn_eval.json",
+      "onnx": ".tmp/ulcnn/ulcnn_fp32_fixed.onnx",
+      "onnx_bytes": 53288,
+      "onnx_sha256": "7c4936039fb0df17e7fa15322a9d5c4cd81847cea5fa7b54a39bd79e5b22a8e9",
+      "graph_issue": "opset 13 声明但 ReduceMean 用旧式 axes 输入 -> ORT INVALID_GRAPH；脚本改写成属性后可加载",
+      "accuracy_best": {
+        "variant": "raw",
+        "overall": 0.4876,
+        "plus10db": 0.7314
+      },
+      "accuracy_l2": {
+        "variant": "l2-window",
+        "overall": 0.1255
+      },
+      "footprint_float": {
+        "params": 8395,
+        "macc": 455819,
+        "weights_b": 33580,
+        "activations_b": 49280,
+        "ram_total_b": 50348
+      },
+      "verdict": "上游无部署工程 -> 2.104 ms / 1.78x / RAM 24.69 KB 不可复现；发布 ONNX 精度也达不到论文 85.80%"
+    },
+    "a7_itcm": {
+      "scatter": "stm32_deployment/custom_engine/DSC_AMCNet_Deployment_itcm.sct",
+      "experiment": "把 dsc_infer.o 整体/仅代码放进 ITCM 0x00000000，`UV4 -r` + `-f` 上板测 DWT",
+      "builds": [
+        {
+          "name": "baseline",
+          "layout": "flash + AXI",
+          "code_bytes": 60844,
+          "zero_ms": 0.895,
+          "real_ms": 0.904
+        },
+        {
+          "name": "scatter-control",
+          "layout": "flash + AXI (scatter file, no ITCM)",
+          "code_bytes": 60844,
+          "zero_ms": 0.895,
+          "real_ms": 0.904
+        },
+        {
+          "name": "itcm-full-object",
+          "layout": "dsc_infer.o RO (15,168 B) in ITCM",
+          "code_bytes": 60924,
+          "zero_ms": 0.906,
+          "real_ms": 0.914
+        },
+        {
+          "name": "itcm-code-only",
+          "layout": "dsc_infer.o code (9,464 B) in ITCM",
+          "code_bytes": 60924,
+          "zero_ms": 0.906,
+          "real_ms": 0.914
+        }
+      ],
+      "verdict": "两种 ITCM 放置均慢 1.2% -> 回退；引擎是数据流型，Flash ART 已藏住取指延迟，ITCM 单端口反而增加冲突",
+      "restored": {
+        "firmware": "Target-dialog layout",
+        "zero_ms": 0.895,
+        "real_ms": 0.904,
+        "golden": "22/22",
+        "replay": {
+          "n_ok": 300,
+          "exact": 297,
+          "argmax": 300
+        }
+      }
+    },
+    "a1_a3_toolchain": {
+      "verify_all": "stm32_deployment/tools/verify_all.ps1 (8 阶段，all_passed=true，results/verify_last.json)",
+      "offline_ci": ".github/workflows/ci.yml",
+      "docs_checker": "stm32_deployment/tools/check_docs_consistency.py (PASS)",
+      "host_parity_44k": {
+        "bit_exact": 0.98775,
+        "argmax": 0.9998
+      }
+    },
+    "commit": "e759179 (A4-A7), 6ce108a (A1-A3)"
   }
 }

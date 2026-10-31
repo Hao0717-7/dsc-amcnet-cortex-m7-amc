@@ -146,6 +146,17 @@
 - 证据：`results/evidence/{serial_boot,build,flash,golden,stream}.log` 全部按 550 MHz 重录；`docs/evidence/latency_dscamcnet_int8.csv` = 0.895/0.904；`measured_latest.json` 新增 `p2_clock_550mhz_2026_10_31`；`docs/REPORT.html`/`REPORT_preview.png`/`figs/*.png` 重生成；`check_clock_config.py` 与 `gen_report.py` 已改为 550 MHz 口径。
 - 文档口径：README、PROJECT_STATUS、P4、P0_ACCURACY、P5_BLOCKED、P5_REALTIME、P5_RESOURCES、COMPARISON、BUILD、REPRODUCE、custom_engine/README、stm32_deployment/README 均已同步；`docs/P1_BENCHMARK.md` 与 v1.0.x release notes 保留当时（544 MHz）读数并注明。
 
+## 8.4 A1–A7 工具链与实验（2026-10-31，提交 6ce108a / e759179）
+
+- **A1 一键验收**：`stm32_deployment/tools/verify_all.ps1` 8 阶段（preflight → host parity → build → flash+boot → golden → replay → stream → latency → report），结果 `results/verify_last.json`（schema `dsc-amcnet-verify-v1`，`all_passed=true`）。首次 44k 全量验收：host parity bit-exact 98.775% / argmax 99.98%；build `Code=60844` 0 Error；boot 0.895/0.904 ms；golden 22/22；replay 297/300 逐位、300/300 argmax；stream 20/20、916.6 µs。
+- **A2 离线 CI**：`.github/workflows/ci.yml`（offline job：时钟检查 + golden 22 条 host 逐位 + compileall + 文档巡检；hardware job 需手动触发 + self-hosted Windows）。`compare_engine.py --golden` 为数据集无关的 22 条 golden 校验模式。
+- **A3 文档巡检**：`check_docs_consistency.py` 以 `measured_latest.json` 为权威基准，扫描陈旧值与必需字符串；`PROJECT_MEMORY`/`P1_BENCHMARK`/`P4` 作为历史文档豁免但仍检查"必含当前值"。
+- **A4 QAT**：FP32 59.5614% → PTQ 59.2091%（−0.35 pp）→ QAT fake-quant 58.8205%；`convert()` 在 SE `x*s.unsqueeze(2)` 处报 `NotImplementedError (QuantizedCPU)`，QAT→QDQ ONNX 也因 `fused_moving_avg_obs_fake_quant` 不可导出 ⇒ DSC 的 QAT 没有可部署出口，维持 PTQ。
+- **A5 per-channel**：59.4000%（+0.19 pp，未达 0.2 pp 门槛），argmax 与 per-tensor 差 5.16%，模型 31,802 B（+3,813 B）⇒ 维持 per-tensor。
+- **A6 ULCNN**：上游 `ulcnn_fp32_fixed.onnx` 图违法（opset 13 却用旧式 axes 输入，ORT 判 INVALID_GRAPH，脚本内修复）；上游未定义预处理，4 种变体最好为 raw：48.76% / +10 dB 73.14%（L2 仅 12.6%）⇒ 发布模型达不到论文 85.80%，且无部署工程 ⇒ 2.104 ms / 1.78× 不可复现；FP32 足迹 params 8,395 / MACC 455,819 / weights 33,580 B。证据 `docs/evidence/ulcnn_eval_log.txt`。
+- **A7 ITCM**：scatter 文件把 `dsc_infer.o`（整体或仅代码）放 ITCM 0x0；整引擎 / 仅代码都是 0.906/0.914 ms（慢 1.2%），scatter 对照 0.895/0.904 ⇒ 不是 scatter 文件原因。结论：引擎数据流受限、Flash ART 已藏住取指延迟，ITCM 单端口反而增加冲突；已回退，sct 留作实验记录。
+- **数据加载修正**：`datasets/prepare_dataset.py:load_raw()` 改为 canonical `sorted(key=(mod, snr))` 展平，与 `split_indices.npz` 对齐（修正后 +10 dB n=2,219、≥10 dB n=11,039）；训练/评估脚本原本就用 canonical 顺序，已发布数字不受影响。
+
 ## 9. 可复现性缺口（2026-10-29 代码审计，只读）
 
 1. **仓库里缺板上真正用的 `dwt_measure`** —— **已修复（2026-10-30）**，文件已收入 `stm32_deployment/custom_engine/`（见 §9.1）。历史问题（2026-10-29 审计）：
