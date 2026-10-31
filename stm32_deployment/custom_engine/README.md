@@ -83,6 +83,17 @@
 5. 计时：`DWT_Init()` → `DWT_BenchmarkN(inference_fn, 1000, &mean_x100, &min_x100, &max_x100)`
    （前 10 次为 warm-up 不计），打印 `[DWT] N=1000 mean=0.905 ms`。
 
+## 主机侧逐位校验（改引擎前先跑这个）
+
+`dsc_infer.c` 支持 `-DDSC_HOST_SIM`：只在 PC 编译时把两处 inline asm（`smlad` / `smull`）和两个固件头替换成等价实现，**目标构建代码完全不变**（Keil 仍 `Code=60844`、板端仍 0.905/0.914 ms）。配套工具在 `stm32_deployment/tools/host_sim/`：
+
+```
+pip install ziglang                     # 任意 C 编译器均可，zig 自带
+python stm32_deployment/tools/host_sim/compare_engine.py   # 44,000 窗逐位对比 ONNX
+```
+
+参考结果：bit-exact 98.775%、argmax 一致 99.9795%、acc 59.2045% / +10 dB 89.3646%，与板端 `p5_accuracy_44k.json` 完全一致；引擎跑完 44,000 窗约 0.7 s。改完引擎先过这一关，再上板跑 `golden_test.py` + `p0_replay.py`。
+
 ## 注意
 
 - 本引擎按 DSC-AMCNet 的精确结构硬编码（2×128 输入、3 级 DSC、SE、GAP、11 类）；换模型需重新生成权重与结构。

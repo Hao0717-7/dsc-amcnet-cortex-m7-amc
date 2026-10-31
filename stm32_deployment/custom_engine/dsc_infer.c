@@ -10,8 +10,10 @@
  */
 #include "dsc_infer.h"
 #include "dsc_model_data.h"
+#if !defined(DSC_HOST_SIM)
 #include "test_sample.h"
 #include "main.h"
+#endif
 
 #include <stdint.h>
 #include <string.h>
@@ -32,9 +34,16 @@ static inline uint32_t pk2(int lo, int hi)
 
 static inline int32_t smlad(uint32_t a, uint32_t b, int32_t acc)
 {
+#if defined(DSC_HOST_SIM)
+    /* portable stand-in for host-side numerical parity tests (same INT8 math) */
+    const int32_t a0 = (int16_t)(a & 0xffffu), a1 = (int16_t)(a >> 16);
+    const int32_t b0 = (int16_t)(b & 0xffffu), b1 = (int16_t)(b >> 16);
+    return acc + a0 * b0 + a1 * b1;
+#else
     int32_t r;
     __asm volatile("smlad %0, %1, %2, %3" : "=r"(r) : "r"(a), "r"(b), "r"(acc));
     return r;
+#endif
 }
 
 /* Q31 requant, expressed with a Q32 multiplier so that the whole rounding
@@ -44,10 +53,15 @@ static inline int32_t smlad(uint32_t a, uint32_t b, int32_t acc)
  * carry out of the low word (bit 31 of lo), which is bit-exact. */
 static inline int32_t rq(int32_t acc, int32_t mq32)
 {
+#if defined(DSC_HOST_SIM)
+    const int64_t p = (int64_t)acc * (int64_t)mq32;
+    return (int32_t)(p >> 32) + (int32_t)(((uint32_t)p) >> 31);
+#else
     int32_t hi;
     uint32_t lo;
     __asm volatile("smull %0, %1, %2, %3" : "=r"(lo), "=r"(hi) : "r"(acc), "r"(mq32));
     return hi + (int32_t)(lo >> 31);
+#endif
 }
 
 /* ---- packed weights + multipliers ---- */
@@ -308,11 +322,13 @@ static int8_t A[24 * 128];
 static int8_t B[24 * 128];
 static int8_t C[24 * 16 + 64];
 
+#if !defined(DSC_HOST_SIM)
 void dsc_fill_sample(float *dst)
 {
     int i;
     for (i = 0; i < 256; i++) dst[i] = ((float)test_sample[i] + 4.0f) * A_IN;
 }
+#endif
 
 void dsc_infer_run_q(const int8_t *in8, int8_t *logits_out)
 {
