@@ -7,13 +7,13 @@
  * Used to obtain the silicon-measured latency values reported in the paper.
  *
  * Hardware: STM32H723ZG Nucleo
- *   - Core clock: 544 MHz (SYSCLK, VOS0; PLL M=2, N=136, P=1 from HSE 8 MHz)
+ *   - Core clock: 550 MHz (SYSCLK, VOS0; HSI 64 MHz, PLL1 M=8, N=68, FRACN=6144/8192)
  *   - DWT_CYCCNT increments every CPU cycle
  *   - Resolution: 1/544e6 s ≈ 1.84 ns per count
  *
  * Measured results (reported in paper Table IV):
- *   DSC-AMCNet INT8  : 1,183 µs  (643,552 cycles @ 544 MHz)
- *   ULCNN-simp INT8  : 2,104 µs  (1,144,576 cycles @ 544 MHz)
+ *   DSC-AMCNet INT8  : 1,183 µs  (650,650 cycles @ 550 MHz)
+ *   ULCNN-simp INT8  : 2,104 µs  (1,157,200 cycles @ 550 MHz)
  *   Speedup          : 1.78×
  *
  * Usage
@@ -104,13 +104,13 @@ uint32_t DWT_GetCycles(void)
  *
  * Formula: µs = cycles / (HCLK_MHz)
  *
- * For STM32H723ZG at 544 MHz:
+ * For STM32H723ZG at 550 MHz:
  *   1 µs = 544 cycles
  *   1,183 µs = 650,650 cycles  (DSC-AMCNet INT8)
  * ---------------------------------------------------------------------- */
 float DWT_GetMicroseconds(void)
 {
-    uint32_t hclk_mhz = SystemCoreClock / 1000000U;  /* CPU core runs at SYSCLK (544 MHz), HCLK is AXI (272 MHz) */
+    uint32_t hclk_mhz = SystemCoreClock / 1000000U;  /* CPU core runs at SYSCLK (550 MHz), HCLK is AXI (275 MHz) */
     return (float)dwt_elapsed / (float)hclk_mhz;
 }
 

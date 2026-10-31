@@ -15,7 +15,9 @@ using STM32CubeIDE 2.1.1 and X-CUBE-AI 10.2.0 (ST Edge AI Core 2.2.0).
 | STM32CubeMX | 6.11.x | Bundled with CubeIDE |
 | Arm GCC | 12.3 | Bundled with CubeIDE |
 
-**Board:** NUCLEO-H723ZG (STM32H723ZG, Cortex-M7, 544 MHz, 1 MB Flash, 564 KB RAM)
+**Board:** NUCLEO-H723ZG (STM32H723ZG, Cortex-M7, **550 MHz**（2026-10-31 起；此前 544 MHz）, 1 MB Flash, 564 KB RAM)
+
+> 2026-10-31 更新：当前固件用 **HSI 64 MHz → PLL1 M=8 / N=68 + FRACN 6144/8192 → 550 MHz**、`FLASH_LATENCY_4`，片内 `CPU_FREQ_BOOST` 已使能。下文 Step 4 里 HSE 晶振 / 544 MHz 的步骤是旧版说明，仅作历史参考；以 `docs/BUILD.md` §1.1 与仓库内 `custom_engine/app_main.c` 为准。
 
 ---
 

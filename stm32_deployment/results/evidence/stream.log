@@ -1,15 +1,16 @@
 board: [UART] formatter test: int=-42 uint=7 long=1234567 str=OK f3=1.235 f2=3.14
 board: [STREAM] switching to 921600, 256 x int16 LE per window
-[  0] 8PSK    conf=0.126 compute=929.8us rtt=   7.6ms
-[  1] AM-SSB  conf=0.365 compute=925.9us rtt=   7.4ms
-[  2] WBFM    conf=1.000 compute=926.1us rtt=   7.6ms
-[  3] QAM64   conf=0.802 compute=927.4us rtt=   7.4ms
-[  4] CPFSK   conf=0.999 compute=926.5us rtt=   7.4ms
-[  5] PAM4    conf=1.000 compute=927.2us rtt=   7.4ms
-[  6] AM-SSB  conf=0.350 compute=925.6us rtt=   7.6ms
-[  7] QPSK    conf=0.788 compute=926.4us rtt=   7.6ms
-[  8] AM-DSB  conf=0.288 compute=926.9us rtt=   7.5ms
-[  9] PAM4    conf=1.000 compute=926.6us rtt=   7.4ms
+[  0] 8PSK    conf=0.126 compute=920.3us rtt=   7.5ms
+[  1] AM-SSB  conf=0.365 compute=915.8us rtt=   7.4ms
+[  2] WBFM    conf=1.000 compute=915.9us rtt=   7.3ms
+[  3] QAM64   conf=0.802 compute=917.2us rtt=   7.6ms
+[  4] CPFSK   conf=0.999 compute=916.4us rtt=   7.4ms
+[  5] PAM4    conf=1.000 compute=917.1us rtt=   7.5ms
+[  6] AM-SSB  conf=0.350 compute=915.4us rtt=   7.5ms
+[  7] QPSK    conf=0.788 compute=916.2us rtt=   7.2ms
+[  8] AM-DSB  conf=0.288 compute=916.7us rtt=   7.5ms
+[  9] PAM4    conf=1.000 compute=916.5us rtt=   7.4ms
+
 windows=20/20  board_acc=0.650
-compute  mean=926.7us  min=925.2  max=929.8
-round-trip mean=7.5ms (UART 921600: 512 B payload ~= 5.6 ms)
+compute  mean=916.6us  min=915.1  max=920.3
+round-trip mean=7.4ms (UART 921600: 512 B payload ~= 5.6 ms)

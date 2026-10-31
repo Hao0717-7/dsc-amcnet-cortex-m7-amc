@@ -79,36 +79,37 @@ def main() -> int:
         m = int(ioc.get("RCC.DIVM1", "0"))
         n = int(ioc.get("RCC.DIVN1", "0"))
         p = int(ioc.get("RCC.DIVP1", "0"))
+        fracn = int(ioc.get("RCC.PLLFRACN", "0"))
     except ValueError:
-        m = n = p = 0
+        m = n = p = fracn = 0
     src = ioc.get("RCC.PLLSourceVirtual") or ioc.get("RCC.PLL1Source") or "HSI (default)"
-    print(f"PLL1: source={src} M={m} N={n} P={p}")
+    print(f"PLL1: source={src} M={m} N={n} FRACN={fracn}/8192 P={p}")
     check("PLL1 M/N/P present", m > 0 and n > 0 and p > 0)
     if m and n and p:
         vco_in = 64_000_000 // m          # HSI 64 MHz / M
-        sysclk = vco_in * n // p
+        sysclk = (vco_in * n + vco_in * fracn // 8192) // p
         check("PLL1 VCO input in 1-16 MHz", 1_000_000 <= vco_in <= 16_000_000, f"{vco_in / 1e6:.1f} MHz")
-        check("SYSCLK == 544 MHz", sysclk == 544_000_000, f"{sysclk / 1e6:.1f} MHz")
+        check("SYSCLK == 550 MHz", sysclk == 550_000_000, f"{sysclk / 1e6:.1f} MHz")
 
     # --- bus dividers ---------------------------------------------------
     hpre = div_of(ioc.get("RCC.HPRE", ""), "RCC_HCLK_DIV")
-    check("HPRE = /2 (HCLK 272 MHz)", hpre == 2, ioc.get("RCC.HPRE", "missing"))
+    check("HPRE = /2 (HCLK 275 MHz)", hpre == 2, ioc.get("RCC.HPRE", "missing"))
     for key, label, prefix in (("RCC.D1PPRE", "APB3", "RCC_APB3_DIV"),
                                ("RCC.D2PPRE1", "APB1", "RCC_APB1_DIV"),
                                ("RCC.D2PPRE2", "APB2", "RCC_APB2_DIV"),
                                ("RCC.D3PPRE", "APB4", "RCC_APB4_DIV")):
         div = div_of(ioc.get(key, ""), prefix)
-        check(f"{label} prescaler = /2 (136 MHz)", div == 2, ioc.get(key, "missing"))
+        check(f"{label} prescaler = /2 (137.5 MHz)", div == 2, ioc.get(key, "missing"))
 
     # --- values recorded by CubeMX --------------------------------------
-    for key, expected in (("RCC.SYSCLKFreq_VALUE", 544_000_000),
-                          ("RCC.HCLKFreq_Value", 272_000_000),
-                          ("RCC.APB1Freq_Value", 136_000_000)):
+    for key, expected in (("RCC.SYSCLKFreq_VALUE", 550_000_000),
+                          ("RCC.HCLKFreq_Value", 275_000_000),
+                          ("RCC.APB1Freq_Value", 137_500_000)):
         try:
             got = int(ioc.get(key, "0"))
         except ValueError:
             got = 0
-        check(f"{key} == {expected / 1e6:.0f} MHz", got == expected, f"{got / 1e6:.0f} MHz")
+        check(f"{key} == {expected / 1e6:g} MHz", got == expected, f"{got / 1e6:g} MHz")
 
     # --- settings NOT stored in .ioc -> must be present in main.c -------
     print()
@@ -117,12 +118,12 @@ def main() -> int:
     check("main.c: PWR_LDO_SUPPLY", "PWR_LDO_SUPPLY" in main_txt)
     check("main.c: PWR_REGULATOR_VOLTAGE_SCALE0 (VOS0)", "PWR_REGULATOR_VOLTAGE_SCALE0" in main_txt)
     check("main.c: VOSRDY wait loop", "PWR_FLAG_VOSRDY" in main_txt)
-    check("main.c: FLASH_LATENCY_3", "FLASH_LATENCY_3" in main_txt)
+    check("main.c: FLASH_LATENCY_4 (550 MHz)", "FLASH_LATENCY_4" in main_txt)
     check("main.c: USART3 (PD8/PD9 VCP)", "USART3" in main_txt)
 
     print()
     if ok:
-        print("RESULT: clock config consistent (544 MHz / HCLK 272 / APB 136, VOS0 + LDO + FLASH_LATENCY_3 present).")
+        print("RESULT: clock config consistent (550 MHz / HCLK 275 / APB 137.5, VOS0 + LDO + FLASH_LATENCY_4 present).")
         return 0
     print("RESULT: FAILED -> " + "; ".join(fails))
     print("See docs/BUILD.md section 1.1 (CubeMX regeneration checklist).")

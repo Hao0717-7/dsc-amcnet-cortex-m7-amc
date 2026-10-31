@@ -6,7 +6,7 @@
 ## 数据流
 
 ```
-host (PC)                    board (STM32H723, 544 MHz)
+host (PC)                    board (STM32H723, 550 MHz)
  512 B / window   ────────►  USART3 RX (921600 8N1)
                               ├─ int16 LE → float (÷32768)
                               ├─ 窗口 L2 归一化（256 点）

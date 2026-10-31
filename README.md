@@ -16,7 +16,7 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 
 - Model training and evaluation (RML2016.10a)
 - Post-Training Quantization (PTQ) to INT8 with X-CUBE-AI-compatible backend
-- Deployment on STM32H723ZG (ARM Cortex-M7, 544 MHz) with DWT cycle-accurate latency measurement
+- Deployment on STM32H723ZG (ARM Cortex-M7, 550 MHz) with DWT cycle-accurate latency measurement
 - Four-tier over-the-air (OTA) validation (HackRF One TX → RX loopback via SMA attenuator; live FM/AM broadcast reception)
 
 ---
@@ -39,14 +39,16 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 
 | 项 | 实测 | 说明 |
 |---|---|---|
-| 推理时延 | **0.905 ms**（全零）/ **0.914 ms**（真实 QPSK 窗口） | 自研 SMLAD INT8 引擎，544 MHz，I/D Cache 开；2026-10-30 C1 内核优化（SMULL requant + dw3 无分支） |
+| 推理时延 | **0.895 ms**（全零）/ **0.904 ms**（真实 QPSK 窗口） | 自研 SMLAD INT8 引擎，**550 MHz**（HSI 64 → PLL1 M=8 / N=68 + FRACN 6144/8192，`FLASH_LATENCY_4`，`CPU_FREQ_BOOST` 已使能），I/D Cache 开；内核为 2026-10-30 C1 版（SMULL requant + dw3 无分支，544 MHz 时为 0.905/0.914 ms） |
 | 对照 | X-CUBE-AI 10.2.1 同模型 1.827 ms | 官方运行时是标量 C 内核，已确认是上限 |
 | 全量精度 | **59.20%**（44k locked test，全 SNR） | onnxruntime 参考 59.21%，逐位一致 98.8% |
 | +10 dB 精度 | **89.36%** | 与论文 89.5% 一致 |
 | Flash / RAM | 78.23 KB / 47.29 KB | 双推理栈 + HAL（C1 后 ROM 80,104 B，原 80,904 B）；组成见 `docs/P5_RESOURCES.md` |
 | 能耗 | 未本地复测 | 缺电流测量硬件，保留论文 0.091 mJ 作为文献值 |
 
-> 2026-10-29 重新复核、2026-10-30 C1 内核优化后更新（0.905/0.914 ms、ROM 78.23 KB）：FP32/INT8 44k 精度重算与 `results/ref_accuracy.json` 完全一致；板端 golden 22/22、300 窗回放 argmax 300/300；资源数取 C1 后构建 map（22:33，Code 60,844 / RO 16,236 / RW 8,452 / ZI 39,972）。全部数值与来源见 `stm32_deployment/results/measured_latest.json`。
+> 2026-10-31 时钟升到 550 MHz 后更新（0.895/0.904 ms、23.6% vs 论文、2.02× vs 运行时、ROM 78.23 KB；544 MHz 时的 C1 读数为 0.905/0.914 ms）。
+>
+> 历史上：2026-10-29 重新复核、2026-10-30 C1 内核优化后更新（0.905/0.914 ms、ROM 78.23 KB）：FP32/INT8 44k 精度重算与 `results/ref_accuracy.json` 完全一致；板端 golden 22/22、300 窗回放 argmax 300/300；资源数取 C1 后构建 map（22:33，Code 60,844 / RO 16,236 / RW 8,452 / ZI 39,972）。全部数值与来源见 `stm32_deployment/results/measured_latest.json`。
 
 复现入口：`docs/REPRODUCE.md`；基准方法 `docs/P1_BENCHMARK.md`；优化记录 `docs/P4_OPTIMIZATION.md`；
 实时链路 `docs/P5_REALTIME.md`；全量精度 `docs/P5_ACCURACY.md`；回归向量 `stm32_deployment/results/golden_vectors.json`。
@@ -169,7 +171,7 @@ python ota_collection/collect_ota.py \
 |---|---|---|---|
 | FP32 85.80%（SNR≥10，`train.py` eval log） | Val acc ≥ 85.5% | ✅ 用 `models/eval_checkpoint.py` 加载仓库内 `.pt` 跑 44k：+10 dB **89.73%**、≥10 dB **88.93%**（n=11,039）、整体 59.56%；与 FP32 ONNX argmax 一致 44,000/44,000（max logit diff 3.8e-05）。权重是本地重训（Zenodo 官方 `.pt` 已损坏，见下），故不比 85.80% 这一具体数字 | `docs/evidence/fp32_eval_log.txt`、`models/checkpoints/`（权重 sha256 `f7a05c25…`） |
 | INT8 Flash 51.26 / RAM 12.09 KB（ST Edge AI Core **analyze report**） | Analyze report | ⚠️ 口径不同：官方为模型+运行时估算；本仓库为完整可烧录固件 **78.23 / 47.29 KB**（map 实测），另有 analyze report 的模型足迹（weights 5,804 B / activations 7,488 B / ram 7,755 B / MACC 163,081） | `docs/evidence/stedgeai_analyze/dscamcnet_int8_analyze_report.txt`、`docs/P5_RESOURCES.md` |
-| INT8 延迟 1.183 ms（`measure_latency.py` 串口 CSV） | Serial log / CSV | ✅ 同脚本、同判据实测 **0.905 ms（全零）/ 0.914 ms（真实窗）**，比论文快 **22.7%**（按官方 550 MHz 折算 0.904 ms，快 23.6%） | `docs/evidence/latency_dscamcnet_int8.csv`、`docs/P1_BENCHMARK.md` |
+| INT8 延迟 1.183 ms（`measure_latency.py` 串口 CSV） | Serial log / CSV | ✅ 同脚本、同判据实测 **0.895 ms（全零）/ 0.904 ms（真实窗）**，比论文快 **23.6%**（本机同为 550 MHz，可直接比较） | `docs/evidence/latency_dscamcnet_int8.csv`、`docs/P1_BENCHMARK.md` |
 | OTA 82.76%（`collect_ota.py` `.npz`） | `.npz` 结果 | ❌ 未复现：本机无 HackRF One + RTL-SDR（脚本本身还缺整窗 L2 归一化） | 仅论文声明，无产物 |
 | PTQ 掉点 <0.5%（`ptq_quantize.py` eval log） | Eval log | ✅ 实测整体 **0.35 pp**（59.5614%→59.2091%，26,207→26,052 / 44,000）；+10 dB 89.73%→89.36%（0.37 pp）；≥10 dB 0.49 pp（仍 < 0.5）。另：从 `.pt` 重跑 PTQ 可复现出同尺寸/同结构 ONNX，98 个 initializer 中 96 个逐字节相同，精度逐位一致（两处 scale 常量有 1e-7 级舍入差） | `docs/evidence/ptq_eval_log.txt`、`docs/evidence/ptq_regen_log.txt` |
 
@@ -178,8 +180,8 @@ python ota_collection/collect_ota.py \
 | 项 | 状态 | 说明 |
 |---|---|---|
 | ULCNN-simplified 对照（2.104 ms / 1.78×） | ❌ 未复现 | 仓库无 ULCNN 部署代码；Zenodo 有 `ulcnn_fp32_fixed.onnx`（53,288 B）但需转 INT8 + 上板才能测 |
-| 550 MHz | ⚠️ 本仓库 544 MHz | 固件时钟为 HSI 64 MHz → PLL1 M=8/N=68/P=1 → **544 MHz**（HCLK 272 / APB 136）；官方声称 550 MHz，差 1.1% |
-| 自研引擎 0.914 ms（优于论文） | ✅ | `stm32_deployment/custom_engine/`，**2.00×** vs X-CUBE-AI 运行时 1.827 ms |
+| 550 MHz | ✅ 本仓库 550 MHz | 固件时钟 HSI 64 MHz → PLL1 M=8 / N=68 + FRACN 6144/8192 → **550 MHz**（HCLK 275 / APB 137.5），`FLASH_LATENCY_4`；片内 `CPU_FREQ_BOOST` 已使能（否则 VOS0 上限 520 MHz），与官方口径一致 |
+| 自研引擎 0.904 ms（优于论文） | ✅ | `stm32_deployment/custom_engine/`，**2.02×** vs X-CUBE-AI 运行时 1.827 ms |
 | 板端全量精度 59.20% | ✅ | 44,000 窗，逐位一致 98.80%，argmax 一致 99.98% |
 | 22 条 golden 回归向量 | ✅ | `golden_test.py`，±1 LSB，22/22 |
 | X-CUBE-AI 版本 | ⚠️ 实测 pack **10.2.1** | 固件 banner 字符串硬编码 "10.2.0"（`Src/inference_main.c:202`），以 pack 版本为准 |
@@ -203,7 +205,7 @@ python ota_collection/collect_ota.py \
 python stm32_deployment/tools/check_clock_config.py
 ```
 
-校验 `.ioc` 里的 PLL/分频（HSI 64 MHz → M=8/N=68/P=1 → **544 MHz**、HCLK 272、APB 136）与 **CubeMX 不写进 .ioc 的四项**（`PWR_LDO_SUPPLY`、`PWR_REGULATOR_VOLTAGE_SCALE0`、`VOSRDY` 等待、`FLASH_LATENCY_3`，外加 `USART3`）是否仍在 main 源码里。当前输出全部 `OK`。
+校验 `.ioc` 里的 PLL/分频（HSI 64 MHz → M=8、N=68 + FRACN 6144/8192 → **550 MHz**、HCLK 275、APB 137.5）与 **CubeMX 不写进 .ioc 的四项**（`PWR_LDO_SUPPLY`、`PWR_REGULATOR_VOLTAGE_SCALE0`、`VOSRDY` 等待、`FLASH_LATENCY_4`，外加 `USART3`）是否仍在 main 源码里。当前输出全部 `OK`。
 
 ### 未复现 / 未验证项（如实声明）
 
@@ -215,7 +217,7 @@ python stm32_deployment/tools/check_clock_config.py
 | ULCNN-simplified 对照（2.104 ms / 1.78× / RAM 省 24.69 KB） | 2.104 ms，1.78× | 上游没有 ULCNN 部署代码；Zenodo 仅有 FP32 ONNX（`ulcnn_fp32_fixed.onnx`，53,288 B），要同口径对比需自行转 INT8、写引擎并上板 | 仅作文献引用；**不声称**本仓库的 1.90× 是"对 ULCNN 的 1.78×" |
 | 能耗（0.091 mJ / inference） | 0.091 mJ | 需要电流表；NUCLEO-H723ZG 的 `JP4` 跳线可串入 mA 表（原理图 sheet 4 已核对），但本机无万用表 | 测量路径说明 + `docs/P5_BLOCKED.md`；**不伪造数字** |
 
-同类"声明值 vs 实测值"还有：550 MHz（本仓库 HSI 64→PLL1 实测 **544 MHz**）、X-CUBE-AI 10.2.0（实测 pack **10.2.1**）——均以本仓库实测为准。详细对照见 [`docs/COMPARISON_vs_OFFICIAL_README.md`](docs/COMPARISON_vs_OFFICIAL_README.md)。
+同类"声明值 vs 实测值"还有：550 MHz（本仓库 HSI 64→PLL1 实测 **550 MHz**）、X-CUBE-AI 10.2.0（实测 pack **10.2.1**）——均以本仓库实测为准。详细对照见 [`docs/COMPARISON_vs_OFFICIAL_README.md`](docs/COMPARISON_vs_OFFICIAL_README.md)。
 
 ---
 

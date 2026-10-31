@@ -25,7 +25,8 @@ GBK. Lines are sanitized before printing so that non-ASCII bytes never raise
 UnicodeEncodeError; the CSV only contains ASCII numbers.
 
 Paper result (for reference, different hardware/clock):
-    DSC-AMCNet INT8 : mean = 1.183 ms @ 550 MHz (paper) / measured here 0.951-0.960 ms @ 544 MHz
+    DSC-AMCNet INT8 : mean = 1.183 ms @ 550 MHz (paper) / measured here 0.895 / 0.904 ms @ 550 MHz
+                      (C1 kernel at 544 MHz was 0.905 / 0.914 ms)
     ULCNN-simp INT8 : mean = 2.104 ms @ 550 MHz
 """
 

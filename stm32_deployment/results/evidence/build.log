@@ -1,3 +1,1975 @@
 *** Using Compiler 'V6.7', folder: 'D:\APP\Keil5\ARM\ARMCLANG\Bin'
+Rebuild target 'DSC_AMCNet_Deployment'
+assembling startup_stm32h723xx.s...
+../Middlewares/ST/AI/App/network_data_params.c(32): warning: no previous extern declaration for non-static variable 's_network_weights_array_u64' [-Wmissing-variable-declarations]
+const ai_u64 s_network_weights_array_u64[726] = {
+             ^
+../Middlewares/ST/AI/App/network_data_params.c(220): warning: cast from 'const unsigned long long *' to 'void *' drops const qualifier [-Wcast-qual]
+  AI_HANDLE_PTR(s_network_weights_array_u64),
+  ^
+../Middlewares/ST/AI/Inc\ai_platform.h(145): note: expanded from macro 'AI_HANDLE_PTR'
+#define AI_HANDLE_PTR(ptr_)           ((ai_handle)(ptr_))
+                                                  ^
+2 warnings generated.
+compiling network_data_params.c...
+../Src/retarget_keil.c(26): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Src/retarget_keil.c(26): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(462): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(242): warning: padding struct 'struct __UART_HandleTypeDef' with 2 bytes to align 'FifoMode' [-Wpadded]
+  uint32_t                 FifoMode;                 /*!< Specifies if the FIFO mode is being used.
+                           ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(263): warning: padding struct 'struct __UART_HandleTypeDef' with 3 bytes to align 'gState' [-Wpadded]
+  __IO HAL_UART_StateTypeDef    gState;              /*!< UART state information related to global Handle management
+                                ^
+../Src/retarget_keil.c(26): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+../Src/retarget_keil.c(49): warning: no previous prototype for function '_sys_exit' [-Wmissing-prototypes]
+void _sys_exit(int x)
+     ^
+../Src/retarget_keil.c(50): warning: function '_sys_exit' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/retarget_keil.c(55): warning: no previous prototype for function '_ttywrch' [-Wmissing-prototypes]
+void _ttywrch(int ch)
+     ^
+../Src/retarget_keil.c(64): warning: '$' in identifier [-Wdollar-in-identifier-extension]
+int $Sub$$_sys_open(const char *name, int openmode)
+    ^
+../Src/retarget_keil.c(64): warning: '$' in identifier [-Wdollar-in-identifier-extension]
+int $Sub$$_sys_open(const char *name, int openmode)
+        ^
+../Src/retarget_keil.c(64): warning: '$' in identifier [-Wdollar-in-identifier-extension]
+int $Sub$$_sys_open(const char *name, int openmode)
+         ^
+../Src/retarget_keil.c(64): warning: no previous prototype for function '$Sub$$_sys_open' [-Wmissing-prototypes]
+int $Sub$$_sys_open(const char *name, int openmode)
+    ^
+13 warnings generated.
+compiling retarget_keil.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c(82): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal_tim_ex.c...
+../Src/stm32h7xx_hal_msp.c(21): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Src/stm32h7xx_hal_msp.c(86): warning: missing field 'Mode' initializer [-Wmissing-field-initializers]
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+                                       ^
+../Src/stm32h7xx_hal_msp.c(87): warning: missing field 'PLL2' initializer [-Wmissing-field-initializers]
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+                                                   ^
+../Src/stm32h7xx_hal_msp.c(21): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(462): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(242): warning: padding struct 'struct __UART_HandleTypeDef' with 2 bytes to align 'FifoMode' [-Wpadded]
+  uint32_t                 FifoMode;                 /*!< Specifies if the FIFO mode is being used.
+                           ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(263): warning: padding struct 'struct __UART_HandleTypeDef' with 3 bytes to align 'gState' [-Wpadded]
+  __IO HAL_UART_StateTypeDef    gState;              /*!< UART state information related to global Handle management
+                                ^
+../Src/stm32h7xx_hal_msp.c(21): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+8 warnings generated.
+compiling stm32h7xx_hal_msp.c...
+../Middlewares/ST/AI/App/network_data.c(22): warning: no previous extern declaration for non-static variable 'g_network_data_map_activations' [-Wmissing-variable-declarations]
+ai_buffer g_network_data_map_activations[AI_NETWORK_DATA_ACTIVATIONS_COUNT] = {
+          ^
+../Middlewares/ST/AI/App/network_data.c(28): warning: cast from 'const unsigned long long *' to 'void *' drops const qualifier [-Wcast-qual]
+  AI_BUFFER_INIT(AI_FLAG_NONE,  AI_BUFFER_FORMAT_U8,
+  ^
+../Middlewares/ST/AI/Inc/ai_platform.h(474): note: expanded from macro 'AI_BUFFER_INIT'
+  .data = (ai_handle)(data_), \
+                     ^
+../Middlewares/ST/AI/App/network_data.c(27): warning: no previous extern declaration for non-static variable 'g_network_data_map_weights' [-Wmissing-variable-declarations]
+ai_buffer g_network_data_map_weights[AI_NETWORK_DATA_WEIGHTS_COUNT] = {
+          ^
+3 warnings generated.
+compiling network_data.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c(82): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c(216): warning: function 'HAL_NVIC_SystemReset' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c(82): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(298): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_cortex.h(53): warning: padding struct 'MPU_Region_InitTypeDef' with 2 bytes to align 'BaseAddress' [-Wpadded]
+  uint32_t               BaseAddress;           /*!< Specifies the base address of the region to protect.                           */
+                         ^
+5 warnings generated.
+compiling stm32h7xx_hal_cortex.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c(187): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal_tim.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c(87): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c(87): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(65): warning: padding struct 'FLASH_ProcessTypeDef' with 3 bytes to align 'NbSectorsToErase' [-Wpadded]
+  __IO uint32_t               NbSectorsToErase;   /*!< Internal variable to save the remaining sectors to erase in IT context        */
+                              ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(75): warning: padding struct 'FLASH_ProcessTypeDef' with 3 bytes to align 'ErrorCode' [-Wpadded]
+  __IO uint32_t               ErrorCode;          /*!< FLASH error code                                                              */
+                              ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c(668): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+6 warnings generated.
+compiling stm32h7xx_hal_flash.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c(67): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal_rcc.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c(88): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c(165): warning: 'USE_MULTI_CORE_SHARED_CODE' is not defined, evaluates to 0 [-Wundef]
+#if  USE_MULTI_CORE_SHARED_CODE != 0U
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c(201): warning: 'USE_MULTI_CORE_SHARED_CODE' is not defined, evaluates to 0 [-Wundef]
+#if  USE_MULTI_CORE_SHARED_CODE != 0U
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c(244): warning: 'USE_MULTI_CORE_SHARED_CODE' is not defined, evaluates to 0 [-Wundef]
+#if  USE_MULTI_CORE_SHARED_CODE != 0U
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c(331): warning: 'USE_MULTI_CORE_SHARED_CODE' is not defined, evaluates to 0 [-Wundef]
+#if  USE_MULTI_CORE_SHARED_CODE != 0U
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c(355): warning: 'USE_MULTI_CORE_SHARED_CODE' is not defined, evaluates to 0 [-Wundef]
+#if  USE_MULTI_CORE_SHARED_CODE != 0U
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c(379): warning: 'USE_MULTI_CORE_SHARED_CODE' is not defined, evaluates to 0 [-Wundef]
+#if  USE_MULTI_CORE_SHARED_CODE != 0U
+     ^
+9 warnings generated.
+compiling stm32h7xx_hal_hsem.c...
+../Src/stm32h7xx_it.c(21): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Src/stm32h7xx_it.c(70): warning: function 'NMI_Handler' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/stm32h7xx_it.c(85): warning: function 'HardFault_Handler' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/stm32h7xx_it.c(100): warning: function 'MemManage_Handler' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/stm32h7xx_it.c(115): warning: function 'BusFault_Handler' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/stm32h7xx_it.c(130): warning: function 'UsageFault_Handler' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+8 warnings generated.
+compiling stm32h7xx_it.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c(107): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal_gpio.c...
+../Src/dwt_measure.c(31): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Src/dwt_measure.c(137): warning: implicit declaration of function 'uart_printf' is invalid in C99 [-Wimplicit-function-declaration]
+    uart_printf("[DWT] %s: %lu cycles | %lu.%02lu us | %lu.%03lu ms\r\n",
+    ^
+../Src/dwt_measure.c(137): warning: this function declaration is not a prototype [-Wstrict-prototypes]
+5 warnings generated.
+compiling dwt_measure.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c(85): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c(85): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(65): warning: padding struct 'FLASH_ProcessTypeDef' with 3 bytes to align 'NbSectorsToErase' [-Wpadded]
+  __IO uint32_t               NbSectorsToErase;   /*!< Internal variable to save the remaining sectors to erase in IT context        */
+                              ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(75): warning: padding struct 'FLASH_ProcessTypeDef' with 3 bytes to align 'ErrorCode' [-Wpadded]
+  __IO uint32_t               ErrorCode;          /*!< FLASH error code                                                              */
+                              ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c(845): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+6 warnings generated.
+compiling stm32h7xx_hal_flash_ex.c...
+../Src/inference_main.c(33): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Src/inference_main.c(85): warning: implicit declaration of function 'uart_printf' is invalid in C99 [-Wimplicit-function-declaration]
+        uart_printf("[AI] Create error: type=%d code=%d\r\n", err.type, err.code);
+        ^
+../Src/inference_main.c(85): warning: this function declaration is not a prototype [-Wstrict-prototypes]
+../Src/inference_main.c(90): warning: suggest braces around initialization of subobject [-Wmissing-braces]
+        AI_NETWORK_DATA_WEIGHTS(ai_network_data_weights_get()),
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Middlewares/ST/AI/App\network_data.h(29): note: expanded from macro 'AI_NETWORK_DATA_WEIGHTS'
+  ai_network_data_weights_buffer_get(AI_HANDLE_PTR(ptr_))
+  ^
+../Src/inference_main.c(90): warning: suggest braces around initialization of subobject [-Wmissing-braces]
+        AI_NETWORK_DATA_WEIGHTS(ai_network_data_weights_get()),
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Middlewares/ST/AI/App\network_data.h(29): note: expanded from macro 'AI_NETWORK_DATA_WEIGHTS'
+  ai_network_data_weights_buffer_get(AI_HANDLE_PTR(ptr_))
+  ^
+../Src/inference_main.c(242): warning: implicit declaration of function 'dsc_fill_sample' is invalid in C99 [-Wimplicit-function-declaration]
+    dsc_fill_sample(input_data);
+    ^
+../Src/inference_main.c(242): warning: this function declaration is not a prototype [-Wstrict-prototypes]
+../Src/inference_main.c(260): warning: declaration shadows a variable in the global scope [-Wshadow]
+    signed char my_logits[11];
+                ^
+../Src/inference_main.c(139): note: previous declaration is here
+static int8_t my_logits[11];
+              ^
+../Src/inference_main.c(198): warning: no previous prototype for function 'inference_main' [-Wmissing-prototypes]
+void inference_main(void)
+     ^
+../Src/inference_main.c(199): warning: function 'inference_main' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/inference_main.c(33): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(462): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(242): warning: padding struct 'struct __UART_HandleTypeDef' with 2 bytes to align 'FifoMode' [-Wpadded]
+  uint32_t                 FifoMode;                 /*!< Specifies if the FIFO mode is being used.
+                           ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(263): warning: padding struct 'struct __UART_HandleTypeDef' with 3 bytes to align 'gState' [-Wpadded]
+  __IO HAL_UART_StateTypeDef    gState;              /*!< UART state information related to global Handle management
+                                ^
+../Src/inference_main.c(33): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+../Src/inference_main.c(123): warning: unused function 'run_inference_once' [-Wunused-function]
+static void run_inference_once(void)
+            ^
+16 warnings generated.
+compiling inference_main.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c(51): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c(51): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c(51): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(1174): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma_ex.h(72): warning: padding struct 'HAL_DMA_MuxSyncConfigTypeDef' with 2 bytes to align 'RequestNumber' [-Wpadded]
+  uint32_t RequestNumber; /*!< Specifies the number of DMA request that will be authorized after a sync event.
+           ^
+5 warnings generated.
+compiling stm32h7xx_hal_dma_ex.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c(44): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c(44): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(462): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(242): warning: padding struct 'struct __UART_HandleTypeDef' with 2 bytes to align 'FifoMode' [-Wpadded]
+  uint32_t                 FifoMode;                 /*!< Specifies if the FIFO mode is being used.
+                           ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(263): warning: padding struct 'struct __UART_HandleTypeDef' with 3 bytes to align 'gState' [-Wpadded]
+  __IO HAL_UART_StateTypeDef    gState;              /*!< UART state information related to global Handle management
+                                ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c(44): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c(44): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(462): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(1595): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h(46): warning: padding size of 'UART_WakeUpTypeDef' with 1 byte to alignment boundary [-Wpadded]
+typedef struct
+        ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c(746): warning: cast from 'uint8_t *' (aka 'unsigned char *') to 'uint16_t *' (aka 'unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+      pdata16bits = (uint16_t *) pData;
+                    ^~~~~~~~~~~~~~~~~~
+8 warnings generated.
+compiling stm32h7xx_hal_uart_ex.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(162): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(162): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(462): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(242): warning: padding struct 'struct __UART_HandleTypeDef' with 2 bytes to align 'FifoMode' [-Wpadded]
+  uint32_t                 FifoMode;                 /*!< Specifies if the FIFO mode is being used.
+                           ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(263): warning: padding struct 'struct __UART_HandleTypeDef' with 3 bytes to align 'gState' [-Wpadded]
+  __IO HAL_UART_StateTypeDef    gState;              /*!< UART state information related to global Handle management
+                                ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(162): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(1146): warning: cast from 'const uint8_t *' (aka 'const unsigned char *') to 'const uint16_t *' (aka 'const unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+      pdata16bits = (const uint16_t *) pData;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(1250): warning: cast from 'uint8_t *' (aka 'unsigned char *') to 'uint16_t *' (aka 'unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+      pdata16bits = (uint16_t *) pData;
+                    ^~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(3091): warning: enumeration values 'UART_CLOCKSOURCE_D2PCLK1', 'UART_CLOCKSOURCE_D2PCLK2', and 'UART_CLOCKSOURCE_UNDEFINED' not explicitly handled in switch [-Wswitch-enum]
+    switch (clocksource)
+            ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(3158): warning: enumeration values 'UART_CLOCKSOURCE_D3PCLK1' and 'UART_CLOCKSOURCE_UNDEFINED' not explicitly handled in switch [-Wswitch-enum]
+    switch (clocksource)
+            ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(3214): warning: enumeration values 'UART_CLOCKSOURCE_D3PCLK1' and 'UART_CLOCKSOURCE_UNDEFINED' not explicitly handled in switch [-Wswitch-enum]
+    switch (clocksource)
+            ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(4104): warning: cast from 'const uint8_t *' (aka 'const unsigned char *') to 'const uint16_t *' (aka 'const unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+      tmp = (const uint16_t *) huart->pTxBuffPtr;
+            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(4181): warning: cast from 'const uint8_t *' (aka 'const unsigned char *') to 'const uint16_t *' (aka 'const unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+        tmp = (const uint16_t *) huart->pTxBuffPtr;
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(4326): warning: cast from 'uint8_t *' (aka 'unsigned char *') to 'uint16_t *' (aka 'unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+    tmp = (uint16_t *) huart->pRxBuffPtr ;
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c(4590): warning: cast from 'uint8_t *' (aka 'unsigned char *') to 'uint16_t *' (aka 'unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+      tmp = (uint16_t *) huart->pRxBuffPtr ;
+            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+15 warnings generated.
+compiling stm32h7xx_hal_uart.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(95): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(350): warning: cast from function call of type 'uint32_t' (aka 'unsigned int') to non-matching type 'DMA_Base_Registers *' [-Wbad-function-cast]
+    regs_dma = (DMA_Base_Registers *)DMA_CalcBaseAndBitshift(hdma);
+                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(395): warning: cast from function call of type 'uint32_t' (aka 'unsigned int') to non-matching type 'BDMA_Base_Registers *' [-Wbad-function-cast]
+    regs_bdma = (BDMA_Base_Registers *)DMA_CalcBaseAndBitshift(hdma);
+                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(95): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(500): warning: cast from function call of type 'uint32_t' (aka 'unsigned int') to non-matching type 'DMA_Base_Registers *' [-Wbad-function-cast]
+    regs_dma = (DMA_Base_Registers *)DMA_CalcBaseAndBitshift(hdma);
+                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(523): warning: cast from function call of type 'uint32_t' (aka 'unsigned int') to non-matching type 'BDMA_Base_Registers *' [-Wbad-function-cast]
+    regs_bdma = (BDMA_Base_Registers *)DMA_CalcBaseAndBitshift(hdma);
+                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(1591): warning: enumeration value 'HAL_DMA_XFER_ALL_CB_ID' not explicitly handled in switch [-Wswitch-enum]
+    switch (CallbackID)
+            ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c(1692): warning: default label in switch which covers all enumeration values [-Wcovered-switch-default]
+    default:
+    ^
+10 warnings generated.
+compiling stm32h7xx_hal_dma.c...
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(20): warning: In file included from...../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(176): warning: comparing floating point with == or != is unsafe [-Wfloat-equal]
+    if (((ai_float)i32_x == x) && ((i32_x & 0x1) != 0)) {
+         ~~~~~~~~~~~~~~~ ^  ~
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(188): warning: comparing floating point with == or != is unsafe [-Wfloat-equal]
+    if (((ai_float)u32_x) == x && ((u32_x & 0x1) != 0)) {
+        ~~~~~~~~~~~~~~~~~ ^  ~
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(55): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    ai_register ai_vec4_float ch_in_f = AI_VEC4_FLOAT(data1);
+                                        ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(56): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    ai_register ai_vec4_float weights_in_f = AI_VEC4_FLOAT(data0);
+                                             ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(64): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    ch_in_f = AI_VEC4_FLOAT(data1);
+              ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(65): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    weights_in_f = AI_VEC4_FLOAT(data0);
+                   ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(73): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    ch_in_f = AI_VEC4_FLOAT(data1);
+              ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(74): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    weights_in_f = AI_VEC4_FLOAT(data0);
+                   ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(82): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    ch_in_f = AI_VEC4_FLOAT(data1);
+              ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(25): warning: In file included from...../Middlewares/ST/AI/Inc\ai_math_helpers.h(83): warning: cast from 'const float *' to 'void *' drops const qualifier [-Wcast-qual]
+    weights_in_f = AI_VEC4_FLOAT(data0);
+                   ^
+../Middlewares/ST/AI/Inc/ai_lite_math_helpers.h(211): note: expanded from macro 'AI_VEC4_FLOAT'
+  _get_vec4_float((ai_handle)(ptr_))
+                             ^
+../Middlewares/ST/AI/App/network.c(395): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(402): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(409): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(416): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(423): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(430): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(437): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(444): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(451): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(458): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(465): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(472): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(479): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(486): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(493): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(500): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(507): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(514): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(521): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(528): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(535): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(542): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(549): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(556): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(563): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(570): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(577): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(584): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-128)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(591): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-5)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(598): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(605): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-4)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(612): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(-4)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(619): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(63)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/App/network.c(626): warning: cast from 'const signed char *' to 'void *' drops const qualifier [-Wcast-qual]
+    AI_PACK_INTQ_ZP(0)))
+    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(653): note: expanded from macro 'AI_PACK_INTQ_ZP'
+  (INTQ_CONST ai_i8[]) { AI_PACK(__VA_ARGS__) }
+  ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(630): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(658): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(672): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(686): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(693): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(700): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(707): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(714): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(728): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(742): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(756): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(770): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(777): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(791): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(805): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(819): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(833): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(840): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(854): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(868): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(889): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(903): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(910): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(924): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(938): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(945): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(952): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(994): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1008): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1015): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1029): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1043): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1050): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1057): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1085): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(134): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_stride_dimension, dim_, ## __VA_ARGS__))
+                                                     ^
+../Middlewares/ST/AI/App/network.c(1099): warning: cast from 'const struct ai_intq_info_list_ *' to 'void *' drops const qualifier [-Wcast-qual]
+AI_TENSOR_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(235): note: expanded from macro 'AI_TENSOR_OBJ_DECLARE'
+  attr_ ai_tensor name_ = AI_TENSOR_OBJ_INIT(id_, flags_, AI_PACK(shape_), AI_PACK(stride_), \
+                          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(225): note: expanded from macro 'AI_TENSOR_OBJ_INIT'
+  .klass  = (ai_klass_obj)(klass_obj_), \
+                          ^
+../Middlewares/ST/AI/App/network.c(1192): warning: cast from 'const float *' to 'unsigned char *' drops const qualifier [-Wcast-qual]
+AI_ARRAY_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(194): note: expanded from macro 'AI_ARRAY_OBJ_DECLARE'
+  attr_ ai_array name_ = AI_ARRAY_OBJ_INIT(format_, data_, data_start_, size_);
+                         ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(184): note: expanded from macro 'AI_ARRAY_OBJ_INIT'
+  .data = AI_PTR(data_), \
+          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(53): note: expanded from macro 'AI_PTR'
+#define AI_PTR(ptr_)                     AI_CAST(ai_ptr, ptr_)
+                                         ^
+../Middlewares/ST/AI/Inc/ai_platform.h(98): note: expanded from macro 'AI_CAST'
+#define AI_CAST(type_, expr_)            ((type_)(expr_))
+                                                 ^
+../Middlewares/ST/AI/App/network.c(1192): warning: cast from 'const float *' to 'unsigned char *' drops const qualifier [-Wcast-qual]
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(194): note: expanded from macro 'AI_ARRAY_OBJ_DECLARE'
+  attr_ ai_array name_ = AI_ARRAY_OBJ_INIT(format_, data_, data_start_, size_);
+                         ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(185): note: expanded from macro 'AI_ARRAY_OBJ_INIT'
+  .data_start = AI_PTR(data_start_) }
+                ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(53): note: expanded from macro 'AI_PTR'
+#define AI_PTR(ptr_)                     AI_CAST(ai_ptr, ptr_)
+                                         ^
+../Middlewares/ST/AI/Inc/ai_platform.h(98): note: expanded from macro 'AI_CAST'
+#define AI_CAST(type_, expr_)            ((type_)(expr_))
+                                                 ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(1300): warning: cast from 'const signed char *' to 'unsigned char *' drops const qualifier [-Wcast-qual]
+AI_ARRAY_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(194): note: expanded from macro 'AI_ARRAY_OBJ_DECLARE'
+  attr_ ai_array name_ = AI_ARRAY_OBJ_INIT(format_, data_, data_start_, size_);
+                         ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(184): note: expanded from macro 'AI_ARRAY_OBJ_INIT'
+  .data = AI_PTR(data_), \
+          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(53): note: expanded from macro 'AI_PTR'
+#define AI_PTR(ptr_)                     AI_CAST(ai_ptr, ptr_)
+                                         ^
+../Middlewares/ST/AI/Inc/ai_platform.h(98): note: expanded from macro 'AI_CAST'
+#define AI_CAST(type_, expr_)            ((type_)(expr_))
+                                                 ^
+../Middlewares/ST/AI/App/network.c(1300): warning: cast from 'const signed char *' to 'unsigned char *' drops const qualifier [-Wcast-qual]
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(194): note: expanded from macro 'AI_ARRAY_OBJ_DECLARE'
+  attr_ ai_array name_ = AI_ARRAY_OBJ_INIT(format_, data_, data_start_, size_);
+                         ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(185): note: expanded from macro 'AI_ARRAY_OBJ_INIT'
+  .data_start = AI_PTR(data_start_) }
+                ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(53): note: expanded from macro 'AI_PTR'
+#define AI_PTR(ptr_)                     AI_CAST(ai_ptr, ptr_)
+                                         ^
+../Middlewares/ST/AI/Inc/ai_platform.h(98): note: expanded from macro 'AI_CAST'
+#define AI_CAST(type_, expr_)            ((type_)(expr_))
+                                                 ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(1386): warning: cast from 'const float *' to 'unsigned char *' drops const qualifier [-Wcast-qual]
+AI_ARRAY_OBJ_DECLARE(
+^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(194): note: expanded from macro 'AI_ARRAY_OBJ_DECLARE'
+  attr_ ai_array name_ = AI_ARRAY_OBJ_INIT(format_, data_, data_start_, size_);
+                         ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(184): note: expanded from macro 'AI_ARRAY_OBJ_INIT'
+  .data = AI_PTR(data_), \
+          ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(53): note: expanded from macro 'AI_PTR'
+#define AI_PTR(ptr_)                     AI_CAST(ai_ptr, ptr_)
+                                         ^
+../Middlewares/ST/AI/Inc/ai_platform.h(98): note: expanded from macro 'AI_CAST'
+#define AI_CAST(type_, expr_)            ((type_)(expr_))
+                                                 ^
+../Middlewares/ST/AI/App/network.c(1386): warning: cast from 'const float *' to 'unsigned char *' drops const qualifier [-Wcast-qual]
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(194): note: expanded from macro 'AI_ARRAY_OBJ_DECLARE'
+  attr_ ai_array name_ = AI_ARRAY_OBJ_INIT(format_, data_, data_start_, size_);
+                         ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(185): note: expanded from macro 'AI_ARRAY_OBJ_INIT'
+  .data_start = AI_PTR(data_start_) }
+                ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(53): note: expanded from macro 'AI_PTR'
+#define AI_PTR(ptr_)                     AI_CAST(ai_ptr, ptr_)
+                                         ^
+../Middlewares/ST/AI/Inc/ai_platform.h(98): note: expanded from macro 'AI_CAST'
+#define AI_CAST(type_, expr_)            ((type_)(expr_))
+                                                 ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(23): warning: In file included from...../Middlewares/ST/AI/Inc/layers_conv2d.h(106): warning: padding struct 'struct ai_layer_conv2d_nl_pool_' with 2 bytes to align 'pool_size' [-Wpadded]
+  ai_shape_2d pool_size;    /*!< pooling size */
+              ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(23): warning: In file included from...../Middlewares/ST/AI/Inc/layers_conv2d.h(94): warning: padding size of 'struct ai_layer_conv2d_' with 2 bytes to alignment boundary [-Wpadded]
+typedef AI_ALIGNED_TYPE(struct, 4) ai_layer_conv2d_ {
+                                   ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(30): warning: In file included from...../Middlewares/ST/AI/Inc\layers.h(22): warning: In file included from...../Middlewares/ST/AI/Inc/layers_common.h(90): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+                      next_, forward_func_, tensors_chain_, ## __VA_ARGS__);
+                                                            ^
+../Middlewares/ST/AI/Inc/layers_common.h(78): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    ## __VA_ARGS__ \
+    ^
+../Middlewares/ST/AI/App/network.c(24): warning: In file included from...../Middlewares/ST/AI/Inc/ai_platform_interface.h(107): warning: token pasting of ',' and __VA_ARGS__ is a GNU extension [-Wgnu-zero-variadic-macro-arguments]
+    AI_STORAGE_KLASS_PACK(ai_shape_dimension, dim_, ## __VA_ARGS__))
+                                                    ^
+../Middlewares/ST/AI/App/network.c(1653): warning: missing field 'data' initializer [-Wmissing-field-initializers]
+  AI_TENSOR_LIST_IO_OBJ_INIT(AI_FLAG_NONE, AI_NETWORK_IN_NUM, &input_output),
+  ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(282): note: expanded from macro 'AI_TENSOR_LIST_IO_OBJ_INIT'
+              .buffer = (ai_buffer[size_]){AI_STRUCT_INIT}, \
+                                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1653): warning: missing field 'curr_ptr' initializer [-Wmissing-field-initializers]
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(283): note: expanded from macro 'AI_TENSOR_LIST_IO_OBJ_INIT'
+              .state  = (ai_tensor_state[size_]){AI_STRUCT_INIT}, \
+                                                 ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1653): warning: missing field 'intq_info' initializer [-Wmissing-field-initializers]
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(284): note: expanded from macro 'AI_TENSOR_LIST_IO_OBJ_INIT'
+              .meta   = (ai_buffer_meta_info[size_]){AI_STRUCT_INIT} \
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1654): warning: missing field 'data' initializer [-Wmissing-field-initializers]
+  AI_TENSOR_LIST_IO_OBJ_INIT(AI_FLAG_NONE, AI_NETWORK_OUT_NUM, &logits_QuantizeLinear_Input_0_conversion_output),
+  ^
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(282): note: expanded from macro 'AI_TENSOR_LIST_IO_OBJ_INIT'
+              .buffer = (ai_buffer[size_]){AI_STRUCT_INIT}, \
+                                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1654): warning: missing field 'curr_ptr' initializer [-Wmissing-field-initializers]
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(283): note: expanded from macro 'AI_TENSOR_LIST_IO_OBJ_INIT'
+              .state  = (ai_tensor_state[size_]){AI_STRUCT_INIT}, \
+                                                 ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1654): warning: missing field 'intq_info' initializer [-Wmissing-field-initializers]
+../Middlewares/ST/AI/Inc/ai_platform_interface.h(284): note: expanded from macro 'AI_TENSOR_LIST_IO_OBJ_INIT'
+              .meta   = (ai_buffer_meta_info[size_]){AI_STRUCT_INIT} \
+                                                     ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1867): warning: expansion of date or time macro is not reproducible [-Wdate-time]
+      .compile_datetime  = AI_TOOLS_COMPILE_TIME,
+                           ^
+../Middlewares/ST/AI/App/network.c(48): note: expanded from macro 'AI_TOOLS_COMPILE_TIME'
+#define AI_TOOLS_COMPILE_TIME    __DATE__ " " __TIME__
+                                 ^
+../Middlewares/ST/AI/App/network.c(1867): warning: expansion of date or time macro is not reproducible [-Wdate-time]
+../Middlewares/ST/AI/App/network.c(48): note: expanded from macro 'AI_TOOLS_COMPILE_TIME'
+#define AI_TOOLS_COMPILE_TIME    __DATE__ " " __TIME__
+                                              ^
+../Middlewares/ST/AI/App/network.c(1875): warning: missing field 'minor' initializer [-Wmissing-field-initializers]
+      .tool_api_version  = AI_STRUCT_INIT,
+                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1885): warning: missing field 'data' initializer [-Wmissing-field-initializers]
+      .params            = AI_STRUCT_INIT,
+                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1886): warning: missing field 'data' initializer [-Wmissing-field-initializers]
+      .activations       = AI_STRUCT_INIT,
+                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/Inc/ai_platform.h(819): warning: padding struct 'struct ai_network_report_' with 4 bytes to align 'n_macc' [-Wpadded]
+  ai_macc                         n_macc;
+                                  ^
+../Middlewares/ST/AI/Inc/ai_platform.h(802): warning: padding size of 'struct ai_network_report_' with 4 bytes to alignment boundary [-Wpadded]
+typedef struct ai_network_report_ {
+               ^
+../Middlewares/ST/AI/App/network.c(1914): warning: expansion of date or time macro is not reproducible [-Wdate-time]
+      .compile_datetime  = AI_TOOLS_COMPILE_TIME,
+                           ^
+../Middlewares/ST/AI/App/network.c(48): note: expanded from macro 'AI_TOOLS_COMPILE_TIME'
+#define AI_TOOLS_COMPILE_TIME    __DATE__ " " __TIME__
+                                 ^
+../Middlewares/ST/AI/App/network.c(1914): warning: expansion of date or time macro is not reproducible [-Wdate-time]
+../Middlewares/ST/AI/App/network.c(48): note: expanded from macro 'AI_TOOLS_COMPILE_TIME'
+#define AI_TOOLS_COMPILE_TIME    __DATE__ " " __TIME__
+                                              ^
+../Middlewares/ST/AI/App/network.c(1922): warning: missing field 'minor' initializer [-Wmissing-field-initializers]
+      .tool_api_version  = AI_STRUCT_INIT,
+                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1933): warning: missing field 'size' initializer [-Wmissing-field-initializers]
+      .map_weights       = AI_STRUCT_INIT,
+                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+../Middlewares/ST/AI/App/network.c(1934): warning: missing field 'size' initializer [-Wmissing-field-initializers]
+      .map_activations   = AI_STRUCT_INIT,
+                           ^
+../Middlewares/ST/AI/Inc/ai_platform.h(163): note: expanded from macro 'AI_STRUCT_INIT'
+  #define AI_STRUCT_INIT              {0}
+                                        ^
+286 warnings generated.
+compiling network.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c(23): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal_rcc_ex.c...
+../Src/main.c(20): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Src/main.c(132): warning: no previous prototype for function 'uart_printf' [-Wmissing-prototypes]
+void uart_printf(const char *fmt, ...)
+     ^
+../Src/main.c(235): warning: no previous prototype for function 'dsc_stream_entry' [-Wmissing-prototypes]
+void dsc_stream_entry(void) { stream_loop(); }
+     ^
+../Src/main.c(247): warning: implicit declaration of function 'DWT_Init' is invalid in C99 [-Wimplicit-function-declaration]
+  DWT_Init();
+  ^
+../Src/main.c(247): warning: this function declaration is not a prototype [-Wstrict-prototypes]
+../Src/main.c(20): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(462): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(242): warning: padding struct 'struct __UART_HandleTypeDef' with 2 bytes to align 'FifoMode' [-Wpadded]
+  uint32_t                 FifoMode;                 /*!< Specifies if the FIFO mode is being used.
+                           ^
+../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_uart.h(263): warning: padding struct 'struct __UART_HandleTypeDef' with 3 bytes to align 'gState' [-Wpadded]
+  __IO HAL_UART_StateTypeDef    gState;              /*!< UART state information related to global Handle management
+                                ^
+../Src/main.c(238): warning: function 'stream_loop' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/main.c(282): warning: no previous prototype for function 'dsc_replay_entry' [-Wmissing-prototypes]
+void dsc_replay_entry(void) { replay_loop(1); }
+     ^
+../Src/main.c(298): warning: function 'replay_loop' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/main.c(324): warning: implicit conversion increases floating-point precision: 'float' to 'double' [-Wdouble-promotion]
+              -42, 7U, (unsigned long)1234567UL, "OK", 1.2345f, 3.14159f);
+                                                       ^~~~~~~
+../Src/main.c(324): warning: implicit conversion increases floating-point precision: 'float' to 'double' [-Wdouble-promotion]
+              -42, 7U, (unsigned long)1234567UL, "OK", 1.2345f, 3.14159f);
+                                                                ^~~~~~~~
+../Src/main.c(20): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+../Src/main.c(342): warning: missing field 'HSEState' initializer [-Wmissing-field-initializers]
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+                                           ^
+../Src/main.c(343): warning: missing field 'SYSCLKSource' initializer [-Wmissing-field-initializers]
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+                                           ^
+../Src/main.c(472): warning: missing field 'Number' initializer [-Wmissing-field-initializers]
+  MPU_Region_InitTypeDef MPU_InitStruct = {0};
+                                            ^
+../Src/main.c(20): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(298): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_cortex.h(53): warning: padding struct 'MPU_Region_InitTypeDef' with 2 bytes to align 'BaseAddress' [-Wpadded]
+  uint32_t               BaseAddress;           /*!< Specifies the base address of the region to protect.                           */
+                         ^
+../Src/main.c(506): warning: missing field 'Mode' initializer [-Wmissing-field-initializers]
+    GPIO_InitTypeDef g = {0};
+                           ^
+../Src/main.c(502): warning: function 'Error_Handler' could be declared with attribute 'noreturn' [-Wmissing-noreturn]
+{
+^
+../Src/main.c(47): warning: no previous extern declaration for non-static variable 'huart3' [-Wmissing-variable-declarations]
+UART_HandleTypeDef huart3;
+                   ^
+../Src/main.c(470): warning: unused function 'MPU_Config' [-Wunused-function]
+void MPU_Config(void)
+     ^
+23 warnings generated.
+compiling main.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c(150): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c(150): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(258): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_mdma.h(212): warning: padding struct 'struct __MDMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                  *Parent;                                                               /*!< Parent object state                    */
+                         ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c(424): warning: enumeration value 'HAL_MDMA_XFER_ALL_CB_ID' not explicitly handled in switch [-Wswitch-enum]
+    switch (CallbackID)
+            ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c(524): warning: default label in switch which covers all enumeration values [-Wcovered-switch-default]
+    default:
+    ^
+6 warnings generated.
+compiling stm32h7xx_hal_mdma.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c(146): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal_pwr.c...
+../Src/dsc_infer.c(14): warning: In file included from...../Src/test_sample.h(5): warning: excess elements in array initializer
+    -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12,     ^~~
+../Src/dsc_infer.c(15): warning: In file included from...../Inc\main.h(30): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Src/dsc_infer.c(326): warning: no previous prototype for function 'dsc_fill_sample' [-Wmissing-prototypes]
+void dsc_fill_sample(float *dst)
+     ^
+../Src/dsc_infer.c(362): warning: no newline at end of file [-Wnewline-eof]
+}
+ ^
+6 warnings generated.
+compiling dsc_infer.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c(153): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal_pwr_ex.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c(36): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling stm32h7xx_hal.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c(51): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c(51): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(366): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_i2c.h(215): warning: padding struct 'struct __I2C_HandleTypeDef' with 1 byte to align 'ErrorCode' [-Wpadded]
+  __IO uint32_t              ErrorCode;      /*!< I2C Error code                            */
+                             ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c(51): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+5 warnings generated.
+compiling stm32h7xx_hal_i2c_ex.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c(120): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c(628): warning: default label in switch which covers all enumeration values [-Wcovered-switch-default]
+    default:
+    ^
+4 warnings generated.
+compiling stm32h7xx_hal_exti.c...
+../Src/system_stm32h7xx.c(52): warning: In file included from...../Drivers/CMSIS/Device/ST/STM32H7xx/Include\stm32h7xx.h(283): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+3 warnings generated.
+compiling system_stm32h7xx.c...
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c(323): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(334): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_flash.h(707): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(179): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(233): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h(866): warning: 'USE_FLASH_ECC' is not defined, evaluates to 0 [-Wundef]
+#if (USE_FLASH_ECC == 1U)
+     ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c(323): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(366): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_i2c.h(215): warning: padding struct 'struct __I2C_HandleTypeDef' with 1 byte to align 'ErrorCode' [-Wpadded]
+  __IO uint32_t              ErrorCode;      /*!< I2C Error code                            */
+                             ^
+../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c(323): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal.h(29): warning: In file included from...../Inc\stm32h7xx_hal_conf.h(254): warning: In file included from...../Drivers/STM32H7xx_HAL_Driver/Inc\stm32h7xx_hal_dma.h(146): warning: padding struct 'struct __DMA_HandleTypeDef' with 2 bytes to align 'Parent' [-Wpadded]
+  void                            *Parent;                                                          /*!< Parent object state                           */
+                                   ^
+5 warnings generated.
+compiling stm32h7xx_hal_i2c.c...
+linking...
+Program Size: Code=60844 RO-data=16236 RW-data=8452 ZI-data=39972  
+FromELF: creating hex file...
 "DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.axf" - 0 Error(s), 481 Warning(s).
-Build Time Elapsed:  00:00:04
+Build Time Elapsed:  00:00:05

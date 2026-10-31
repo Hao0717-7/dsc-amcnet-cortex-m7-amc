@@ -52,9 +52,9 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 
 ```
 [AI] weights=5804 B (flash) | activations=4488 B | io=1024+44 B
-[DWT] N=1000  mean=0.905 ms  min=0.905 ms  max=0.905 ms
-[RESULT] ... Mean : 0.905 ms
-[RESULT-SAMPLE] ... Mean : 0.914 ms
+[DWT] N=1000  mean=0.895 ms  min=0.895 ms  max=0.895 ms
+[RESULT] ... Mean : 0.895 ms
+[RESULT-SAMPLE] ... Mean : 0.904 ms
 ```
 
 ## 5. 精度验收（P0）
@@ -72,7 +72,7 @@ python stm32_deployment/tools/p0_replay.py --n 5000 --flash
 |---|---|---|
 | 参数量 | 4,961 | 4,961 |
 | INT8 +10 dB 精度 | 86.92% | 89.36%（重训后；论文 FP32 87.01% 不可复现） |
-| Latency | 1.183 ms | **0.905 ms（全零）/ 0.914 ms（真实样本）** |
+| Latency | 1.183 ms | **0.895 ms（全零）/ 0.904 ms（真实样本）** |
 | 运行时 | X-CUBE-AI（未注明版本） | 自研 SMLAD 引擎（X-CUBE-AI 10.2.1 实测 1.827 ms） |
 
 ## 7. 许可与引用

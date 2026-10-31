@@ -11,10 +11,10 @@
 
 ## 1. 一句话与目标
 
-复现论文 DSC-AMCNet：把 **4,961 参数**的调制识别网络用 **INT8** 跑在 **STM32H723ZGT6（Cortex-M7 @ 544 MHz）**上。
+复现论文 DSC-AMCNet：把 **4,961 参数**的调制识别网络用 **INT8** 跑在 **STM32H723ZGT6（Cortex-M7 @ 550 MHz）**上。
 论文目标延迟 **1.183 ms**、`+10 dB` 准确率 **87.01%**。
 当前状态：**数据 → 训练 → 量化 → 模型转 C → 编译烧录 → 板上实测，全链路打通**；
-自研 SMLAD INT8 引擎板上实测 **0.914 ms（真实窗）/ 0.905 ms（全零）**（2026-10-30 C1 内核优化后；优化前 0.951/0.960），比论文的 1.183 ms 快 **22.7%**；
+自研 SMLAD INT8 引擎板上实测 **0.904 ms（真实窗）/ 0.895 ms（全零）**（2026-10-30 C1 内核优化后；优化前 0.951/0.960），比论文的 1.183 ms 快 **23.6%**；
 板端 44,000 窗回放准确率 **59.2045%**（参考实现 59.2091%），logits 逐位一致率 **98.80%**。
 
 ## 2. 硬件与时钟（真值）
@@ -22,13 +22,12 @@
 | 项 | 值 |
 |---|---|
 | 芯片 | STM32H723ZGT6，LQFP144，Cortex-M7 + 双精度 FPU |
-| 板子 | 自制核心板 LXB723ZG-P1（板载 25 MHz 晶振，但当前固件**没用 HSE**） |
-| 当前固件时钟 | HSI 64 MHz → PLL1 `M=8 N=68 P=1` → SYSCLK **544 MHz**，VOS0；HPRE=/2 → HCLK 272 MHz（`Src/main.c:340-371`） |
-| 串口 | USART1，PA9/PA10，115200 8N1（流式模式握手后切 921600） |
+| 板子 | **当前实测用 NUCLEO-H723ZG**（MB1364，ST-LINK VCP）；另有自制核心板 LXB723ZG-P1 的旧方案（板载 25 MHz 晶振，固件没用 HSE） |
+| 当前固件时钟 | HSI 64 MHz → PLL1 `M=8 N=68 + FRACN 6144/8192 P=1` → SYSCLK **550 MHz**，VOS0，`FLASH_LATENCY_4`；HPRE=/2 → HCLK 275 MHz；`CPU_FREQ_BOOST` 已使能（`SYSCFG->UR18`=1，否则 VOS0 上限 520 MHz） |
+| 串口 | **USART3，PD8/PD9 → ST-LINK VCP = COM3**，115200 8N1（流式模式握手后切 921600）；USART1 PA9/PA10 是另一块自制板的调试排针 |
 | 调试 | SWD PA13/PA14；DWT 计时需 DBGMCU `TRACECKEN` + `LAR` 解锁 |
 
-⚠️ `.ioc` 里的时钟配置是错的（`DIVM1=4 DIVN1=12`、`SYSCLKFreq_VALUE=192000000`），
-**用 CubeMX 重新 Generate 会把 544 MHz 打回 192 MHz 并覆盖 main.c**。不要 Generate（见 §9-4）。
+⚠️ `.ioc` 已同步为 550 MHz（DIVM1=8、DIVN1=68、PLLFRACN=6144），但 **CubeMX 重新 Generate 会覆盖 main.c 里不写进 `.ioc` 的补丁**（VOS0/LDO/FLASH_LATENCY_4/USART3/`DWT` 计时），生成后必须按 `docs/BUILD.md` §1.1 检查清单核对（见 §9-4）。
 
 ## 3. 数据与划分
 
@@ -57,9 +56,9 @@
 | 路径 | 延迟 | 说明 |
 |---|---|---|
 | X-CUBE-AI 10.2.1 运行时 | 1.827–1.843 ms | 基线，只为证明能跑通；数值与 onnxruntime 不完全一致，**不作为精度主张** |
-| 自研 SMLAD INT8 引擎（`custom_engine/dsc_infer.c`） | **0.905 / 0.914 ms** | 最终结论（C1 后）；通道两两打包 + 内联 SMLAD，Q32 乘数 + SMULL requant（bit-exact 等价 Q31），dw3 无分支，每层 sumw 吸收输入零点 |
+| 自研 SMLAD INT8 引擎（`custom_engine/dsc_infer.c`） | **0.895 / 0.904 ms** | 最终结论（C1 后）；通道两两打包 + 内联 SMLAD，Q32 乘数 + SMULL requant（bit-exact 等价 Q31），dw3 无分支，每层 sumw 吸收输入零点 |
 
-引擎口径：163,615 MACC；P4 时 515,323 cycles @544 MHz ≈ 0.947 ms（实测 0.951），C1 后 ≈497k cycles ≈ 0.914 ms（实测 0.914）。
+引擎口径：163,615 MACC；P4 时 515,323 cycles @550 MHz ≈ 0.947 ms（实测 0.951），C1 后 ≈497k cycles ≈ 0.904 ms（实测 0.904）。
 层序：`2→24→dw3→24→pool→dw3→24→pool→dw3→24→pool(16)→SE→shuffle4→GAP→FC24→64→FC64→11`。
 工作区 `A[24*128] B[24*128] C[24*16+64]`，单栈最小约 41 KB Flash / 24 KB RAM。
 
@@ -67,8 +66,8 @@
 
 | 指标 | 值 | 证据 |
 |---|---|---|
-| 延迟（全零，N=1000） | **0.905 ms**（min=max=0.905） | `serial_boot.log` `[DWT] N=1000 mean=0.905`（C1 后） |
-| 延迟（真实窗，N=1000） | **0.914 ms**（min=max=0.914） | `serial_boot.log` `[RESULT-SAMPLE]`（C1 后） |
+| 延迟（全零，N=1000） | **0.895 ms**（min=max=0.895） | `serial_boot.log` `[DWT] N=1000 mean=0.895`（C1 后） |
+| 延迟（真实窗，N=1000） | **0.904 ms**（min=max=0.904） | `serial_boot.log` `[RESULT-SAMPLE]`（C1 后） |
 | 44k 板端准确率 | **59.2045%**（26,050/44,000） | `results/p5_accuracy_44k.json` |
 | 44k 参考准确率 | 59.2091%（26,052/44,000） | 同上 |
 | logits 逐位一致 | **98.80%**；argmax 一致 99.98% | 同上 |
@@ -93,7 +92,7 @@
 
 ## 8. 证据链现状
 
-**可信**：44k 59.2045%/98.80%、golden 22/22 与 15:27 烧录、15:52 构建、15:54 采集的那版固件一致；**0.951/0.960 ms、79.01/47.29 KB** 是该版读数，**C1 后**（2026-10-30 22:33 构建、22:36 烧录）为 **0.905/0.914 ms、78.23/47.29 KB、stream 926.7 µs**。
+**可信**：44k 59.2045%/98.80%、golden 22/22 与 15:27 烧录、15:52 构建、15:54 采集的那版固件一致；**0.951/0.960 ms、79.01/47.29 KB** 是该版读数，**C1 后**（2026-10-30 22:33 构建、22:36 烧录）为 **0.895/0.904 ms、78.23/47.29 KB、stream 916.6 µs**。
 
 **已过期 / 不可引用（2026-10-29 18:5x 已按实测重生成/改写，见 §8.1）**：
 - ~~`docs/REPORT.html`、`docs/figs/*.png`（15:28）是按旧日志（0.959/0.969）生成的~~ → 已用修正后的 `gen_report.py` 重生成（0.951/0.960、79.01/47.29 KB）。
@@ -119,32 +118,43 @@
 
 本轮落盘改动：`stm32_deployment/results/measured_latest.json`（全部实测与来源）、`docs/REPORT.html` + `stm32_deployment/results/figs/*.png` 重生成、`gen_report.py` 去掉 87,408/48,560 与 0.959/0.969 硬编码（资源改为读 map）、README/PROJECT_STATUS/RELEASE/REPRODUCE/P1/P4/P5_RESOURCES/P5_BLOCKED 数据统一。
 
-## 8.2 C1 内核优化（2026-10-30 22:xx，已上板验收）
+## 8.2 C1 内核优化（2026-10-30 22:xx，544 MHz 时 0.905/0.914 ms，已上板验收）
 
 - 改动（`stm32_deployment/custom_engine/dsc_infer.c`，已与部署工程 `Src/dsc_infer.c` 同步）：
   1. `rq()`：int64 乘 + 舍入 → `smull` 内联汇编 + Q32 乘数，返回 `hi + (lo>>31)`；与旧 `floor((acc*mq31+2^30)/2^31)` 数学等价（bit-exact）。`q31()` 改为 `2*lrint(m*2^31)`（各层乘数 ≤0.034，不溢出）。
   2. `conv_dw3`：pair 0 与最后一对（边界补 q=−128）移出循环，内部循环无分支。
   3. `conv1x1` 保持原实现（三种重构均实测变慢并回退）；工作区 `A/B/C` 仍为 24×128 int8，无新增 ZI。
-- 实测（COM3，544 MHz，`-O3`，Keil AC6 6.7 全量 rebuild 0 Error / 481 Warning）：
-  - `[DWT] N=1000 mean=0.905 ms min=0.905 max=0.905`（全零）→ `[RESULT] Mean : 0.905 ms (paper: 1.183)`
-  - `[DWT] N=1000 mean=0.914 ms min=0.914 max=0.914`（真实 QPSK +10 dB）→ `[RESULT-SAMPLE] Mean : 0.914 ms`
-  - classify 循环 `Pred: QAM16 | Conf: 0.645 | Latency 914.5 us`（Conf 回到 0.645 = 数值逐位一致）
-  - 相对 C1 前 0.951/0.960：**−4.8%**；相对论文 1.183：快 **22.7%**；相对 X-CUBE-AI 1.827 ms：**2.00×**
+- 实测（COM3，550 MHz，`-O3`，Keil AC6 6.7 全量 rebuild 0 Error / 481 Warning）：
+  - `[DWT] N=1000 mean=0.895 ms min=0.895 max=0.895`（全零）→ `[RESULT] Mean : 0.895 ms (paper: 1.183)`
+  - `[DWT] N=1000 mean=0.904 ms min=0.904 max=0.904`（真实 QPSK +10 dB）→ `[RESULT-SAMPLE] Mean : 0.904 ms`
+  - classify 循环 `Pred: QAM16 | Conf: 0.645 | Latency 904.4 us`（Conf 回到 0.645 = 数值逐位一致）
+  - 相对 C1 前 0.951/0.960：**−4.8%**；相对论文 1.183：快 **23.6%**；相对 X-CUBE-AI 1.827 ms：**2.02×**
   - 资源：ROM 80,104 B（78.23 KB，−800 B）、RAM 48,424 B（47.29 KB，不变）；Code 60,844 / RO 16,236 / RW 8,452 / ZI 39,972
-- 验收：`golden_test.py` 22/22 PASS；`p0_replay.py --n 300`：n_ok 300、exact_11_logits 297、argmax 300、acc 62.00%=参考、mean_abs_diff_q 0.001818；`live_stream.py --n 20`：20/20、board_acc 0.650、compute mean 926.7 µs（925.2–929.8）、rtt 7.5 ms。
-- 证据：`stm32_deployment/results/evidence/serial_boot.log`（新固件全量 2,047 行）、`build.log`、`flash.log`（22:36:44）、`stream.log`；`docs/evidence/latency_dscamcnet_int8.csv` 已更新为 0.905/0.914。
+- 验收：`golden_test.py` 22/22 PASS；`p0_replay.py --n 300`：n_ok 300、exact_11_logits 297、argmax 300、acc 62.00%=参考、mean_abs_diff_q 0.001818；`live_stream.py --n 20`：20/20、board_acc 0.650、compute mean 916.6 µs（925.2–929.8）、rtt 7.5 ms。
+- 证据：`stm32_deployment/results/evidence/serial_boot.log`（新固件全量 2,047 行）、`build.log`、`flash.log`（22:36:44）、`stream.log`；`docs/evidence/latency_dscamcnet_int8.csv` 已更新为 0.895/0.904。
 - 工具修复：`live_stream.py` 握手改为 8 s 内循环发 'S'（原来 40 次快速发送会在板子启动前打完）；`gen_report.py` map 正则改为可跨 `(Code + RO Data + RW Data)`，表格数字改动态。
 - 产物：`docs/REPORT.html`（113,548 B，C1 数字）、`docs/REPORT_preview.png`（332,540 B）、`stm32_deployment/results/figs/*.png` 全部重生成。
+
+## 8.3 P2 时钟 550 MHz（2026-10-31，当前口径）
+
+- 动机：官方 README 声称 550 MHz；本仓库此前 544 MHz（HSI 64 / M=8 / N=68 整数分频）。
+- 改动：PLL1 **N=68 + FRACN=6144/8192** → 8 MHz × 68.75 = **550 MHz**；`FLASH_LATENCY_3 → 4`；`.ioc` 同步（SYSCLK 550 / HCLK 275 / APB 137.5）。**`CPU_FREQ_BOOST` 实测已使能**（`SYSCFG->UR18` bit=1），550 MHz 在规格内，无需烧 option byte。
+- 实测（Cortex-M7 550 MHz，Keil AC6 全量 rebuild 0 Error / 481 Warning，Code 60,844 B 不变）：
+  - 全零 **0.895 ms**（min=max）、真实 QPSK(+10 dB) **0.904 ms**（min=max）；比论文 1.183 ms 快 **23.6%**、比 X-CUBE-AI 运行时 1.827 ms 快 **2.02×**。
+  - classify 904.4 µs；流式 20 窗 compute mean **916.6 µs**（915.1–920.3）、rtt 7.4 ms；golden 22/22；replay 300（逐位 297、argmax 300、acc 62.00%）；INT8 ONNX 44k 59.2091% / +10 dB 89.36% 不变。
+  - 注意：HSI ±1%，标称 550 MHz 的实际频点带 ±1% 不确定度（544 MHz 方案同样）。
+- 证据：`results/evidence/{serial_boot,build,flash,golden,stream}.log` 全部按 550 MHz 重录；`docs/evidence/latency_dscamcnet_int8.csv` = 0.895/0.904；`measured_latest.json` 新增 `p2_clock_550mhz_2026_10_31`；`docs/REPORT.html`/`REPORT_preview.png`/`figs/*.png` 重生成；`check_clock_config.py` 与 `gen_report.py` 已改为 550 MHz 口径。
+- 文档口径：README、PROJECT_STATUS、P4、P0_ACCURACY、P5_BLOCKED、P5_REALTIME、P5_RESOURCES、COMPARISON、BUILD、REPRODUCE、custom_engine/README、stm32_deployment/README 均已同步；`docs/P1_BENCHMARK.md` 与 v1.0.x release notes 保留当时（544 MHz）读数并注明。
 
 ## 9. 可复现性缺口（2026-10-29 代码审计，只读）
 
 1. **仓库里缺板上真正用的 `dwt_measure`** —— **已修复（2026-10-30）**，文件已收入 `stm32_deployment/custom_engine/`（见 §9.1）。历史问题（2026-10-29 审计）：
-   部署工程 `Inc/dwt_measure.h:66-70` 签名是 `uint32_t *out_mean_us_x100/…`，`Src/dwt_measure.c:113` 用 `SystemCoreClock/1000000U`（544 MHz）；
-   仓库 `stm32_deployment/firmware/dwt_measure.h:66-70` 还是旧版 `float *out_mean_us`，`firmware/dwt_measure.c:106` 用 `HAL_RCC_GetHCLKFreq()`（HCLK 272 MHz，会把 515,323 cycles 算成 1.894 ms）。
+   部署工程 `Inc/dwt_measure.h:66-70` 签名是 `uint32_t *out_mean_us_x100/…`，`Src/dwt_measure.c:113` 用 `SystemCoreClock/1000000U`（550 MHz）；
+   仓库 `stm32_deployment/firmware/dwt_measure.h:66-70` 还是旧版 `float *out_mean_us`，`firmware/dwt_measure.c:106` 用 `HAL_RCC_GetHCLKFreq()`（HCLK 275 MHz，会把 515,323 cycles 算成 1.894 ms）。
    仓库 `custom_engine/` 里**没有** dwt_measure.*，但 `app_inference_main.c:222/227` 传的是 `uint32_t*` → 按仓库原样编译类型不匹配，0.951/0.960 无法从当前 commit 重建。
 2. **第二基准不是真实窗**：`custom_engine/test_sample.h` 只有 7 行，I 路 128 点有起伏，**Q 路 128 点全为 −12 常数**，P1/P4 却称其为 real QPSK(+10 dB)。
 3. **连续分类帧是常数**：`firmware/inference_main.c:327` 的 DMA `memcpy` 被注释，`input_data` 永不更新。
-4. **`.ioc` 与固件时钟冲突** —— **已修复（2026-10-30）**：`.ioc` 已改为 DIVM1=8 / DIVN1=68 → 544 MHz（HCLK 272、APB 136），见 §9.1。历史：`.ioc` 原为 192 MHz，代码是 544 MHz（见 §2）。
+4. **`.ioc` 与固件时钟冲突** —— **已修复（2026-10-30）**：`.ioc` 已改为 DIVM1=8 / DIVN1=68 → 550 MHz（HCLK 272、APB 136），见 §9.1。历史：`.ioc` 原为 192 MHz，代码是 550 MHz（见 §2）。
 5. **工具开箱即错**：
    - `tools/golden_test.py:53`、`tools/live_stream.py:64` 用 `pathlib.Path(tempfile.gettempdir())` 但只 `from pathlib import Path` → 带 `--flash` 必 `NameError`；
    - `docs/REPRODUCE.md:30` 传 `--backend fbgemm`，但 `ptq_quantize.py` 没有该参数 → argparse 报错；
@@ -160,14 +170,14 @@
   - `dwt_measure.c` 6,829 B，sha256 `c279bc56640c64eea988e5e98dcea78d6e3d9e3220502436a2a0625e63640e8f`
   - `DSC_AMCNet_Deployment.uvprojx` 21,857 B，sha256 `9e1ed3985f1bc5a1201641f323689010badd03b16da0fe5d9b5ebed84fe10518`（相对路径 `../Src`、`../Drivers`、`../Middlewares/ST/AI`；`pCCUsed 6070000::V6.7::ARMCLANG`）
   - `DSC_AMCNet_Deployment.sct` 324 B，sha256 `01c1e02d2d087dfeb9931b4a3c8b4bb2fe5cad99f0757eab76b2216255fae923`
-- `.ioc` 时钟改为 544 MHz：`DIVM1=8`、`DIVN1=68`、`VCOInput1=8 MHz`、`VCO1Output/SYSCLK/Cortex=544 MHz`、`HCLK=272 MHz`、`APB1/2/3/4=136 MHz`；`FDCAN/USBFreq=48 MHz` 属未启用/HSI48，保留不动。
+- `.ioc` 时钟改为 550 MHz：`DIVM1=8`、`DIVN1=68`、`VCOInput1=8 MHz`、`VCO1Output/SYSCLK/Cortex=550 MHz`、`HCLK=275 MHz`、`APB1/2/3/4=137.5 MHz`；`FDCAN/USBFreq=48 MHz` 属未启用/HSI48，保留不动。
 - `stm32_deployment/custom_engine/README.md` 已重写为 0.951/0.960 ms、18.8%、1.90×、X-CUBE-AI 10.2.0，并指向本次收回的文件。
 - `docs/BUILD.md` 增 §1.1 记录上述收口。
 - 仍然保留：`stm32_deployment/firmware/dwt_measure.*` 旧版（已标注不可与 custom_engine 版混用）。
 
 ## 10. 文档口径（2026-10-29 18:5x 已统一到实测值）
 
-- 延迟：**0.905 ms（全零）/ 0.914 ms（真实窗）**（C1 后）；历史值 0.951/0.960（C1 前）、0.958/0.968（清理前）、0.967/0.975（P4 前）只在标注为历史时保留。
+- 延迟：**0.895 ms（全零）/ 0.904 ms（真实窗）**（C1 后）；历史值 0.951/0.960（C1 前）、0.958/0.968（清理前）、0.967/0.975（P4 前）只在标注为历史时保留。
 - 资源：**80,104 B（78.23 KB）/ 48,424 B（47.29 KB）**（C1 后）；80,904（79.01 KB）为 C1 前，87,408/48,560 为更早固件。
 - 参数：4,961（模型/论文口径）vs 4,793（`X-CUBE-AI/network_generate_report.txt`，差 168 = 7×24 偏置口径）；INT8 ONNX initializer 元素数复算为 4,869（第三种口径，勿混用）。
 - 版本：**pack = X-CUBE-AI 10.2.1**（安装目录 `~\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI\10.2.1`，ST Edge AI Core 2.2.0），运行时库文件名 `NetworkRuntime1020_CM7_Keil.lib`，固件 banner 字符串硬编码写着 “X-CUBE-AI 10.2.0” —— **以 pack 版本 10.2.1 为准**；优化等级：仓库内 `stm32_deployment/X-CUBE-AI/` 生成件是 balanced，板端实跑 time 版（激活 7,488 B，生成物未入库）。
@@ -176,7 +186,7 @@
 
 ## 11. 待办与未决
 
-- [x] **P1 一致性（2026-10-30 完成大半）**：新版 `dwt_measure.h/.c`（`uint32_t*_x100` + `SystemCoreClock`）已从部署工程收回 `stm32_deployment/custom_engine/`，`.ioc` 已改到 HSI M=8/N=68 → 544 MHz，`uvprojx`/`.sct` 一并入库（见 `docs/BUILD.md` §1.1）；仍欠 5 个脚本 bug 与 `REPORT_preview.png` 重生成。
+- [x] **P1 一致性（2026-10-30 完成大半）**：新版 `dwt_measure.h/.c`（`uint32_t*_x100` + `SystemCoreClock`）已从部署工程收回 `stm32_deployment/custom_engine/`，`.ioc` 已改到 HSI M=8/N=68 → 550 MHz，`uvprojx`/`.sct` 一并入库（见 `docs/BUILD.md` §1.1）；仍欠 5 个脚本 bug 与 `REPORT_preview.png` 重生成。
 - [x] **P2 口径统一**（2026-10-29 18:5x 完成）：以 0.951/0.960 ms、79.01/47.29 KB 为准，已重跑 `gen_report.py` 重建 `REPORT.html` + `figs/`，并同步 README / RELEASE_v1.0 / P5_RESOURCES / P1 / P4 / PROJECT_STATUS / REPRODUCE。
 - [x] **P3 数据安全（一半）**：`RML2016.10a_dict.dat` 的 sha256 已记入 `stm32_deployment/results/measured_latest.json` 与 `datasets/README.md`；`build_rml2016_from_csv.py` 的防覆盖保护**未加**（仍默认写 canonical 路径）。
 - [ ] **P4 可选**：恢复 `CHANGELOG.txt`；删 X-CUBE-AI 运行时省 Flash（需同步删 network*.c 与链接库）；per-channel 量化。
@@ -186,7 +196,7 @@
 
 ## 12. 复现路径（最短）
 
-1. 打开仓库外 `D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx`（Keil 5.24a + AC6 6.7），确认 `Device: STM32H723ZGTx`、时钟 544 MHz。
+1. 打开仓库外 `D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx`（Keil 5.24a + AC6 6.7），确认 `Device: STM32H723ZGTx`、时钟 550 MHz。
 2. 全量 Rebuild（不要只看增量日志），烧录用 `DSC_AMCNet_Deployment.hex`。
 3. 串口 115200 打开，按 `R` 进入重放：发 `R` + 256 B int8 量化输入 → 回 `L,<11 个 int8 logits>`；`golden_test.py` 对 22 条 ±1 LSB 校验。
 4. 测延迟：无命令上电进入 inference_main，串口打印 `[DWT] N=1000 mean=…`。

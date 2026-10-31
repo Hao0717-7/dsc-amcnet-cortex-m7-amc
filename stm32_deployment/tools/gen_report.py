@@ -45,7 +45,7 @@ bars = ax.bar(labels, vals, color=colors, width=0.55)
 for b, v in zip(bars, vals):
     ax.text(b.get_x() + b.get_width() / 2, v + 0.02, f"{v:.3f}", ha="center", fontsize=9)
 ax.set_ylabel("ms per inference")
-ax.set_title("Latency @544 MHz (DWT, N=1000, 10 warm-up discarded)")
+ax.set_title("Latency @550 MHz (DWT, N=1000, 10 warm-up discarded)")
 ax.set_ylim(0, 2.1)
 ax.grid(axis="y", alpha=0.25)
 fig.tight_layout()
@@ -131,7 +131,7 @@ a {{ color:#0969da; }}
 .note {{ color:#57606a; font-size:12px; }}
 </style></head><body><div class="wrap">
 <h1>DSC-AMCNet INT8 上板验收报告</h1>
-<div class="sub">NUCLEO-H723ZG · Cortex-M7 @544 MHz · 自研 INT8 SMLAD 引擎 · 生成于 {datetime.now():%Y-%m-%d %H:%M}</div>
+<div class="sub">NUCLEO-H723ZG · Cortex-M7 @550 MHz · 自研 INT8 SMLAD 引擎 · 生成于 {datetime.now():%Y-%m-%d %H:%M}</div>
 
 <div class="kpi">
   <div><b>{float(real[1]) if len(real)>1 else 0.960:.3f} ms</b><span>单次推理（真实窗口，DWT N=1000）</span></div>
