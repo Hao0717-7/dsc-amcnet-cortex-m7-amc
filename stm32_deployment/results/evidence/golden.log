@@ -1,4 +1,4 @@
-PASS 8PSK_10dB    argmax=0 (exact)
+﻿PASS 8PSK_10dB    argmax=0 (exact)
 PASS AM-DSB_10dB  argmax=1 (exact)
 PASS AM-SSB_10dB  argmax=2 (exact)
 PASS BPSK_10dB    argmax=3 (exact)

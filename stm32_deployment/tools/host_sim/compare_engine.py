@@ -28,19 +28,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
 
 import numpy as np
-import onnxruntime as ort
 
 ROOT = Path(__file__).resolve().parents[3]
 ENGINE_SRC = ROOT / "stm32_deployment/custom_engine/dsc_infer.c"
 HOST_DIR = ROOT / "stm32_deployment/tools/host_sim"
 WORK_DIR = ROOT / ".tmp/host_sim"
-DEFAULT_ENGINE = WORK_DIR / "engine.exe"
+DEFAULT_ENGINE = WORK_DIR / ("engine.exe" if os.name == "nt" else "engine")
 
 A_IN = 0.00213504443
 A_LOGITS = 0.350085318
@@ -104,6 +104,8 @@ def run_engine(engine: Path, q: np.ndarray) -> tuple[np.ndarray, float]:
 
 
 def run_ort(int8_onnx: Path, x: np.ndarray) -> tuple[np.ndarray, float]:
+    import onnxruntime as ort  # lazy: --golden mode does not need it
+
     sess = ort.InferenceSession(str(int8_onnx), providers=["CPUExecutionProvider"])
     inp, out = sess.get_inputs()[0].name, sess.get_outputs()[0].name
     batch = sess.get_inputs()[0].shape[0]
@@ -115,6 +117,29 @@ def run_ort(int8_onnx: Path, x: np.ndarray) -> tuple[np.ndarray, float]:
     return logits, time.time() - t0
 
 
+def run_golden(golden_json: Path, engine: Path) -> int:
+    """Dataset-free parity check against the committed golden vectors (22 windows)."""
+    vectors = json.loads(golden_json.read_text(encoding="utf-8"))
+    q = np.asarray([v["q"] for v in vectors], dtype=np.int8)
+    ref = np.asarray([v["logits"] for v in vectors], dtype=np.int8)
+    got, _ = run_engine(engine, q)
+    diff = np.abs(got.astype(np.int16) - ref.astype(np.int16))
+    per = [int(diff[i].max()) for i in range(len(vectors))]
+    argmax_ok = int((got.argmax(1) == ref.argmax(1)).sum())
+    summary = {
+        "mode": "golden-vectors",
+        "n_vectors": int(len(vectors)),
+        "max_abs_diff": int(diff.max()),
+        "within_1lsb": int(sum(1 for d in per if d <= 1)),
+        "argmax_equal": argmax_ok,
+    }
+    print(json.dumps(summary, indent=2))
+    ok = summary["within_1lsb"] == len(vectors) and argmax_ok == len(vectors)
+    print(("PASS" if ok else "FAIL") + f": {summary['within_1lsb']}/{len(vectors)} within +/-1 LSB, "
+          f"argmax {argmax_ok}/{len(vectors)}")
+    return 0 if ok else 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--data", default=str(ROOT / "datasets/RML2016.10a_dict.dat"))
@@ -123,11 +148,15 @@ def main() -> int:
     ap.add_argument("--engine", default="", help="prebuilt host engine (otherwise build)")
     ap.add_argument("--limit", type=int, default=0, help="only the first N test windows")
     ap.add_argument("--json", default="", help="write the summary JSON here")
+    ap.add_argument("--golden", default="", help="dataset-free check: compare against results/golden_vectors.json (|d|<=1 LSB + argmax)")
     args = ap.parse_args()
 
     engine = Path(args.engine) if args.engine else (DEFAULT_ENGINE if DEFAULT_ENGINE.exists() else build_engine(DEFAULT_ENGINE))
     if not engine.exists():
         engine = build_engine(DEFAULT_ENGINE)
+
+    if args.golden:
+        return run_golden(Path(args.golden), engine)
 
     X, y, snr = load_dataset(Path(args.data), Path(args.split))
     if args.limit:

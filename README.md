@@ -199,13 +199,23 @@ python ota_collection/collect_ota.py \
 
 换算关系：`4,793 = 4,961 − 336(BN) + 168(折叠偏置)`；`4,869 = 4,793 + 76（38 个 scale + 38 个 zero-point）`。三者都对，只是统计层面不同。
 
-### 工程一致性自动检查
+### 工程一致性自动检查（三个脚本，均可离线跑）
 
 ```bash
-python stm32_deployment/tools/check_clock_config.py
+python stm32_deployment/tools/check_clock_config.py        # .ioc + main.c 时钟/电源/串口
+python stm32_deployment/tools/check_docs_consistency.py    # 文档口径 ↔ measured_latest.json
+python stm32_deployment/tools/host_sim/compare_engine.py --golden stm32_deployment/results/golden_vectors.json
 ```
 
-校验 `.ioc` 里的 PLL/分频（HSI 64 MHz → M=8、N=68 + FRACN 6144/8192 → **550 MHz**、HCLK 275、APB 137.5）与 **CubeMX 不写进 .ioc 的四项**（`PWR_LDO_SUPPLY`、`PWR_REGULATOR_VOLTAGE_SCALE0`、`VOSRDY` 等待、`FLASH_LATENCY_4`，外加 `USART3`）是否仍在 main 源码里。当前输出全部 `OK`。
+1. **时钟**：校验 `.ioc` 里的 PLL/分频（HSI 64 MHz → M=8、N=68 + FRACN 6144/8192 → **550 MHz**、HCLK 275、APB 137.5）与
+   **CubeMX 不写进 .ioc 的四项**（`PWR_LDO_SUPPLY`、`PWR_REGULATOR_VOLTAGE_SCALE0`、`VOSRDY` 等待、`FLASH_LATENCY_4`，外加 `USART3`）。
+2. **文档口径**：检查 JSON 内部三段（P2 / C1 / 基线）自洽（资源与 C1 后构建一致、550 MHz 必须快于 544 MHz），
+   并要求 README / PROJECT_STATUS / REPORT.html 等当前口径文档含最新数字、不残留旧数字（历史文件豁免）。
+3. **引擎数值**：用 zig 现场编译主机侧引擎，对提交进仓库的 22 条 golden 向量做 ±1 LSB + argmax 比对
+   （**不需要 225 MB 数据集**，CI 也跑这个）。
+
+本机全流程（含板子）用 `stm32_deployment/tools/verify_all.ps1`，见 `docs/BUILD.md` §4.1；
+GitHub Actions 的离线 CI 在 `.github/workflows/ci.yml`（每次 push/PR 跑上面三件 + Python 语法检查）。
 
 ### 未复现 / 未验证项（如实声明）
 

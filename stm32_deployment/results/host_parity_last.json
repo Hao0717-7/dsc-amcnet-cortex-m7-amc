@@ -1,0 +1,12 @@
+{
+  "n_windows": 44000,
+  "bit_exact_fraction": 0.98775,
+  "argmax_agree": 0.9997954545454546,
+  "mean_abs_dq": 0.0025640495867768594,
+  "max_abs_dq": 1,
+  "accuracy_onnxruntime": 0.5920909090909091,
+  "accuracy_engine": 0.5920454545454545,
+  "accuracy_plus10db_engine": 0.8936457863902659,
+  "seconds_onnxruntime": 3.17,
+  "seconds_engine": 0.66
+}

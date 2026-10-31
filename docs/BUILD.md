@@ -87,6 +87,50 @@ $proj = "D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
 
 串口 `COM3`，115200 8N1。
 
+## 4.1 一键验收 + 离线 CI（2026-10-31）
+
+### 本机一键验收（需要板子 + Keil + 部署工程）
+
+```powershell
+powershell -ExecutionPolicy Bypass -File stm32_deployment	oolserify_all.ps1            # 全流程，约 6-10 分钟
+powershell ... verify_all.ps1 -LimitHost 4000 -SkipReport                                   # 快速冒烟
+powershell ... verify_all.ps1 -SkipHost -Port COM5                                          # 只跑硬件侧
+```
+
+八个阶段，任一失败则退出码非 0：
+
+| # | 阶段 | 做什么 | 失败判据 |
+|---|---|---|---|
+| 0 | preflight | 检查 UV4 / uvprojx / venv 解释器 / git commit | 缺文件 |
+| 1 | host parity | 主机侧引擎 44k 窗与 QDQ ONNX 逐位对比（可 `-LimitHost`） | bit-exact < 95% 或 argmax < 99% |
+| 2 | build | `UV4 -b` 增量编译，读 `Code=` / `Error(s)` | 有 Error |
+| 3 | flash+boot | `UV4 -f` 烧录 + 串口抓 banner/`[DWT]`，`Verify OK` | 没有 `[DWT]`/`[AI] weights=`/Verify OK |
+| 4 | golden | `golden_test.py` 22 条向量（±1 LSB + argmax） | 非 22/22 |
+| 5 | replay | `p0_replay.py --n 300` | n_ok≠300 或 argmax≠300 |
+| 6 | stream | `live_stream.py --n 20`（921600 流式） | 20 个窗未全部返回 |
+| 7 | latency | 复位后 `measure_latency.py` 抓 `[DWT]` → `docs/evidence/latency_dscamcnet_int8.csv` | CSV 少于 2 行 |
+| 8 | report | `gen_report.py` 重生成 `docs/REPORT.html` + figs | 脚本失败 |
+
+产物：8 份日志在 `stm32_deployment/results/evidence/`，机器可读汇总在
+`stm32_deployment/results/verify_last.json`（schema `dsc-amcnet-verify-v1`）。
+
+> 解释器说明：脚本统一用 `D:\APP\Pytorch\Scripts\python.exe`（含 numpy / onnx / onnxruntime /
+> pyserial / matplotlib / ziglang），不再依赖 PATH 里的 `python`——后者在不同终端会解析到不同
+> 解释器，曾导致 `ModuleNotFoundError: serial`。
+
+### 离线 CI（无板子，GitHub Actions）
+
+`.github/workflows/ci.yml` 在每次 push / PR 跑四项（ubuntu，约 2 分钟）：
+
+1. `check_clock_config.py`：校验 `.ioc` 的 550 MHz 分频 + `main.c` 里 CubeMX 不保存的补丁；
+2. `compare_engine.py --golden stm32_deployment/results/golden_vectors.json`：用 zig 现场编译主机侧引擎，
+   对提交进仓库的 22 条 golden 向量做 ±1 LSB + argmax 比对（**不需要 225 MB 数据集**）；
+3. `compileall`：全部 Python 脚本语法检查；
+4. `check_docs_consistency.py`：文档口径 ↔ `measured_latest.json` 一致性巡检
+   （必含当前数字、禁止陈旧数字、JSON 内部三段自洽）。
+
+带板子的完整流程走 `hardware` job（`workflow_dispatch` + 仓库变量 `HW_CI=true` + self-hosted Windows runner）。
+
 ## 5. 验收清单
 
 1. 串口出现 `[UART] formatter test: int=-42 ...`

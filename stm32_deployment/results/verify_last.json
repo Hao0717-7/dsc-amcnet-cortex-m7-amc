@@ -1,0 +1,49 @@
+﻿{
+    "schema":  "dsc-amcnet-verify-v1",
+    "generated":  "2026-10-31T11:00:00",
+    "commit":  "16b1af2",
+    "port":  "COM3",
+    "all_passed":  true,
+    "latency":  {
+                    "zero_ms":  "0.895",
+                    "real_ms":  "0.904"
+                },
+    "stages":  {
+                   "preflight":  {
+                                     "ok":  true,
+                                     "detail":  "HEAD=16b1af2 port=COM3"
+                                 },
+                   "host parity":  {
+                                       "ok":  true,
+                                       "detail":  "n=44000 bit-exact=98.775% argmax=99.980% (exit=0)"
+                                   },
+                   "build":  {
+                                 "ok":  true,
+                                 "detail":  "Code=60844B errors=0 warnings=481"
+                             },
+                   "flash+boot":  {
+                                      "ok":  true,
+                                      "detail":  "zero=0.895 ms real=0.904 ms verify_ok=True"
+                                  },
+                   "golden":  {
+                                  "ok":  true,
+                                  "detail":  "passed=22/22 (exit=0)"
+                              },
+                   "replay":  {
+                                  "ok":  true,
+                                  "detail":  "n_ok=300 exact=297 argmax=300"
+                              },
+                   "stream":  {
+                                  "ok":  true,
+                                  "detail":  "windows=20/20 acc=0.650 compute=916.6us"
+                              },
+                   "latency CSV":  {
+                                       "ok":  true,
+                                       "detail":  "rows=2 first=2026-10-31T10:59:50.844980,1000,0.895,0.895,0.895"
+                                   },
+                   "report":  {
+                                  "ok":  true,
+                                  "detail":  "D:\\dsc-amcnet-cortex-m7-amc\\docs\\REPORT.html 112669 chars"
+                              }
+               }
+}

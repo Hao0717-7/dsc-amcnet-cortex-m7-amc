@@ -1,0 +1,69 @@
+# Offline checks: every push / PR runs the parts that need no board and no dataset.
+#
+# What runs:
+#   * clock configuration checker (.ioc + main.c: 550 MHz / FRACN / VOS0 / boost / USART3)
+#   * host-side engine build + golden-vector parity (22 vectors, |d| <= 1 LSB + argmax)
+#   * python syntax (compileall)
+#   * documentation consistency vs stm32_deployment/results/measured_latest.json
+#
+# What cannot run here (needs hardware): build/flash (Keil MDK), 44k board accuracy,
+# golden/replay/stream on COM3, real 44,000-window ORT parity (the 225 MB dataset is
+# git-ignored). Use the "hardware" job on a self-hosted Windows runner, or locally:
+#   powershell -ExecutionPolicy Bypass -File stm32_deployment\tools\verify_all.ps1
+name: offline-checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy onnx onnxruntime ziglang
+
+      - name: Clock configuration (550 MHz / FLASH_LATENCY_4 / CPU_FREQ_BOOST / USART3)
+        run: python stm32_deployment/tools/check_clock_config.py
+
+      - name: Host engine parity against committed golden vectors
+        run: python stm32_deployment/tools/host_sim/compare_engine.py --golden stm32_deployment/results/golden_vectors.json
+
+      - name: Python syntax (all scripts, no imports executed)
+        run: |
+          python -m compileall -q models quantization stm32_deployment/tools \
+              hardware_characterization datasets ota_collection
+          echo "compileall OK"
+
+      - name: Documentation consistency vs measured_latest.json
+        run: python stm32_deployment/tools/check_docs_consistency.py
+
+  # Manual, self-hosted Windows box with NUCLEO-H723ZG on COM3 + Keil MDK + the
+  # deployment project. Trigger from the Actions tab ("Run workflow").
+  hardware:
+    if: github.event_name == 'workflow_dispatch' && vars.HW_CI == 'true'
+    runs-on: [self-hosted, windows]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: One-click verification (host parity skipped here; see logs)
+        shell: powershell
+        run: stm32_deployment\tools\verify_all.ps1 -SkipHost -Port COM3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verify-evidence
+          path: |
+            stm32_deployment/results/verify_last.json
+            stm32_deployment/results/evidence/*.log

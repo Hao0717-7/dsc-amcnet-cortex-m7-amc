@@ -1,42 +1,8 @@
-
-[UART] formatter test: int=-42 uint=7 long=1234567 str=OK f3=1.235 f2=3.14
-
-=== DSC-AMCNet Inference on STM32H723ZG ===
-    Core: Cortex-M7 @ 550 MHz
-    Model: DSC-AMCNet INT8 (X-CUBE-AI 10.2.0)
-
-[AI] DSC-AMCNet INT8 initialised.
-[AI] weights=5804 B (flash) | activations=4488 B | io=1024+44 B (ram)
-[BENCH] Running 1000 inferences (10 warm-up discarded) ...
-[DWT] N=1000  mean=0.895 ms  min=0.895 ms  max=0.895 ms
-
-[RESULT] DSC-AMCNet INT8 Latency (custom SMLAD engine)
-         Mean : 0.895 ms  (paper: 1.183 ms)
-         Min  : 0.895 ms
-         Max  : 0.895 ms
-[DWT] N=1000  mean=0.904 ms  min=0.904 ms  max=0.904 ms
-
-[RESULT-SAMPLE] same engine, real QPSK(+10 dB) window
-         Mean : 0.904 ms
-         Min  : 0.904 ms
-         Max  : 0.904 ms
-
-[CLASSIFY] Starting continuous classification ...
-[     0] Pred: QAM16 | Conf: 0.645 | Latency: 904.77 us
-[     1] Pred: QAM16 | Conf: 0.645 | Latency: 904.61 us
-[     2] Pred: QAM16 | Conf: 0.645 | Latency: 904.56 us
-[     3] Pred: QAM16 | Conf: 0.645 | Latency: 904.57 us
-[     4] Pred: QAM16 | Conf: 0.645 | Latency: 904.57 us
-[     5] Pred: QAM16 | Conf: 0.645 | Latency: 904.55 us
-[     6] Pred: QAM16 | Conf: 0.645 | Latency: 904.45 us
-[     7] Pred: QAM16 | Conf: 0.645 | Latency: 904.49 us
-[     8] Pred: QAM16 | Conf: 0.645 | Latency: 904.51 us
-[     9] Pred: QAM16 | Conf: 0.645 | Latency: 904.51 us
-[    10] Pred: QAM16 | Conf: 0.645 | Latency: 904.50 us
-[    11] Pred: QAM16 | Conf: 0.645 | Latency: 904.48 us
-[    12] Pred: QAM16 | Conf: 0.645 | Latency: 904.44 us
-[    13] Pred: QAM16 | Conf: 0.645 | Latency: 904.41 us
-[    14] Pred: QAM16 | Conf: 0.645 | Latency: 904.47 us
-[    15] Pred: QAM16 | Conf: 0.645 | Latency: 904.46 us
-[    16] Pred: QAM16 | Conf: 0.645 | Latency: 904.56 us
-[ 
+﻿    Core: Cortex-M7 @ 550 MHz
+[AI] DSC-AMCNet INT8 initialised.
+[AI] weights=5804 B (flash) | activations=4488 B | io=1024+44 B (ram)
+[BENCH] Running 1000 inferences (10 warm-up discarded) ...
+[DWT] N=1000  mean=0.895 ms  min=0.895 ms  max=0.895 ms
+[RESULT] DSC-AMCNet INT8 Latency (custom SMLAD engine)
+[DWT] N=1000  mean=0.904 ms  min=0.904 ms  max=0.904 ms
+[RESULT-SAMPLE] same engine, real QPSK(+10 dB) window
