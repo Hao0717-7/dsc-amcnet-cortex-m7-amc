@@ -34,11 +34,11 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 │   ├── P5_REALTIME.md               # UART 流式链路
 │   ├── P5_RESOURCES.md              # 固件 Flash/RAM 组成、能耗缺口
 │   ├── P5_BLOCKED.md                # OTA/ULCNN/能耗为何未复现
-│   ├── COMPARISON_vs_OFFICIAL_README.md  # 官方 README 对照（544 MHz 期）
-│   ├── RELEASE_v1.0.md … v1.0.9.md  # [归档] 8 份发布说明
+│   ├── COMPARISON_vs_OFFICIAL_README.md  # 官方 README 对照（已更新到 550 MHz 口径）
+│   ├── RELEASE_v1.0.md … v1.0.9.md  # [归档] 8 份发布说明（v1.0.1 / v1.0.2 无单独文件，见 v1.0.3）
 │   ├── REPORT.html                  # [生成] 一页式证据报告
 │   ├── REPORT_preview.png           # [生成] 报告截图
-│   ├── figs/                        # [生成] 项目地图 3 张渲染图（PNG，可替换上面的 Mermaid 块）
+│   ├── figs/                        # [生成] 图 A/B/C 的 PNG 渲染（由 Mermaid 源生成）
 │   │   ├── project_flow_a.png       # 端到端流水线（图 A）
 │   │   ├── project_flow_b.png       # 引擎 int8 数据流（图 B）
 │   │   └── project_flow_c.png       # 验收与 CI（图 C）
@@ -118,7 +118,7 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 | README.md | 总览、实测 6 个数、论文对照、未复现声明 | P0 必读 |
 | PROJECT_STATUS.md | 进度、八条坑、产物约定、里程碑、限制 | P0 必读 |
 | docs/PROJECT_MEMORY.md | 最新记忆快照；与其他文档冲突以它为准 | P0 必读 |
-| docs/PROJECT_MAP.md | 3 张流程图 + 关键数字速查（本文件） | P0 必读 |
+| docs/PROJECT_MAP.md | 3 张流程图 + 关键数字速查 | P0 必读 |
 | docs/DIRECTORY.md | 目录树、索引、证据清单（本文件） | P0 必读 |
 | docs/P4_OPTIMIZATION.md | 550 MHz 时延、逐层 cycle、C1-C11 实验 | 深挖 |
 | docs/REPRODUCE.md | 数据→训练→量化→板端的复现命令 | 深挖 |

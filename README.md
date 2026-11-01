@@ -60,35 +60,46 @@ DSC-AMCNet is a lightweight neural network for **Automatic Modulation Classifica
 ```
 DSC-AMCNet/
 ├── models/
-│   ├── dsc_amcnet.py           # Model architecture (PyTorch)
+│   ├── dsc_amcnet.py           # Model (4,961 params)
 │   ├── train.py                # Training script (RML2016.10a)
+│   ├── eval_checkpoint.py      # FP32 44k evaluation (official-format log)
+│   ├── eval_ulcnn.py           # ULCNN FP32 ONNX accuracy/footprint check
 │   └── checkpoints/
-│       └── README.md           # Download links (Zenodo)
+│       └── README.md           # Download links (Zenodo) + local provenance
 ├── datasets/
-│   ├── prepare_dataset.py      # Dataset loading + locked split
+│   ├── prepare_dataset.py      # Canonical-order loader + locked split
 │   └── README.md               # Dataset acquisition instructions
 ├── quantization/
-│   ├── ptq_quantize.py         # PTQ pipeline (fbgemm → ONNX → X-CUBE-AI)
+│   ├── ptq_quantize.py         # PTQ pipeline (signed INT8 QDQ ONNX)
+│   ├── ptq_eval_log.py         # FP32 vs INT8 drop log (44k)
+│   ├── ptq_per_channel.py      # per-channel PTQ experiment (+0.19 pp)
+│   ├── compare_ptq_regen.py    # PTQ reproducibility check
+│   ├── qat_compare.py          # QAT vs PTQ experiment (negative result)
 │   ├── validate_backend.py     # qnnpack vs fbgemm validation
-│   └── qat_experiment.py       # QAT experiment (documented failure)
+│   └── qat_experiment.py       # Original QAT experiment (documented failure)
 ├── stm32_deployment/
-│   ├── firmware/
-│   │   ├── inference_main.c    # STM32 inference loop
-│   │   └── dwt_measure.c       # DWT cycle-accurate timing
-│   └── README.md               # STM32CubeIDE setup instructions
+│   ├── custom_engine/          # SMLAD INT8 engine + real firmware sources
+│   ├── tools/                  # verify_all.ps1, checkers, host_sim parity, board scripts
+│   ├── results/                # measured_latest.json, evidence logs, figs (mostly gitignored)
+│   ├── X-CUBE-AI/              # Generated baseline network (reference only)
+│   └── README.md               # Deployment guide
 ├── hardware_characterization/
-│   ├── measure_latency.py      # Serial latency logger
-│   └── analyze_flash_ram.py    # Flash/RAM parser (ST Edge AI Core)
+│   ├── measure_latency.py      # Serial latency logger (DWT)
+│   └── analyze_flash_ram.py    # Model + firmware footprint parser
 ├── ota_collection/
-│   └── collect_ota.py          # OTA capture + noise-floor-referenced SNR
+│   └── collect_ota.py          # OTA capture (hardware-blocked)
 ├── supplementary/
 │   ├── appendix_a_architecture.md   # Layer-by-layer specification
 │   ├── appendix_b_per_modulation.md # Per-class accuracy breakdown
 │   └── appendix_c_qat_failure.md    # QAT failure analysis
+├── docs/                       # PROJECT_MAP / DIRECTORY / BUILD / REPRODUCE / P0-P5 / RELEASE_* / REPORT.html
+├── .github/workflows/ci.yml    # Offline CI + manual hardware job
 ├── requirements.txt
 ├── environment.yml
 └── README.md
 ```
+
+阅读顺序建议：`docs/PROJECT_MAP.md`（三张流程图）→ `docs/DIRECTORY.md`（目录与文档索引）。
 
 ---
 
@@ -170,7 +181,7 @@ python ota_collection/collect_ota.py \
 | 官方 claim | 官方要求产物 | 本仓库状态 | 产物 / 证据 |
 |---|---|---|---|
 | FP32 85.80%（SNR≥10，`train.py` eval log） | Val acc ≥ 85.5% | ✅ 用 `models/eval_checkpoint.py` 加载仓库内 `.pt` 跑 44k：+10 dB **89.73%**、≥10 dB **88.93%**（n=11,039）、整体 59.56%；与 FP32 ONNX argmax 一致 44,000/44,000（max logit diff 3.8e-05）。权重是本地重训（Zenodo 官方 `.pt` 已损坏，见下），故不比 85.80% 这一具体数字 | `docs/evidence/fp32_eval_log.txt`、`models/checkpoints/`（权重 sha256 `f7a05c25…`） |
-| INT8 Flash 51.26 / RAM 12.09 KB（ST Edge AI Core **analyze report**） | Analyze report | ⚠️ 口径不同：官方为模型+运行时估算；本仓库为完整可烧录固件 **78.23 / 47.29 KB**（map 实测），另有 analyze report 的模型足迹（weights 5,804 B / activations 7,488 B / ram 7,755 B / MACC 163,081） | `docs/evidence/stedgeai_analyze/dscamcnet_int8_analyze_report.txt`、`docs/P5_RESOURCES.md` |
+| INT8 Flash 51.26 / RAM 12.09 KB（ST Edge AI Core **analyze report**） | Analyze report | ⚠️ 口径不同：官方为模型+运行时估算；本仓库为完整可烧录固件 **78.23 / 47.29 KB**（map 实测），另外 analyze report 的模型足迹（weights 5,804 B / activations 7,488 B / ram 7,755 B / MACC 163,081；自研引擎口径 MACC 163,615，两者差 534 ≈0.3%，cycles/MACC 以 163,615 计） | `docs/evidence/stedgeai_analyze/dscamcnet_int8_analyze_report.txt`、`docs/P5_RESOURCES.md` |
 | INT8 延迟 1.183 ms（`measure_latency.py` 串口 CSV） | Serial log / CSV | ✅ 同脚本、同判据实测 **0.895 ms（全零）/ 0.904 ms（真实窗）**，比论文快 **23.6%**（本机同为 550 MHz，可直接比较） | `docs/evidence/latency_dscamcnet_int8.csv`、`docs/P1_BENCHMARK.md` |
 | OTA 82.76%（`collect_ota.py` `.npz`） | `.npz` 结果 | ❌ 未复现：本机无 HackRF One + RTL-SDR（脚本本身还缺整窗 L2 归一化） | 仅论文声明，无产物 |
 | PTQ 掉点 <0.5%（`ptq_quantize.py` eval log） | Eval log | ✅ 实测整体 **0.35 pp**（59.5614%→59.2091%，26,207→26,052 / 44,000）；+10 dB 89.73%→89.36%（0.37 pp）；≥10 dB 0.49 pp（仍 < 0.5）。另：从 `.pt` 重跑 PTQ 可复现出同尺寸/同结构 ONNX，98 个 initializer 中 96 个逐字节相同，精度逐位一致（两处 scale 常量有 1e-7 级舍入差） | `docs/evidence/ptq_eval_log.txt`、`docs/evidence/ptq_regen_log.txt` |

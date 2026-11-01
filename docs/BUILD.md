@@ -92,12 +92,12 @@ $proj = "D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
 ### 本机一键验收（需要板子 + Keil + 部署工程）
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File stm32_deployment	oolserify_all.ps1            # 全流程，约 6-10 分钟
+powershell -ExecutionPolicy Bypass -File stm32_deployment\tools\verify_all.ps1            # 全流程，约 6-10 分钟
 powershell ... verify_all.ps1 -LimitHost 4000 -SkipReport                                   # 快速冒烟
 powershell ... verify_all.ps1 -SkipHost -Port COM5                                          # 只跑硬件侧
 ```
 
-八个阶段，任一失败则退出码非 0：
+阶段 0–8（preflight + 8 个验收阶段），任一失败则退出码非 0：
 
 | # | 阶段 | 做什么 | 失败判据 |
 |---|---|---|---|
