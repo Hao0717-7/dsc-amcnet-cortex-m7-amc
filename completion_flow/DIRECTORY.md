@@ -1,7 +1,7 @@
 # 仓库目录与阅读索引
 
 > 仓库：`D:\dsc-amcnet-cortex-m7-amc`；本文生成于 2026-11-01。
-> 文件数口径：`git ls-files` 共 **186 个跟踪文件**（本文与 PROJECT_MAP 之后为 186）；被 `.gitignore` 忽略的
+> 文件数口径：`git ls-files` 共 **186 个跟踪文件**；被 `.gitignore` 忽略的
 > 数据/ONNX/日志/缓存不计入，见 §5。
 >
 > 标记：`[源码]` 手写代码或脚本 · `[生成]` 由脚本/工具产出 ·
@@ -21,9 +21,7 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 ├── requirements.txt                 # [源码] pip 依赖
 ├── STM32H723ZG MCU/                 # [文档] 芯片数据手册/参考手册 PDF（2 份）
 ├── .github/workflows/ci.yml         # [源码] 离线 CI + 手工 hardware job
-├── docs/                            # [文档] 23 个文件 + evidence/ + figs/
-│   ├── PROJECT_MAP.md               # 3 张流程图与数字速查（新建）
-│   ├── DIRECTORY.md                 # 本文件：目录与索引（新建）
+├── docs/                            # [文档] 21 个文件 + evidence/
 │   ├── PROJECT_MEMORY.md            # 记忆快照；冲突时以它为准
 │   ├── BUILD.md                     # 部署工程重建 + 8 阶段验收 + 离线 CI
 │   ├── REPRODUCE.md                 # 端到端复现命令（数据到板端）
@@ -38,10 +36,6 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 │   ├── RELEASE_v1.0.md … v1.0.9.md  # [归档] 8 份发布说明（v1.0.1 / v1.0.2 无单独文件，见 v1.0.3）
 │   ├── REPORT.html                  # [生成] 一页式证据报告
 │   ├── REPORT_preview.png           # [生成] 报告截图
-│   ├── figs/                        # [生成] 图 A/B/C 的 PNG 渲染（由 Mermaid 源生成）
-│   │   ├── project_flow_a.png       # 端到端流水线（图 A）
-│   │   ├── project_flow_b.png       # 引擎 int8 数据流（图 B）
-│   │   └── project_flow_c.png       # 验收与 CI（图 C）
 │   └── evidence/                    # [证据] 11 个条目（10 个文件 + stedgeai_analyze/）
 │       ├── fp32_eval_log.txt、ptq_eval_log.txt、ptq_regen_log.txt
 │       ├── ptq_per_channel_log.txt、qat_eval_log.txt
@@ -49,6 +43,13 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 │       ├── latency_dscamcnet_int8.csv     # DWT 时延原始 CSV
 │       ├── mcu_golden_2026-10-30.png、mcu_live_bench_2026-10-30.png
 │       └── stedgeai_analyze/        # analyze 报告 + ulcnn 子目录
+├── completion_flow/                 # 交付物目录（本文件所在）
+│   ├── PROJECT_MAP.md               # 3 张流程图 + 关键数字速查
+│   ├── DIRECTORY.md                 # 本文件：目录与索引
+│   └── figs/                        # [生成] 图 A/B/C 的 PNG 渲染（Mermaid 源在正文里）
+│       ├── project_flow_a.png       # 端到端流水线（图 A）
+│       ├── project_flow_b.png       # 引擎 int8 数据流（图 B）
+│       └── project_flow_c.png       # 验收与 CI（图 C）
 ├── datasets/                        # 数据脚本与锁定划分
 │   ├── prepare_dataset.py           # [源码] 加载 pickle + canonical 排序
 │   ├── build_rml2016_from_csv.py    # [源码] 由 CSV 重建 pickle
@@ -118,14 +119,14 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 | README.md | 总览、实测 6 个数、论文对照、未复现声明 | P0 必读 |
 | PROJECT_STATUS.md | 进度、八条坑、产物约定、里程碑、限制 | P0 必读 |
 | docs/PROJECT_MEMORY.md | 最新记忆快照；与其他文档冲突以它为准 | P0 必读 |
-| docs/PROJECT_MAP.md | 3 张流程图 + 关键数字速查 | P0 必读 |
-| docs/DIRECTORY.md | 目录树、索引、证据清单（本文件） | P0 必读 |
+| completion_flow/PROJECT_MAP.md | 3 张流程图 + 关键数字速查 | P0 必读 |
+| completion_flow/DIRECTORY.md | 目录树、索引、证据清单（本文件） | P0 必读 |
 | docs/P4_OPTIMIZATION.md | 550 MHz 时延、逐层 cycle、C1-C11 实验 | 深挖 |
 | docs/REPRODUCE.md | 数据→训练→量化→板端的复现命令 | 深挖 |
 | docs/BUILD.md | 部署工程重建、8 阶段验收、离线 CI | 深挖 |
 | docs/P0_ACCURACY.md | 参考精度 + 5,000 窗回放对比 | 深挖 |
 | docs/P5_ACCURACY.md | 44k 板端精度、逐位一致率 | 深挖 |
-| docs/P5_REALTIME.md | UART 流式链路（300 窗旧样本） | 深挖 |
+| docs/P5_REALTIME.md | UART 流式链路（550 MHz 20 窗 + 544 MHz 300 窗历史） | 深挖 |
 | docs/P5_RESOURCES.md | 固件 Flash/RAM 组成、能耗缺口 | 深挖 |
 | docs/P5_BLOCKED.md | OTA/ULCNN/能耗为何未复现 | 深挖 |
 | docs/REPORT.html | 一页式证据报告（脚本生成） | 深挖 |
@@ -133,7 +134,7 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 | docs/RELEASE_v1.0.md | 首个端到端复现发布（0.951/0.960 期） | 归档 |
 | docs/RELEASE_v1.0.3–v1.0.8.md | 历史发布说明（6 份） | 归档 |
 | docs/P1_BENCHMARK.md | P1 基准方法（544 MHz 历史读数） | 归档 |
-| docs/COMPARISON_vs_OFFICIAL_README.md | 与官方 README 逐项对照（544 MHz 期） | 归档 |
+| docs/COMPARISON_vs_OFFICIAL_README.md | 与官方 README 逐项对照（已更新 550 MHz） | 归档 |
 | CHANGELOG.txt | 2026-10-16 旧改动记录 | 归档 |
 | stm32_deployment/README.md | 旧 CubeIDE + X-CUBE-AI 基线指南 | 归档 |
 | stm32_deployment/custom_engine/README.md | 引擎实现、重建、主机侧校验 | 深挖 |
@@ -148,6 +149,9 @@ dsc-amcnet-cortex-m7-amc/            # 仓库根；186 个跟踪文件
 ## 3. results / evidence 清单
 
 ### 3.1 权威来源（引用当前数字只看这些）
+
+> 下表未写前缀的行：`results/...` 指 `stm32_deployment/results/...`；
+> `docs/evidence/...` 指仓库内 `docs/evidence/...`。
 
 | 文件 | 内容 | 备注 |
 |---|---|---|

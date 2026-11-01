@@ -45,9 +45,9 @@ RAM 去掉 8.5 KB AI 缓冲、把栈/堆从 16 KB 收到 4.5 KB 后 ≈ **26–2
 
 - 论文给的是 0.091 mJ/inference（955.1 acc/mJ），需要测平均电流。
 - 本机没有电流表/功率分析仪（USB 设备里没有 Joulescope/Yole 等），
-  NUCLEO-H723ZG 的 IDD 跳线（JP5）也没有接测量设备，因此**无法给出可信的 mJ 数值**。
+  NUCLEO-H723ZG 的 IDD 跳线（**JP4**，原理图 MB1364 sheet 4：VDD—JP4—VDD_MCU）也没有接测量设备，因此**无法给出可信的 mJ 数值**。
 - 可复现的测量方法（留给有硬件的环境）：
-  1. 拔掉 JP5 跳线，串入 µA 级电流表或 Joulescope；
+  1. 拔掉 JP4 跳线，串入 µA 级电流表或 Joulescope；
   2. 固件循环跑同一窗口，示波器同步 DWT 起始/结束 GPIO；
   3. 积分一个推理周期的电流 → 电荷 → ×3.3 V 得 mJ；
   4. 分别记录 550 MHz 全速、WFI 空闲、以及关闭 I/D Cache 的对照。

@@ -12,7 +12,9 @@
 > int8 数据流与四个实现要点，**C** 把「本机一键验收 + 离线 CI」拆到阶段级。
 >
 > Mermaid 源在每个代码块里（GitHub 直接渲染）；图下另附 PNG 渲染版
-> （`docs/figs/project_flow_{a,b,c}.png`，由 mermaid 10.9.1 + headless Chrome 生成）。
+> （`figs/project_flow_{a,b,c}.png`，由 mermaid 10.9.1 + headless Chrome 生成）。
+>
+> 本文件与目录索引都在 `completion_flow/` 目录下（交付物目录）。
 
 ## 图 A：端到端流水线
 
@@ -80,7 +82,7 @@ flowchart TB
   88.4410%，掉点 0.35 / 0.37 / 0.49 pp（`docs/P4_OPTIMIZATION.md` §量化方案对照）。
   44k 样本里 +10 dB 共 2,219 窗、≥10 dB 共 11,039 窗（A4 口径修正后）。
 - ONNX：实测 **93 节点 / 68 个 QDQ**、int8 图 27,989 B（`README.md` 参数口径节、
-  `measured_latest.json` 的 `model` 段）。注意不是 94 节点。
+  `measured_latest.json` 的 `model` 段）。
 - 两条路径从**同一份 INT8 ONNX** 分叉：路径 1 是 X-CUBE-AI 运行时基线
   （1.827 ms，995,505 cycles，约 6.1 cycles/MACC），路径 2 是自研引擎。
   两者共用同一块 NUCLEO-H723ZG、同一个 Keil 工程；运行时库仍在链接，只用于

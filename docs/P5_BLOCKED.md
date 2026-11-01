@@ -19,7 +19,7 @@
 
 ## 3. 能耗（mJ/inference）
 
-- 需要：µA 级电流表或 Joulescope，接 NUCLEO JP5（IDD）跳线。
+- 需要：µA 级电流表或 Joulescope，接 NUCLEO-H723ZG **JP4**（IDD 跳线，VDD—JP4—VDD_MCU；原理图 MB1364 sheet 4，默认 Shunt Fitted）。
 - 现状：无测量硬件，不伪造数字；论文 0.091 mJ 仅作文献值。
 - 方法见 `docs/P5_RESOURCES.md`（积分电流 × 3.3 V / 推理次数）。
 

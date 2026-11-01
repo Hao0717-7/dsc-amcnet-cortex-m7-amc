@@ -92,14 +92,18 @@ DSC-AMCNet/
 │   ├── appendix_a_architecture.md   # Layer-by-layer specification
 │   ├── appendix_b_per_modulation.md # Per-class accuracy breakdown
 │   └── appendix_c_qat_failure.md    # QAT failure analysis
-├── docs/                       # PROJECT_MAP / DIRECTORY / BUILD / REPRODUCE / P0-P5 / RELEASE_* / REPORT.html
+├── docs/                       # BUILD / REPRODUCE / P0-P5 / RELEASE_* / REPORT.html / evidence
+├── completion_flow/            # Project map + directory index (start here)
+│   ├── PROJECT_MAP.md          # 3 flowcharts + key-numbers cheat sheet
+│   ├── DIRECTORY.md            # Annotated tree + reading index
+│   └── figs/                   # Rendered PNGs of the 3 flowcharts
 ├── .github/workflows/ci.yml    # Offline CI + manual hardware job
 ├── requirements.txt
 ├── environment.yml
 └── README.md
 ```
 
-阅读顺序建议：`docs/PROJECT_MAP.md`（三张流程图）→ `docs/DIRECTORY.md`（目录与文档索引）。
+阅读顺序建议：`completion_flow/PROJECT_MAP.md`（三张流程图）→ `completion_flow/DIRECTORY.md`（目录与文档索引）。
 
 ---
 

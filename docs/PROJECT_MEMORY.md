@@ -88,14 +88,14 @@
   - ⚠️ 部署工程根目录的 `firmware_DSC_AMCNet_INT8.hex`（07:27，241,673 B）是**旧构建**，不要用它。
 - 仓库内 `stm32_deployment/custom_engine/` 是固件源码（app_main.c、app_inference_main.c、dsc_infer.c/h、dsc_model_data.h、retarget_keil_h723.c、test_sample.h、.ioc）。
 - 证据：`stm32_deployment/results/evidence/`（build/flash/golden/serial_boot/stream 5 份日志）。
-- 一页式报告：`docs/REPORT.html`（+ `docs/REPORT_preview.png`、`docs/figs/*.png`、生成脚本 `stm32_deployment/tools/gen_report.py`）。
+- 一页式报告：`docs/REPORT.html`（+ `docs/REPORT_preview.png`、`stm32_deployment/results/figs/*.png`、生成脚本 `stm32_deployment/tools/gen_report.py`）。
 
 ## 8. 证据链现状
 
 **可信**：44k 59.2045%/98.80%、golden 22/22 与 15:27 烧录、15:52 构建、15:54 采集的那版固件一致；**0.951/0.960 ms、79.01/47.29 KB** 是该版读数，**C1 后**（2026-10-30 22:33 构建、22:36 烧录）为 **0.895/0.904 ms、78.23/47.29 KB、stream 916.6 µs**。
 
 **已过期 / 不可引用（2026-10-29 18:5x 已按实测重生成/改写，见 §8.1）**：
-- ~~`docs/REPORT.html`、`docs/figs/*.png`（15:28）是按旧日志（0.959/0.969）生成的~~ → 已用修正后的 `gen_report.py` 重生成（0.951/0.960、79.01/47.29 KB）。
+- ~~`docs/REPORT.html`、`stm32_deployment/results/figs/*.png`（15:28）是按旧日志（0.959/0.969）生成的~~ → 已用修正后的 `gen_report.py` 重生成（0.951/0.960、79.01/47.29 KB），2026-10-31 又按 550 MHz 重生成（0.895/0.904、78.23/47.29 KB）。
 - ~~README / RELEASE_v1.0 / P5_RESOURCES / P1 里的 85.36 KB、47.42 KB、0.968、18.2% 都是清理前口径~~ → 已统一为 79.01/47.29 KB、0.951/0.960、18.8%。
 - `evidence/build.log` 只有 4 行、`0 Warning`、`Build Time Elapsed: 00:00:00` —— 是增量空构建，不能证明全量编译（全量实际 23 warnings）。
 - `evidence/flash.log` 时间停在 15:27（烧的那一版），之后的 15:52 构建没有对应烧录记录。
