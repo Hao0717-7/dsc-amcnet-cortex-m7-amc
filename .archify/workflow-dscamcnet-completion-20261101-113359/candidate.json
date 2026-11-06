@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "DSC-AMCNet 复现工作流 · 完成状态",
+    "locale": "zh-CN",
+    "output": ".archify/workflow-dscamcnet-completion-20261101-113359/dscamcnet-completion.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "backend": { "label": "已完成步骤" },
+        "database": { "label": "数据与产物" },
+        "external": { "label": "未完成模块" }
+      }
+    }
+  },
+  "lanes": [
+    { "id": "offline", "label": "离线链路 · PC（已完成）" },
+    { "id": "board", "label": "板端实测 · NUCLEO-H723ZG @550 MHz（已完成）" },
+    { "id": "verify", "label": "验收与证据链（已完成）" },
+    { "id": "exp", "label": "实验对照 · 已完成（未改变结论）" },
+    { "id": "pending", "label": "未完成 / 可选", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "p_data", "label": "① 数据与训练", "fromCol": 0, "toCol": 1 },
+    { "id": "p_quant", "label": "② 量化与转换", "fromCol": 2, "toCol": 3 },
+    { "id": "p_build", "label": "③ 构建与上板", "fromCol": 4, "toCol": 4 },
+    { "id": "p_accept", "label": "④ 回放与验收", "fromCol": 5, "toCol": 5 }
+  ],
+  "groups": [
+    { "id": "g_pending", "label": "缺硬件或权重 · 暂缓", "lane": "pending", "fromCol": 0, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["data", "train", "ptq", "convert", "keil", "engine", "accurate", "golden", "verify_all", "report"],
+  "nodes": [
+    { "id": "data", "lane": "offline", "col": 0, "type": "database", "label": "数据集构建", "sublabel": "220,000 窗 · 官方 I/Q", "width": 156 },
+    { "id": "train", "lane": "offline", "col": 1, "type": "backend", "label": "训练", "sublabel": "+10 dB 89.73%", "width": 132 },
+    { "id": "ptq", "lane": "offline", "col": 2, "type": "backend", "label": "PTQ 量化", "sublabel": "INT8 89.36%", "width": 140 },
+    { "id": "convert", "lane": "offline", "col": 3, "type": "backend", "label": "ST Edge AI 转 C", "sublabel": "权重 5,804 B", "width": 148 },
+    { "id": "keil", "lane": "offline", "col": 4, "type": "backend", "label": "Keil 编译烧录", "sublabel": "AC6 全量 0 error", "width": 148 },
+
+    { "id": "engine", "lane": "board", "col": 4, "type": "backend", "label": "自研 SMLAD 引擎", "sublabel": "0.895 / 0.904 ms", "tag": "比论文快 23.6%", "width": 160 },
+    { "id": "accurate", "lane": "board", "col": 5, "type": "backend", "label": "44k 精度回放", "sublabel": "59.2045% vs 59.2091%", "width": 168 },
+
+    { "id": "golden", "lane": "verify", "col": 5, "type": "backend", "label": "golden 回归", "sublabel": "22/22 · ±1 LSB", "width": 148, "yOffset": -88 },
+    { "id": "verify_all", "lane": "verify", "col": 5, "type": "backend", "label": "一键验收 + CI", "sublabel": "8/8 ALL PASS", "width": 148, "yOffset": 0 },
+    { "id": "report", "lane": "verify", "col": 5, "type": "database", "label": "证据报告与发布", "sublabel": "REPORT.html · v1.0–v1.0.9", "width": 176, "yOffset": 88 },
+
+    { "id": "seeds", "lane": "exp", "col": 1, "type": "backend", "label": "C8 种子稳健性", "sublabel": "86.62–89.82%", "width": 148 },
+    { "id": "quant_exp", "lane": "exp", "col": 2, "type": "backend", "label": "A4/A5 量化对照", "sublabel": "QAT 58.82% · 回退", "width": 156 },
+    { "id": "ulcnn_exp", "lane": "exp", "col": 3, "type": "backend", "label": "A6 ULCNN 对照", "sublabel": "48.76% · 不可复现", "width": 156 },
+    { "id": "kernel_exp", "lane": "exp", "col": 4, "type": "backend", "label": "A7/C9/C11 实验", "sublabel": "均回退 · 板端不变", "width": 156 },
+
+    { "id": "ota", "lane": "pending", "col": 1, "type": "external", "label": "OTA 实采评估", "sublabel": "缺 HackRF + RTL-SDR", "width": 156 },
+    { "id": "energy", "lane": "pending", "col": 3, "type": "external", "label": "能耗实测", "sublabel": "缺电流表", "width": 140 },
+    { "id": "ulcnn_deploy", "lane": "pending", "col": 5, "type": "external", "label": "ULCNN 上板", "sublabel": "无可用权重", "width": 148 }
+  ],
+  "edges": [
+    { "id": "e_data_train", "from": "data", "to": "train", "role": "main" },
+    { "id": "e_train_ptq", "from": "train", "to": "ptq", "role": "main" },
+    { "id": "e_ptq_convert", "from": "ptq", "to": "convert", "role": "main" },
+    { "id": "e_convert_keil", "from": "convert", "to": "keil", "role": "main" },
+    { "id": "e_keil_engine", "from": "keil", "to": "engine", "label": "烧录固件", "role": "main" },
+    { "id": "e_engine_accurate", "from": "engine", "to": "accurate", "role": "main" },
+    { "id": "e_accurate_golden", "from": "accurate", "to": "golden", "label": "实测结果", "role": "main" },
+    { "id": "e_golden_verify", "from": "golden", "to": "verify_all", "role": "main" },
+    { "id": "e_verify_report", "from": "verify_all", "to": "report", "role": "main" },
+    { "id": "e_train_seeds", "from": "train", "to": "seeds", "label": "重训 3 种子", "variant": "dashed", "role": "branch" },
+    { "id": "e_ptq_quant_exp", "from": "ptq", "to": "quant_exp", "label": "量化对照", "variant": "dashed", "role": "branch" },
+    { "id": "e_convert_ulcnn", "from": "convert", "to": "ulcnn_exp", "label": "ONNX 对照", "variant": "dashed", "role": "branch" },
+    { "id": "e_engine_kernel", "from": "engine", "to": "kernel_exp", "label": "布局 / 内核实验", "variant": "dashed", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "已验证核心数字",
+      "items": [
+        "0.895 ms（全零）/ 0.904 ms（真实窗），550 MHz，N=1000",
+        "比论文 1.183 ms 快 23.6%，比 X-CUBE-AI 1.827 ms 快 2.02×",
+        "44k 板端 59.2045% vs 参考 59.2091%；logits 逐位 98.80%",
+        "INT8 ONNX 59.2091% / +10 dB 89.36%；流式 916.6 µs/窗",
+        "资源：ROM 78.23 KB · RAM 47.29 KB"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "证据与工程化",
+      "items": [
+        "verify_all.ps1 8/8 ALL PASS；host parity 44k 逐位 98.775%",
+        "离线 CI：时钟检查 + golden 22 条 + compileall + 文档巡检",
+        "docs/REPORT.html 一页式报告；results/evidence/ 五份原始日志",
+        "发布说明 v1.0–v1.0.9；completion_flow 项目地图 + 目录索引",
+        "main 与 origin/main 同步，工作区干净"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "未完成 / 已知限制",
+      "items": [
+        "OTA 实采需 HackRF + RTL-SDR，尚未运行",
+        "能耗需电流表：只写方法，不伪造数值",
+        "ULCNN 缺可用权重与部署件，2.104 ms 无法复测",
+        "X-CUBE-AI 时代 0.2 ms 级差异仍未解释",
+        "X-CUBE-AI 运行时瘦身、per-channel 上板为可选项"
+      ]
+    }
+  ]
+}

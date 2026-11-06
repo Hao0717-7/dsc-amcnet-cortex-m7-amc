@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "207881c0-3cf7-4624-a6db-aa06bf4b0a4d",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\dsc-amcnet-cortex-m7-amc\\.archify\\workflow-dscamcnet-completion-20261101-113359\\candidate.json",
+  "output": "D:\\dsc-amcnet-cortex-m7-amc\\.archify\\workflow-dscamcnet-completion-20261101-113359\\dscamcnet-completion.html",
+  "specification": {
+    "sha256": "2048b78cd1d7c69dea13ff42d9e1dd403521df5313f7115ba11ec04a74d0b972",
+    "bytes": 6832
+  },
+  "artifact": {
+    "sha256": "6ef6f4d5aa4b5e4762e5fde362db0463f132617bdc0e536ac8473cca6eaf4a84",
+    "bytes": 772851
+  }
+}
