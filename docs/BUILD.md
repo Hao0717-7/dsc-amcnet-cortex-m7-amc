@@ -1,11 +1,11 @@
 # STM32H723ZG 部署工程说明（可复现 / 可重建）
 
-部署工程不在本仓库内，位于 `D:\DSC_AMCNet_Deployment`（CubeMX 生成 + 手工补丁）。本文记录它由什么组成、打了哪些补丁、如何重建。
+部署工程未纳入版本库，位于工作区根目录 `DSC_AMCNet_Deployment`（CubeMX 生成 + 手工补丁）。本文记录它由什么组成、打了哪些补丁、如何重建。
 
 ## 1. 工程结构
 
 ```
-D:\DSC_AMCNet_Deployment\
+DSC_AMCNet_Deployment\
 ├── DSC_AMCNet_Deployment.ioc        # CubeMX 配置（USART3 PD8/PD9、MDK-ARM）
 ├── Src\
 │   ├── main.c                       # ★ 手工补丁：550 MHz 时钟、BEACON、uart_printf、回放握手
@@ -32,7 +32,7 @@ D:\DSC_AMCNet_Deployment\
 
 | 文件 | 来源 | 说明 |
 |---|---|---|
-| `dwt_measure.c` / `dwt_measure.h` | `D:\DSC_AMCNet_Deployment` | 唯一能产生 0.895/0.904（及 C1 前 0.951/0.960）的计时实现：`uint32_t *_us_x100` 接口 + `SystemCoreClock` 按 550 MHz 换算。仓库 `stm32_deployment/firmware/dwt_measure.*` 是 X-CUBE-AI 时代旧版（`float*` + `HAL_RCC_GetHCLKFreq()` = HCLK 275 MHz），会把时间算成 2 倍，**两者不要混用** |
+| `dwt_measure.c` / `dwt_measure.h` | `DSC_AMCNet_Deployment` | 唯一能产生 0.895/0.904（及 C1 前 0.951/0.960）的计时实现：`uint32_t *_us_x100` 接口 + `SystemCoreClock` 按 550 MHz 换算。仓库 `stm32_deployment/firmware/dwt_measure.*` 是 X-CUBE-AI 时代旧版（`float*` + `HAL_RCC_GetHCLKFreq()` = HCLK 275 MHz），会把时间算成 2 倍，**两者不要混用** |
 | `DSC_AMCNet_Deployment.uvprojx` | 同上 | Keil AC6 6.7 工程：`pCCUsed 6070000::V6.7::ARMCLANG`、Stack/Heap 各 0x2000，链接 `NetworkRuntime1020_CM7_Keil.lib`（X-CUBE-AI 10.2.0） |
 | `DSC_AMCNet_Deployment.sct` | 同上 | 分散加载文件（默认分配，无特殊段） |
 | `app_main.c` / `app_inference_main.c` | 与部署工程 `Src/main.c`、`Src/inference_main.c` 逐字一致 | uvprojx 按 `../Src`、`../Inc`、`../Drivers`、`../Middlewares/ST/AI` 相对路径引用，从仓库重建时需把这些文件放回部署工程对应位置 |
@@ -46,7 +46,7 @@ D:\DSC_AMCNet_Deployment\
 3. 计时文件：必须是 `custom_engine/dwt_measure.h` 的 `uint32_t *_us_x100` 接口（`firmware/dwt_measure.h` 是旧 `float*` 版，会把时间算成 2 倍）。
 4. `uvprojx`：`<pCCUsed>6070000::V6.7::ARMCLANG</pCCUsed>`、`<uAC6>1</uAC6>`、Stack/Heap 各 `0x2000`。
 5. 串口：NUCLEO-H723ZG 用 `USART3 PD8/PD9`（ST-LINK VCP → COM3）；`USART1 PA9/PA10` 是另一块自制核心板 LXB723ZG-P1 的调试排针。
-6. 烧录镜像路径：`D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.hex`（项目根那份 `firmware_DSC_AMCNet_INT8.hex` 是旧构建，不要用）。
+6. 烧录镜像路径：`DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment/DSC_AMCNet_Deployment.hex`（项目根那份 `firmware_DSC_AMCNet_INT8.hex` 是旧构建，不要用）。
 
 ## 2. CubeMX 重新生成会丢什么
 
@@ -79,7 +79,7 @@ stedgeai generate --target stm32h7 --name network ^
 
 ```powershell
 $uv = "D:\APP\Keil5\UV4\UV4.exe"
-$proj = "D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
+$proj = "DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment.uvprojx"
 
 & $uv -b $proj -j0 -o build.log     # 编译（exit 1 仅代表有 warning）
 & $uv -f $proj -o flash.log         # 烧录（ST-Link，Verify OK）

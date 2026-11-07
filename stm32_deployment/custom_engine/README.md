@@ -37,7 +37,7 @@
 - `dsc_infer.c` / `dsc_infer.h`：引擎实现与接口（`dsc_infer_init` / `dsc_infer_run` / `dsc_infer_run_q`）。
 - `dsc_model_data.h`：从 `quantization/outputs/dscamcnet_int8.onnx` 抽出的量化权重/偏置/scale（生成方式见 `stm32_deployment/X-CUBE-AI/`）。
 - `test_sample.h`：QPSK@10 dB 参考样本（int8 q，输入 scale 0.00213504443，zp -4）。
-- `dwt_measure.c` / `dwt_measure.h`：**板端实际使用**的 DWT 计时（`uint32_t *_us_x100` 接口 + `SystemCoreClock` 按 550 MHz 换算）。2026-10-30 从 `D:\DSC_AMCNet_Deployment` 原样收回仓库，只修正了头注释里一处与实现不符的旧描述。
+- `dwt_measure.c` / `dwt_measure.h`：**板端实际使用**的 DWT 计时（`uint32_t *_us_x100` 接口 + `SystemCoreClock` 按 550 MHz 换算）。2026-10-30 从 `DSC_AMCNet_Deployment` 原样收回仓库，只修正了头注释里一处与实现不符的旧描述。
 - `DSC_AMCNet_Deployment.uvprojx` / `DSC_AMCNet_Deployment.sct`：产出 0.895/0.904 ms（C1 后；旧版 0.951/0.960）的 Keil AC6 工程配置与分散加载文件；其中的相对路径（`../Src`、`../Inc`、`../Drivers`、`../Middlewares/ST/AI`）按部署工程布局书写，重建说明见 `docs/BUILD.md` §1.1。
 
 ⚠️ `stm32_deployment/firmware/dwt_measure.*` 是 **X-CUBE-AI 时代的旧版**（`float*` 接口，µs 换算用
@@ -46,7 +46,7 @@
 
 ## 工程文件的完整度（2026-10-30 补齐）
 
-下表说明本目录文件与仓库外部署工程 `D:\DSC_AMCNet_Deployment` 的对应关系，以及 clone 后还差什么才能编译。
+下表说明本目录文件与未纳入版本库的部署工程 `DSC_AMCNet_Deployment` 的对应关系，以及 clone 后还差什么才能编译。
 
 | 本目录文件 | 部署工程 | 说明 |
 |---|---|---|

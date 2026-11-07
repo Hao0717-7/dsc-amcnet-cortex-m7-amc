@@ -8,11 +8,15 @@
         .\build_flash.ps1 -Port COM5
 #>
 param(
-    [string]$Project = "D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
+    [string]$Project = "",
     [string]$Port = "COM3",
     [int]$CaptureSeconds = 25,
     [switch]$SkipBuild
 )
+
+if (-not $Project) {
+    $Project = Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) "DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
+}
 
 $ErrorActionPreference = "Stop"
 $uv = "D:\APP\Keil5\UV4\UV4.exe"

@@ -44,7 +44,7 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 
 ## 4. 固件
 
-- 部署工程：`D:\DSC_AMCNet_Deployment`（结构见 `docs/BUILD.md`）
+- 部署工程：`DSC_AMCNet_Deployment`（结构见 `docs/BUILD.md`）
 - 补丁源码快照：`stm32_deployment/custom_engine/`（`app_main.c`、`app_inference_main.c`、`dsc_infer.c`、`retarget_keil_h723.c`、`startup_stm32h723xx.s`）
 - 一键构建+烧录+抓串口：`stm32_deployment/tools/build_flash.ps1`
 
@@ -85,5 +85,5 @@ python stm32_deployment/tools/p0_replay.py --n 5000 --flash
 ## 8. 已知限制
 
 - 板端精度验收已跑全量 44,000 窗口（`p5_accuracy_44k.json`，59.2045% vs 参考 59.2091%）；早期 5,000 子集只是一次抽样复核。
-- `D:\DSC_AMCNet_Deployment` 不在仓库内；CubeMX 重新生成会覆盖 `Src/main.c`，补丁清单见 `docs/BUILD.md`。
+- `DSC_AMCNet_Deployment/` 未纳入版本库；CubeMX 重新生成会覆盖 `Src/main.c`，补丁清单见 `docs/BUILD.md`。
 - OTA 链路未验证（需 HackRF + RTL-SDR）。

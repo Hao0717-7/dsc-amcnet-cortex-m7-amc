@@ -3,7 +3,7 @@
 > 本文件是 **2026-10-29 18:16** 的记忆恢复记录：把「之前在仓库里做过的进度」按**目前最新、已核实**的证据重新固化下来，
 > 供后续会话直接接手，不必再次全文通读。
 >
-> 事实来源：仓库 `D:\dsc-amcnet-cortex-m7-amc`（main = `f4e10cd`）+ 仓库外部署工程 `D:\DSC_AMCNet_Deployment` + `stm32_deployment/results/evidence/*` 串口/构建日志。
+> 事实来源：仓库 `D:\dsc-amcnet-cortex-m7-amc`（main = `f4e10cd`）+ 未纳入版本库的部署工程 `DSC_AMCNet_Deployment` + `stm32_deployment/results/evidence/*` 串口/构建日志。
 > 与 `PROJECT_STATUS.md`、README、docs/*.md 冲突之处，**以本文件为准**（冲突原因见 §9）。
 > 本次只新增本文件，未修改任何既有文件；所有测量数字均来自真实构建与真实串口日志，没有推算或伪造。
 
@@ -83,7 +83,7 @@
 ## 7. 工程与产物位置
 
 - 仓库（git，`main` = `f4e10cd`）：数据/训练/量化/文档/固件源码快照/工具/结果。
-- **实际编译烧录的工程在仓库外**：`D:\DSC_AMCNet_Deployment`（Keil MDK-ARM，AC6 6.7）。
+- **实际编译烧录的工程未纳入版本库**：`DSC_AMCNet_Deployment`（Keil MDK-ARM，AC6 6.7）。
   - 当前产物：`MDK-ARM\DSC_AMCNet_Deployment.hex`（15:52，227,633 B）；`MDK-ARM\...axf` 同步。
   - ⚠️ 部署工程根目录的 `firmware_DSC_AMCNet_INT8.hex`（07:27，241,673 B）是**旧构建**，不要用它。
 - 仓库内 `stm32_deployment/custom_engine/` 是固件源码（app_main.c、app_inference_main.c、dsc_infer.c/h、dsc_model_data.h、retarget_keil_h723.c、test_sample.h、.ioc）。
@@ -176,7 +176,7 @@
 
 ### 9.1 已修复项（2026-10-30，用户批准「你做吧」）
 
-- `stm32_deployment/custom_engine/` 新增以下文件（从 `D:\DSC_AMCNet_Deployment` 原样收回；只 `dwt_measure.h` 头注释改过）：
+- `stm32_deployment/custom_engine/` 新增以下文件（从 `DSC_AMCNet_Deployment` 原样收回；只 `dwt_measure.h` 头注释改过）：
   - `dwt_measure.h` 2,326 B，sha256 `5d58caa4aafd19b75fd30c3033e2cd04e3a341ef1a9af1f3d8ea7a3488a81b6c`（注释已改为 `SystemCoreClock`，并注明用 `HAL_RCC_GetHCLKFreq()` 会报 2 倍）
   - `dwt_measure.c` 6,829 B，sha256 `c279bc56640c64eea988e5e98dcea78d6e3d9e3220502436a2a0625e63640e8f`
   - `DSC_AMCNet_Deployment.uvprojx` 21,857 B，sha256 `9e1ed3985f1bc5a1201641f323689010badd03b16da0fe5d9b5ebed84fe10518`（相对路径 `../Src`、`../Drivers`、`../Middlewares/ST/AI`；`pCCUsed 6070000::V6.7::ARMCLANG`）
@@ -207,7 +207,7 @@
 
 ## 12. 复现路径（最短）
 
-1. 打开仓库外 `D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx`（Keil 5.24a + AC6 6.7），确认 `Device: STM32H723ZGTx`、时钟 550 MHz。
+1. 打开未纳入版本库的 `DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment.uvprojx`（Keil 5.24a + AC6 6.7），确认 `Device: STM32H723ZGTx`、时钟 550 MHz。
 2. 全量 Rebuild（不要只看增量日志），烧录用 `DSC_AMCNet_Deployment.hex`。
 3. 串口 115200 打开，按 `R` 进入重放：发 `R` + 256 B int8 量化输入 → 回 `L,<11 个 int8 logits>`；`golden_test.py` 对 22 条 ±1 LSB 校验。
 4. 测延迟：无命令上电进入 inference_main，串口打印 `[DWT] N=1000 mean=…`。

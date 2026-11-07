@@ -2,7 +2,7 @@
 
 ## 实测 Flash / RAM（当前双模式固件）
 
-数据来源：`D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.map`
+数据来源：`DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment/DSC_AMCNet_Deployment.map`
 （2026-10-30 22:33 构建，C1 内核优化后、已移除固件调试探针）与同目录 Keil 构建报告。
 
 > 2026-10-29 15:52 构建（C1 前）为 Code 61,788 / RO 16,092 / RW 8,452 / ZI 39,972 → ROM 80,904 B（79.01 KB）。C1 只改内核：Code −944 B、RO +144 B → ROM 80,104 B（78.23 KB），RAM 不变。

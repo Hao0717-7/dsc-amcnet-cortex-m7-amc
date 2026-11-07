@@ -15,8 +15,8 @@
 |---|---|
 | 自研 INT8 引擎 | `stm32_deployment/custom_engine/dsc_infer.c/.h`、`dsc_model_data.h` |
 | 固件快照 | `stm32_deployment/custom_engine/app_main.c`、`app_inference_main.c` |
-| Keil 工程（仓库外） | `D:\DSC_AMCNet_Deployment` |
-| 固件 hex | `D:\DSC_AMCNet_Deployment\firmware_DSC_AMCNet_INT8.hex` |
+| Keil 工程（未纳入版本库） | `DSC_AMCNet_Deployment` |
+| 固件 hex | `DSC_AMCNet_Deployment/firmware_DSC_AMCNet_INT8.hex` |
 | 实测结果 | `stm32_deployment/results/`（ref_accuracy、p5_accuracy_44k、p5_stream、golden_vectors） |
 | 回归脚本 | `stm32_deployment/tools/golden_test.py` |
 

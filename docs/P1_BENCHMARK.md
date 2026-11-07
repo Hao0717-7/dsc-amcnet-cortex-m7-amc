@@ -41,4 +41,4 @@
          Mean : 0.960 ms
 ```
 
-对应源码：`D:\DSC_AMCNet_Deployment\Src\inference_main.c`（两段 `DWT_BenchmarkN(run_custom_once, 1000, ...)`）。
+对应源码：`DSC_AMCNet_Deployment/Src/inference_main.c`（两段 `DWT_BenchmarkN(run_custom_once, 1000, ...)`）。

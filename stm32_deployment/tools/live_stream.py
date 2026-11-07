@@ -51,7 +51,7 @@ def main():
     ap.add_argument("--flash", action="store_true", help="flash first so 'S' lands in the 1.5 s boot window")
     ap.add_argument("--uv4", default=r"D:\APP\Keil5\UV4\UV4.exe",
                     help="UV4.exe path used by --flash")
-    ap.add_argument("--project", default=r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx",
+    ap.add_argument("--project", default=str(ROOT / "DSC_AMCNet_Deployment" / "MDK-ARM" / "DSC_AMCNet_Deployment.uvprojx"),
                     help="Keil .uvprojx path used by --flash")
     args = ap.parse_args()
 

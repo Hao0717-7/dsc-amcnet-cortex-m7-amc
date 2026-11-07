@@ -23,13 +23,13 @@ import numpy as np
 import onnx
 import onnxruntime as ort
 
-ROOT = Path(r"D:\dsc-amcnet-cortex-m7-amc")
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "stm32_deployment" / "tools"))
 import p0_replay as R  # noqa: E402  (load_rml / l2n / quant)
 
 FP32 = ROOT / "quantization" / "outputs" / "dscamcnet_fp32.onnx"
 INT8 = ROOT / "quantization" / "outputs" / "dscamcnet_int8.onnx"
-MAP = Path(r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.map")
+MAP = ROOT / "DSC_AMCNet_Deployment" / "MDK-ARM" / "DSC_AMCNet_Deployment" / "DSC_AMCNet_Deployment.map"
 CLASSES = R.CLASSES
 
 

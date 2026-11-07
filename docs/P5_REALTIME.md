@@ -27,7 +27,7 @@ host (PC)                    board (STM32H723, 550 MHz)
 进入方式有两种：上电 1.5 s 内收到 `'S'`，或在分类循环中随时收到 `'S'`（循环每 10 ms 轮询一次）。
 `'R'` 仍用于 P0 的 int8 回放（`L,q0..q10`）。
 
-## 固件改动（`D:\DSC_AMCNet_Deployment`）
+## 固件改动（`DSC_AMCNet_Deployment`）
 
 - `Src/main.c`
   - `normalize_l2()`：256 点窗口 L2 归一化（与训练/评测一致）。

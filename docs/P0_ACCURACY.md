@@ -16,7 +16,7 @@
 
 ## 2. 板端回放验证（自研 SMLAD 引擎）
 
-- 固件：`D:\DSC_AMCNet_Deployment`，回放模式（UART：`R` + 256 字节 int8 → `L,q0..q10`）
+- 固件：`DSC_AMCNet_Deployment`，回放模式（UART：`R` + 256 字节 int8 → `L,q0..q10`）
 - 脚本：`stm32_deployment/tools/p0_replay.py --n 5000 --flash --seed 2`
 - 参考侧使用**反量化后的 q 输入**喂 ORT，保证与板端看到的数据完全一致（公平对比）
 - 结果文件：`stm32_deployment/results/p0_replay_compare.json`

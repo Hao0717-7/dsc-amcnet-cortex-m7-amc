@@ -36,7 +36,7 @@ $ErrorActionPreference = "Continue"
 
 $Root   = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)   # ...\dsc-amcnet-cortex-m7-amc
 
-$Proj   = "D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
+$Proj   = Join-Path $Root "DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx"
 
 $UV4    = "D:\APP\Keil5\UV4\UV4.exe"
 

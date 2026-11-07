@@ -57,3 +57,10 @@ _doc/*.docx
 
 # ST Edge AI analyze debug dump (large, regenerated on demand)
 *_c_info.json
+
+# Full CubeMX/Keil deployment project (109 MB: vendor HAL/CMSIS + board
+# schematics + build outputs). Kept inside the workspace for on-board work,
+# but not version-controlled — the reproducible subset (ioc / uvprojx / sct /
+# firmware sources) is tracked under stm32_deployment/custom_engine/ and
+# stm32_deployment/firmware/.
+DSC_AMCNet_Deployment/

@@ -7,7 +7,7 @@
 
 ## 本版做了什么
 
-1. **把部署工程的 8 个工程胶水文件收进仓库**（`stm32_deployment/custom_engine/`，与 `D:\DSC_AMCNet_Deployment`
+1. **把部署工程的 8 个工程胶水文件收进仓库**（`stm32_deployment/custom_engine/`，与 `DSC_AMCNet_Deployment`
    逐字节相同）：`main.h`、`stm32h7xx_hal_conf.h`、`stm32h7xx_it.h/.c`、`stm32h7xx_hal_msp.c`、
    `system_stm32h7xx.c`、`uart_printf.h`、`inference_main.h`。加上 v1.0.1 收进来的
    `dwt_measure.c/.h`、`uvprojx`、`.sct`、`.ioc`，仓库里已有「0.951/0.960 ms 那份固件」的全部手写源码；

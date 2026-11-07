@@ -25,7 +25,7 @@ OUT = ROOT / "stm32_deployment" / "results"
 OUT.mkdir(parents=True, exist_ok=True)
 A_IN = 0.00213504443
 UV4 = Path(r"D:\APP\Keil5\UV4\UV4.exe")
-PROJ = Path(r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.uvprojx")
+PROJ = ROOT / "DSC_AMCNet_Deployment" / "MDK-ARM" / "DSC_AMCNet_Deployment.uvprojx"
 
 CLASSES = ["8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK", "GFSK",
            "PAM4", "QAM16", "QAM64", "QPSK", "WBFM"]

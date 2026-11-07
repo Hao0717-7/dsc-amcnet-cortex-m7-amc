@@ -24,7 +24,7 @@ import numpy as np
 import onnx
 import onnxruntime as ort
 
-ROOT = Path(r"D:\dsc-amcnet-cortex-m7-amc")
+ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "datasets" / "RML2016.10a_dict.dat"
 SPLIT = ROOT / "datasets" / "split_indices.npz"
 CKPT = ROOT / "models" / "checkpoints" / "dscamcnet_best.pt"
@@ -32,7 +32,7 @@ ONNX_FP32 = ROOT / "quantization" / "outputs" / "dscamcnet_fp32.onnx"
 ONNX_INT8 = ROOT / "quantization" / "outputs" / "dscamcnet_int8.onnx"
 RES = ROOT / "stm32_deployment" / "results"
 EV = RES / "evidence"
-MAP = Path(r"D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment.map")
+MAP = ROOT / "DSC_AMCNet_Deployment" / "MDK-ARM" / "DSC_AMCNet_Deployment.map"
 OUT = RES / "measured_latest.json"
 
 CLASSES = ["8PSK", "AM-DSB", "AM-SSB", "BPSK", "CPFSK", "GFSK",

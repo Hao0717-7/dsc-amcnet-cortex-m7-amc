@@ -16,7 +16,7 @@
 | PTQ 量化 | ✅ 完成 | `quantization/outputs/dscamcnet_int8.onnx` | **INT8 89.36%**，比 FP32 掉 0.37 pp |
 | 后端兼容性校验 | ✅ 通过 | `validate_backend.py` 输出 | signed int8 / IR 7 / opset 13 / QDQ 68 节点 |
 | ST Edge AI 转换 | ✅ 完成 | `stm32_deployment/X-CUBE-AI/*.c/.h` | 权重 5,804 B；仓库内为 balanced 版（激活 4,488 B），板端实跑 time 版（激活 7,488 B），MACC 163,615 |
-| CubeMX 工程 + Keil 编译 | ✅ 完成 | `D:\DSC_AMCNet_Deployment`（生成物，未纳入本仓库） | Keil AC6 6.7，0 error / 23 warning（全量构建；evidence/build.log 为增量空构建，见 §11） |
+| CubeMX 工程 + Keil 编译 | ✅ 完成 | `DSC_AMCNet_Deployment/`（工作区内，生成物，未纳入版本库） | Keil AC6 6.7，0 error / 23 warning（全量构建；evidence/build.log 为增量空构建，见 §11） |
 | X-CUBE-AI 运行时上板 | ✅ 完成 | `firmware_DSC_AMCNet_INT8.hex`（部署工程内） | 1.827–1.843 ms；其数值与 onnxruntime 不符，仅作对照基线 |
 | 自研 SMLAD 引擎上板 | ✅ 完成 | 同上（当前固件） | **0.895 / 0.904 ms**（全零 / 真实窗口；2026-10-30 C1 优化后） |
 | 精度验收（44k 回放） | ✅ 完成 | `stm32_deployment/results/p5_accuracy_44k.json` | 板端 59.20% vs 参考 59.21%，逐位一致 98.80% |
@@ -235,13 +235,13 @@ $ste = "$env:USERPROFILE\STM32Cube\Repository\Packs\STMicroelectronics\X-CUBE-AI
 | ST Edge AI Core | ✅ 2.2.0（随 X-CUBE-AI 10.2.1 提供） |
 | Keil MDK | ✅ µVision 5.24a + ARM Compiler 6.7（`D:\APP\Keil5`），STM32H7xx_DFP 4.1.3 手工安装 |
 | STM32CubeIDE / arm-none-eabi-gcc | ❌ 未安装（最终没走 CubeIDE 路线） |
-| 部署工程 | `D:\DSC_AMCNet_Deployment`（CubeMX 生成 + 手工集成 AI 与固件，不在本仓库内） |
+| 部署工程 | `DSC_AMCNet_Deployment/`（工作区内，CubeMX 生成 + 手工集成 AI 与固件，未纳入版本库） |
 | 硬件 | NUCLEO-H723ZG（板载 STLINK-V3E + VCP），COM3；OTA 还需 HackRF + RTL-SDR |
 
 ## 9. 已知限制
 
 - 板端 benchmark 输入是全零，只验证时延，未验证精度；精度核对需跑 `stedgeai validate --mode target` 或用真实样本回放。
-- 部署工程 `D:\DSC_AMCNet_Deployment` 在仓库之外，`.ioc` 中没有 X-CUBE-AI 中间件条目：在 CubeMX 里重新 Generate 会覆盖 `main.c` 的 550 MHz 时钟与 `inference_main()` 调用，也会丢 AI 集成，改配置后要重新打补丁。（2026-10-30 已收口：产生实测镜像的 `dwt_measure.{c,h}`、`uvprojx`、`.sct` 已收回 `stm32_deployment/custom_engine/`，`.ioc` 已同步到 HSI 550 MHz，详见 `docs/BUILD.md` §1.1。）
+- 部署工程 `DSC_AMCNet_Deployment/` 未纳入版本库，`.ioc` 中没有 X-CUBE-AI 中间件条目：在 CubeMX 里重新 Generate 会覆盖 `main.c` 的 550 MHz 时钟与 `inference_main()` 调用，也会丢 AI 集成，改配置后要重新打补丁。（2026-10-30 已收口：产生实测镜像的 `dwt_measure.{c,h}`、`uvprojx`、`.sct` 已收回 `stm32_deployment/custom_engine/`，`.ioc` 已同步到 HSI 550 MHz，详见 `docs/BUILD.md` §1.1。）
 - `.tmp/` 是联调期临时目录（诊断脚本、串口日志、截图），已加入 `.gitignore`，不入库。
 - 0.2 ms 级的差距尚未解释：已排除内存布局、激活对齐、优化等级、编译工具链；剩余怀疑为 int8 I/O 转换与量化图差异（见 §7）。
 - 2026-10-29 收尾提交（f4e10cd）后工作区是干净的；2026-10-30 为统一口径 + 源码收口又改了一批文件（见 `git status`），尚未提交。
@@ -257,7 +257,7 @@ X-CUBE-AI 10.2.1 的运行时是标量 C 内核（反汇编无 SMLAD/SMLAL，约
 - C1（2026-10-30）两项内核改动（均保持与原版逐位一致）：`rq()` 改 SMULL 内联汇编 + Q32 乘数（`hi + (lo>>31)`，与旧 `floor((acc*mq31+2^30)/2^31)` bit-exact）；`conv_dw3` 边界成对外提、内部循环无分支。`conv1x1` 保持基线实现（三种重构全部实测变慢，已回退）。
 - 数值：QPSK@10 dB 样本 `[MYS] 55 31 0 48 30 34 51 64 60 60 34` 与 ORT 完全相同。
 
-部署工程 `D:\DSC_AMCNet_Deployment` 的 `Src/inference_main.c` 已改为调用 `dsc_infer_run`（benchmark 与分类循环均走自研引擎），X-CUBE-AI 仅保留作对照。烧录镜像：`D:\DSC_AMCNet_Deployment\MDK-ARM\DSC_AMCNet_Deployment\DSC_AMCNet_Deployment.hex`（C1 后 0.895/0.904 ms 版；Code 60,844 B / RO 16,236 B / RW 8,452 B / ZI 39,972 B → ROM 80,104 B、RAM 48,424 B）。产生该镜像的 `dwt_measure.{c,h}`、`uvprojx`、`.sct` 已于 2026-10-30 收回 `custom_engine/`，见 `docs/BUILD.md` §1.1。
+部署工程 `DSC_AMCNet_Deployment/` 的 `Src/inference_main.c` 已改为调用 `dsc_infer_run`（benchmark 与分类循环均走自研引擎），X-CUBE-AI 仅保留作对照。烧录镜像：`DSC_AMCNet_Deployment/MDK-ARM/DSC_AMCNet_Deployment/DSC_AMCNet_Deployment.hex`（C1 后 0.895/0.904 ms 版；Code 60,844 B / RO 16,236 B / RW 8,452 B / ZI 39,972 B → ROM 80,104 B、RAM 48,424 B）。产生该镜像的 `dwt_measure.{c,h}`、`uvprojx`、`.sct` 已于 2026-10-30 收回 `custom_engine/`，见 `docs/BUILD.md` §1.1。
 
 ## 11. P0–P5 精度验收与证据（已完成，2026-10-29）
 
@@ -307,7 +307,7 @@ python D:\dsc-amcnet-cortex-m7-amc\stm32_deployment\tools\p0_replay.py --n 200
 
 **P5-1 实时数据链路（2026-10-29）**
 - 固件新增 UART 流式模式：`'S'` → 921600 → 每窗 512 B（int16 平面 IQ）→ 板端 L2/量化/推理 → `C,<cls>,<conf>,<us>,<name>`
-- `D:\DSC_AMCNet_Deployment\Src\main.c:stream_loop()`，分类循环轮询切换；
+- `DSC_AMCNet_Deployment/Src/main.c:stream_loop()`，分类循环轮询切换；
 - 300 窗口实测：板端准确率 **62.3%**（全 SNR 参考 59.2%）、板端计算 **979 µs**、往返 7.4 ms（其中 UART 5.6 ms）
 - 详见 `docs/P5_REALTIME.md`
 
